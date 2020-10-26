@@ -54,10 +54,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/anders/Test_program
+CMAKE_SOURCE_DIR = /home/anders/Hand-eye-Calibration/Test_program
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/anders/Test_program/build
+CMAKE_BINARY_DIR = /home/anders/Hand-eye-Calibration/Test_program/build
 
 #=============================================================================
 # Target rules for target CMakeFiles/Test_program.dir
@@ -66,7 +66,7 @@ CMAKE_BINARY_DIR = /home/anders/Test_program/build
 CMakeFiles/Test_program.dir/all:
 	$(MAKE) -f CMakeFiles/Test_program.dir/build.make CMakeFiles/Test_program.dir/depend
 	$(MAKE) -f CMakeFiles/Test_program.dir/build.make CMakeFiles/Test_program.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/anders/Test_program/build/CMakeFiles --progress-num=1,2 "Built target Test_program"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/home/anders/Hand-eye-Calibration/Test_program/build/CMakeFiles --progress-num=1,2 "Built target Test_program"
 .PHONY : CMakeFiles/Test_program.dir/all
 
 # Include target in all.
@@ -76,9 +76,9 @@ all: CMakeFiles/Test_program.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/Test_program.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/anders/Test_program/build/CMakeFiles 2
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/anders/Hand-eye-Calibration/Test_program/build/CMakeFiles 2
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/Test_program.dir/all
-	$(CMAKE_COMMAND) -E cmake_progress_start /home/anders/Test_program/build/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /home/anders/Hand-eye-Calibration/Test_program/build/CMakeFiles 0
 .PHONY : CMakeFiles/Test_program.dir/rule
 
 # Convenience name for target.

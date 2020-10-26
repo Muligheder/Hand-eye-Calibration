@@ -1169,10 +1169,10 @@ int main()
               //                   TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 
             drawChessboardCorners(frame, patternsize, Mat(centers), patternfound);
-            imshow("window", frame);
-            int key = cv::waitKey(0) & 0xff;
+           // imshow("window", frame);
+            //int key = cv::waitKey(0) & 0xff;
             solvePnP(Mat(obj_points), Mat(centers), cameraMatrix, distortionCoefficients, rvec, tvec);
-            cout <<"Rotation vetor = "<<" " <<endl<<endl<<rvec;
+            cout <<"Rotation vetor = "<<" " <<rvec<<endl<<endl;
             Mat R;
             Rodrigues(rvec, R); // R is 3x3
             R_target2cam.push_back(R);

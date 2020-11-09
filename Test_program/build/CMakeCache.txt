@@ -551,6 +551,9 @@ VTK_DIR:PATH=/usr/lib/cmake/vtk-6.3
 //The directory containing a CMake configuration file for realsense2.
 realsense2_DIR:PATH=/usr/local/lib/cmake/realsense2
 
+//The directory containing a CMake configuration file for ur_rtde.
+ur_rtde_DIR:PATH=/usr/lib/x86_64-linux-gnu/cmake/ur_rtde
+
 
 ########################
 # INTERNAL cache entries

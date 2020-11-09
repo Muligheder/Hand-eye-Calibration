@@ -285,6 +285,7 @@ Test_program: /usr/lib/x86_64-linux-gnu/libvtkTestingRendering-6.3.so.6.3.0
 Test_program: /usr/lib/x86_64-linux-gnu/libvtkViewsContext2D-6.3.so.6.3.0
 Test_program: /usr/lib/x86_64-linux-gnu/libvtkViewsGeovis-6.3.so.6.3.0
 Test_program: /usr/lib/x86_64-linux-gnu/libvtkWrappingJava-6.3.so.6.3.0
+Test_program: /usr/lib/x86_64-linux-gnu/librtde.so.1.3.2
 Test_program: /usr/local/lib/libopencv_shape.so.4.5.0
 Test_program: /usr/local/lib/libopencv_highgui.so.4.5.0
 Test_program: /usr/local/lib/libopencv_datasets.so.4.5.0
@@ -415,6 +416,8 @@ Test_program: /usr/lib/x86_64-linux-gnu/libvtkCommonSystem-6.3.so.6.3.0
 Test_program: /usr/lib/x86_64-linux-gnu/libvtksys-6.3.so.6.3.0
 Test_program: /usr/lib/x86_64-linux-gnu/libproj.so
 Test_program: /usr/lib/x86_64-linux-gnu/libvtkCommonCore-6.3.so.6.3.0
+Test_program: /usr/lib/x86_64-linux-gnu/libboost_system.so
+Test_program: /usr/lib/x86_64-linux-gnu/libboost_thread.so
 Test_program: CMakeFiles/Test_program.dir/link.txt
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/anders/Hand-eye-Calibration/Test_program/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable Test_program"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Test_program.dir/link.txt --verbose=$(VERBOSE)

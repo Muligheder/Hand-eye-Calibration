@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1.0)
+cmake_minimum_required(VERSION 3.5)
 
 project(Test_program)
 
@@ -24,8 +24,10 @@ include_directories(${PCL_INCLUDE_DIRS})
 link_directories(${PCL_LIBRARY_DIRS})
 add_definitions(${PCL_DEFINITIONS})
 
+find_package(ur_rtde REQUIRED)
+
 add_executable(${PROJECT_NAME} "main.cpp")
-target_link_libraries(${PROJECT_NAME} PRIVATE realsense2::realsense2 ${OpenCV_LIBS} ${PCL_LIBRARIES} ${GLFW_LIBRARIES} -lpthread -lm)
+target_link_libraries(${PROJECT_NAME} PRIVATE realsense2::realsense2 ${OpenCV_LIBS} ${PCL_LIBRARIES} ${GLFW_LIBRARIES} PRIVATE ur_rtde::rtde -lpthread -lm)
 
 
 

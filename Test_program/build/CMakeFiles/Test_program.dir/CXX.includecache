@@ -127,6 +127,22 @@ opencv2/highgui/highgui_c.h
 -
 opencv2/aruco/charuco.hpp
 -
+ur_rtde/rtde_control_interface.h
+-
+ur_rtde/rtde_receive_interface.h
+-
+ur_rtde/rtde_io_interface.h
+-
+iostream
+-
+thread
+-
+utility
+-
+thread
+-
+chrono
+-
 
 /home/anders/librealsense/examples/example.hpp
 librealsense2/rs.hpp

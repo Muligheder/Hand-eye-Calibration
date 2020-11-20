@@ -7,6 +7,7 @@
 #define __FLT128_MAX_10_EXP__ 4932
 #define __FLT_MIN__ 1.17549435082228750796873653722224568e-38F
 #define __GCC_IEC_559_COMPLEX 2
+#define vtkRenderingVolume_AUTOINIT 1(vtkRenderingVolumeOpenGL)
 #define __cpp_aggregate_nsdmi 201304
 #define __UINT_LEAST8_TYPE__ unsigned char
 #define __SIZEOF_FLOAT80__ 16
@@ -40,6 +41,7 @@
 #define __DBL_MIN_10_EXP__ (-307)
 #define __FINITE_MATH_ONLY__ 0
 #define __cpp_variable_templates 201304
+#define DISABLE_RSSDK 1
 #define SIZEOF_DPTR (sizeof(void*))
 #define __GNUC_PATCHLEVEL__ 0
 #define __FLT32_HAS_DENORM__ 1
@@ -84,11 +86,14 @@
 #define __FLT64X_EPSILON__ 1.08420217248550443400745280086994171e-19F64x
 #define __STDC_HOSTED__ 1
 #define __LDBL_HAS_INFINITY__ 1
+#define DISABLE_DAVIDSDK 1
 #define __FLT32_DIG__ 6
 #define __FLT_EPSILON__ 1.19209289550781250000000000000000000e-7F
 #define __GXX_WEAK__ 1
 #define __SHRT_WIDTH__ 16
+#define DISABLE_DSSDK 1
 #define __LDBL_MIN__ 3.36210314311209350626267781732175260e-4932L
+#define DISABLE_ENSENSO 1
 #define __DEC32_MAX__ 9.999999E96DF
 #define __cpp_threadsafe_static_init 200806
 #define __FLT64X_DENORM_MIN__ 3.64519953188247460252840593361941982e-4951F64x
@@ -109,6 +114,7 @@
 #define __FLT64X_MIN_10_EXP__ (-4931)
 #define __LDBL_HAS_QUIET_NAN__ 1
 #define __FLT64_MANT_DIG__ 53
+#define qh_QHpointer 1
 #define __GNUC__ 7
 #define __GXX_RTTI 1
 #define __pie__ 2
@@ -116,6 +122,7 @@
 #define __cpp_delegating_constructors 200604
 #define __FLT_HAS_DENORM__ 1
 #define __SIZEOF_LONG_DOUBLE__ 16
+#define vtkIOExodus_AUTOINIT 1(vtkIOParallelExodus)
 #define __BIGGEST_ALIGNMENT__ 16
 #define __STDC_UTF_16__ 1
 #define __FLT64_MAX_10_EXP__ 308
@@ -150,12 +157,14 @@
 #define __ATOMIC_HLE_ACQUIRE 65536
 #define __FLT32_HAS_QUIET_NAN__ 1
 #define __GNUG__ 7
+#define vtkIOImage_AUTOINIT 1(vtkIOMPIImage)
 #define __LONG_LONG_MAX__ 0x7fffffffffffffffLL
 #define __SIZEOF_SIZE_T__ 8
 #define __cpp_rvalue_reference 200610
 #define __cpp_nsdmi 200809
 #define __FLT64X_MIN_EXP__ (-16381)
 #define __SIZEOF_WINT_T__ 4
+#define vtkRenderingContext2D_AUTOINIT 1(vtkRenderingContextOpenGL)
 #define __LONG_LONG_WIDTH__ 64
 #define __cpp_initializer_lists 200806
 #define __FLT32_MAX_EXP__ 128
@@ -171,6 +180,7 @@
 #define __FLT64_DENORM_MIN__ 4.94065645841246544176568792868221372e-324F64
 #define __DBL_MIN__ double(2.22507385850720138309023271733240406e-308L)
 #define __PIE__ 2
+#define vtkRenderingFreeType_AUTOINIT 2(vtkRenderingFreeTypeFontConfig,vtkRenderingMatplotlib)
 #define __LP64__ 1
 #define __FLT32X_EPSILON__ 2.22044604925031308084726333618164062e-16F32x
 #define __DECIMAL_BID_FORMAT__ 1
@@ -193,8 +203,11 @@
 #define __cpp_decltype_auto 201304
 #define __GCC_ATOMIC_INT_LOCK_FREE 2
 #define __FLT128_MAX_EXP__ 16384
+#define vtkRenderingLIC_AUTOINIT 1(vtkRenderingParallelLIC)
 #define __FLT32_MANT_DIG__ 24
 #define __FLOAT_WORD_ORDER__ __ORDER_LITTLE_ENDIAN__
+#define FLANN_STATIC 1
+#define DISABLE_PNG 1
 #define __STDC_IEC_559_COMPLEX__ 1
 #define __FLT128_HAS_DENORM__ 1
 #define __FLT128_DIG__ 33
@@ -206,6 +219,7 @@
 #define __FLT32_MAX_10_EXP__ 38
 #define __INT_FAST32_TYPE__ long int
 #define __UINT_LEAST16_TYPE__ short unsigned int
+#define vtkIOParallel_AUTOINIT 1(vtkIOMPIParallel)
 #define __FLT64X_HAS_INFINITY__ 1
 #define unix 1
 #define __INT16_MAX__ 0x7fff
@@ -218,6 +232,7 @@
 #define __ELF__ 1
 #define __GCC_ASM_FLAG_OUTPUTS__ 1
 #define __FLT_RADIX__ 2
+#define vtkFiltersFlowPaths_AUTOINIT 1(vtkFiltersParallelFlowPaths)
 #define __INT_LEAST16_TYPE__ short int
 #define __LDBL_EPSILON__ 1.08420217248550443400745280086994171e-19L
 #define __UINTMAX_C(c) c ## UL
@@ -227,6 +242,7 @@
 #define __GCC_ATOMIC_WCHAR_T_LOCK_FREE 2
 #define __cpp_sized_deallocation 201309
 #define __SIZEOF_PTRDIFF_T__ 8
+#define DISABLE_LIBUSB_1_0 1
 #define __FLT32X_MANT_DIG__ 53
 #define __x86_64__ 1
 #define __FLT32X_MIN_EXP__ (-1021)
@@ -241,6 +257,7 @@
 #define __FLT64X_HAS_DENORM__ 1
 #define __DEC128_SUBNORMAL_MIN__ 0.000000000000000000000000000000001E-6143DL
 #define __FLT_HAS_INFINITY__ 1
+#define vtkIOSQL_AUTOINIT 2(vtkIOMySQL,vtkIOPostgreSQL)
 #define __cpp_unicode_literals 200710
 #define __UINT_FAST16_TYPE__ long unsigned int
 #define __DEC64_MAX__ 9.999999999999999E384DD
@@ -309,6 +326,7 @@
 #define __SSE__ 1
 #define __LDBL_MIN_EXP__ (-16381)
 #define __FLT64_MAX__ 1.79769313486231570814527423731704357e+308F64
+#define vtkIOGeometry_AUTOINIT 1(vtkIOMPIParallel)
 #define __WINT_WIDTH__ 32
 #define __INT_LEAST8_MAX__ 0x7f
 #define __FLT32X_MAX_10_EXP__ 308
@@ -371,6 +389,7 @@
 #define __STDC__ 1
 #define __FLT32X_DIG__ 15
 #define __PTRDIFF_TYPE__ long int
+#define DISABLE_PCAP 1
 #define __ATOMIC_SEQ_CST 5
 #define __UINT32_TYPE__ unsigned int
 #define __FLT32X_MIN_10_EXP__ (-307)
@@ -382,6 +401,7 @@
 #define __SSE_MATH__ 1
 #define __SIZEOF_LONG_LONG__ 8
 #define __cpp_user_defined_literals 200809
+#define vtkRenderingCore_AUTOINIT 3(vtkInteractionStyle,vtkRenderingFreeType,vtkRenderingOpenGL)
 #define __FLT128_DECIMAL_DIG__ 36
 #define __GCC_ATOMIC_LLONG_LOCK_FREE 2
 #define __FLT32X_MIN__ 2.22507385850720138309023271733240406e-308F32x

@@ -1,5 +1,5 @@
 #include "Plugin.hpp"
-
+#include "/home/anders/librealsense/examples/example.hpp" // Include short list of convenience functions for rendering
 Plugin::Plugin():
     rws::RobWorkStudioPlugin("Plugin", QIcon(":/plugin.png"))
 {
@@ -34,6 +34,27 @@ Plugin::Plugin():
     _btn5 = new QPushButton("Home robot");
     pLayout->addWidget(_btn5, row++, 0);
     connect(_btn5, SIGNAL(clicked()), this, SLOT(clickEvent()));
+
+    _btn6 = new QPushButton("Print state");
+    pLayout->addWidget(_btn6, row++, 0);
+    connect(_btn6, SIGNAL(clicked()), this, SLOT(clickEvent()));
+
+    _btn7 = new QPushButton("Print TCP");
+    pLayout->addWidget(_btn7, row++, 0);
+    connect(_btn7, SIGNAL(clicked()), this, SLOT(clickEvent()));
+
+    _btn8 = new QPushButton("Move In X");
+    pLayout->addWidget(_btn8, row++, 0);
+    connect(_btn8, SIGNAL(clicked()), this, SLOT(clickEvent()));
+
+    _btn9 = new QPushButton("Take Pictures");
+    pLayout->addWidget(_btn9, row++, 0);
+    connect(_btn9, SIGNAL(clicked()), this, SLOT(clickEvent()));
+
+    _btn10 = new QPushButton("Extrating T-Matrix");
+    pLayout->addWidget(_btn10, row++, 0);
+    connect(_btn10, SIGNAL(clicked()), this, SLOT(clickEvent()));
+
 
     pLayout->setRowStretch(row,1);
 
@@ -96,6 +117,17 @@ void Plugin::clickEvent()
         teachModeToggle();
     else if(obj == _btn5)
         startHomeRobot();
+    else if(obj == _btn6)
+        printQ();
+    else if(obj == _btn7)
+        printTCP();
+    else if(obj == _btn8)
+        MoveInToolSpace();
+    else if(obj == _btn9)
+        Take_picture();
+    else if(obj == _btn10)
+        Analyze_images();
+
 }
 
 void Plugin::stateChangedListener(const rw::kinematics::State& state)
@@ -253,6 +285,7 @@ void Plugin::RunHomeRobot()
         return;
     }
 
+
     std::cout << "Homing robot..." << std::endl;
 
     std::vector<std::vector<double>> path;
@@ -267,12 +300,99 @@ void Plugin::RunHomeRobot()
     ur_robot->moveJ(path);
 }
 
-void Plugin::printArray(std::vector<double> input)
+void Plugin::MoveInToolSpace()
 {
+    if(!ur_robot_exists)
+    {
+        std::cout << "Robot not connected..." << std::endl;
+        return;
+    }
+
+    if(ur_robot_teach_mode)
+    {
+        std::cout << "Teach mode enabled..." << std::endl;
+        return;
+    }
+
+    std::vector<double> home = addMove(MoveHome, 0.1, 0.1);
+    std::vector<double> NewX = addMove(MoveX, 0.1, 0.1);
+    std::vector<double> NewZ = addMove(MoveZ, 0.1, 0.1);
+    std::vector<double> NewY = addMove(MoveY, 0.1, 0.1);
+  //  std::vector<double> NewCrazy = addMove(Crazy, 0.1, 0.1);
+
+    std::vector<std::vector<double>> path;
+
+    path.clear();
+    path.push_back(NewZ);
+    ur_robot->moveL(path);
+    write_vector_to_file(NewZ,"test.txt");
+
+    path.clear();
+    path.push_back(NewX);
+    ur_robot->moveL(path);
+    write_vector_to_file(NewX,"test.txt");
+
+    path.clear();
+    path.push_back(NewY);
+    ur_robot->moveL(path);
+    write_vector_to_file(NewY,"test.txt");
+
+    path.clear();
+    path.push_back(home);
+    ur_robot->moveL(path);
+    write_vector_to_file(home,"test.txt");
+
+//    path.clear();
+//    path.push_back(NewCrazy);
+//    ur_robot->moveL(path);
+//    write_vector_to_file(NewCrazy,"test.txt");
+
+}
+
+void Plugin::write_vector_to_file(const std::vector<double>& myVector, std::string filename)
+{
+//    std::ofstream ofs(filename, std::ios::out | std::ofstream::binary);
+//    std::ostream_iterator<char> osi{ ofs };
+//    const char* beginByte = (char*)&myVector[0];
+
+//    const char* endByte = (char*)&myVector.back() + sizeof(double);
+//    std::copy(beginByte, endByte, osi);
+
+    std::ofstream ofs(filename, std::ios::app | std::ofstream::binary);
+    ofs << "{";
+    for(size_t i = 0; i < myVector.size()-3; i++)
+
+        ofs << myVector[i] << ", ";
+
+    ofs << myVector[myVector.size()-3]<< "}" << std::endl;
+}
+
+void Plugin::printQ()
+{
+    std::cout << "Printing Q: " << std::endl;
+    std::vector<double> const &input = ur_robot_receive->getActualQ();
     std::cout << "{ ";
     for(size_t i = 0; i < input.size()-1; i++)
         std::cout << input[i] << ", ";
     std::cout << input[input.size()-1] << " }" << std::endl;
+}
+
+void Plugin::printTCP()
+{
+    std::cout << "Printing TCP: " << std::endl;
+    std::vector<double> const &input = ur_robot_receive->getActualTCPPose();
+    std::cout << "{ ";
+    for(size_t i = 0; i < input.size()-1; i++)
+        std::cout << input[i] << ", ";
+    std::cout << input[input.size()-1] << " }" << std::endl;
+}
+
+void Plugin::printArray(std::vector<double> input)
+{
+    std::cout << "{ ";
+    for(size_t i = 0; i < input.size(); i++)
+        std::cout << input[i] << ", ";
+    std::cout << input[input.size()] << " }" << std::endl;
 }
 
 void Plugin::createPathRRTConnect(std::vector<double> from, std::vector<double> to, double epsilon, std::vector<std::vector<double>> &path, rw::kinematics::State state)
@@ -294,5 +414,180 @@ void Plugin::createPathRRTConnect(std::vector<double> from, std::vector<double> 
     }
 }
 
+void Plugin::Take_picture()
+{
+
+
+    // char tipka;
+    char key;
+    char filename[100]; // For filename
+    int  c = 1; // For filename
+    //rs2_pose pose;
+    std::cout << "starting pipe.." << std::endl;
+    // Declare RealSense pipeline, encapsulating the actual device and sensors
+    rs2::pipeline pipe;
+    // Create a configuration for configuring the pipeline with a non default profile
+    rs2::config cfg;
+    // Add pose stream
+    cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
+
+    // Start pipeline with chosen configuration
+    pipe.start(cfg);
+    std::cout << "capture frame..." << std::endl;
+
+    rs2::frameset frames;
+    //    for(int i = 0; i < 30; i++)
+    //    {
+    //        //Wait for all configured streams to produce a frame
+    //        frames = pipe.wait_for_frames();
+    //    }
+
+    while(true)
+    {
+        // std::cerr << "lets begin.." << std::endl;
+        frames = pipe.wait_for_frames();
+
+        rs2::frame color_frame = frames.get_color_frame();
+
+        // Creating OpenCV Matrix from a color image
+        cv::Mat color(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+
+        // save Image
+        if(color.empty())
+        {
+            std::cerr << "Something is wrong with the camera, could not get frame." << std::endl;
+            break;
+        }
+        usleep(5);
+        cv::imshow("Lidar Camera L515", color);
+
+        key =  cvWaitKey(25);
+
+        if( key == '1')      //CAPTURING IMAGE FROM CAM 1
+        {
+            sprintf(filename, "/home/anders/Hand-eye-Calibration/Robot_control/workcell/Images/0-%d.jpg", c);
+            imshow("CAMERA 1", color);
+            cv::imwrite(filename, color);
+            std::cout << "Cam 1 image captured   = " << c << std::endl;
+            c++;
+        }
+
+        if(key == 27)
+        {
+            std::cout << "Escape Pressed\n";
+            std::cerr << "destroy windows and ends video stream..." << std::endl;
+            cv::destroyAllWindows();
+            break;
+
+        }
+
+
+    }
+
+
+}
+
+
+void Plugin::Analyze_images()
+{
+    // Camera calibration information
+
+    std::vector<double> distortionCoefficients(5);  // camera distortion
+    distortionCoefficients[0] = 9.6349551984637724e-02;
+    distortionCoefficients[1] = -3.3260675111130217e-01;
+    distortionCoefficients[2] = 0;
+    distortionCoefficients[3] = 0;
+    distortionCoefficients[4] = 2.5833277679122602e-01;
+
+    double f_x = 1.2993539019658076e+03; // Focal length in x axis
+    double f_y = 1.2993539019658076e+03; // Focal length in y axis (usually the same?)
+    double c_x = 960; // Camera primary point x
+    double c_y = 540; // Camera primary point y
+
+    cv::Mat cameraMatrix(3, 3, CV_32FC1);
+    cameraMatrix.at<float>(0, 0) = f_x;
+    cameraMatrix.at<float>(0, 1) = 0.0;
+    cameraMatrix.at<float>(0, 2) = c_x;
+    cameraMatrix.at<float>(1, 0) = 0.0;
+    cameraMatrix.at<float>(1, 1) = f_y;
+    cameraMatrix.at<float>(1, 2) = c_y;
+    cameraMatrix.at<float>(2, 0) = 0.0;
+    cameraMatrix.at<float>(2, 1) = 0.0;
+    cameraMatrix.at<float>(2, 2) = 1.0;
+
+    cv::Mat rvec(3, 1, CV_32F), tvec(3, 1, CV_32F);
+    //
+
+    std::vector<cv::Mat> R_gripper2base;
+    std::vector<cv::Mat> t_gripper2base;
+    std::vector<cv::Mat> R_target2cam;
+    std::vector<cv::Mat> t_target2cam;
+    cv::Mat R_cam2gripper = (cv::Mat_<float>(3, 3));
+    cv::Mat t_cam2gripper = (cv::Mat_<float>(3, 1));
+
+    std::vector<std::string> fn;
+    cv::glob("/home/anders/Hand-eye-Calibration/Test_program/build/poses_and_images/images/*.bmp", fn, false);
+
+    std::vector<cv::Mat> images;
+    size_t num_images = fn.size(); //number of bmp files in images folder
+    std::cout << "number of images"<< num_images<<std::endl;
+    cv::Size patternsize(5, 7); //number of centers
+    std::vector<cv::Point2f> centers; //this will be filled by the detected centers
+    float cell_size = 30;
+    std::vector<cv::Point3f> obj_points;
+
+    R_gripper2base.reserve(num_images);
+    t_gripper2base.reserve(num_images);
+    R_target2cam.reserve(num_images);
+    t_target2cam.reserve(num_images);
+
+    for (int i = 0; i < patternsize.height; ++i)
+        for (int j = 0; j < patternsize.width; ++j)
+            obj_points.push_back(cv::Point3f(float(j*cell_size),
+                                         float(i*cell_size), 0.f));
+//cout <<"Objectpoints: " <<endl<<obj_points<<endl;
+//cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
+    for (size_t i = 0; i < num_images; i++)
+        images.push_back(cv::imread(fn[i]));
+
+
+    cv::Mat frame;
+
+    for (size_t i = 0; i < num_images; i++)
+    {
+        frame = cv::imread(fn[i]); //source image
+        cv::Mat gray;
+        cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
+
+        //  imshow("window",gray);
+        // waitKey(0);
+
+        bool patternfound = cv::findChessboardCorners(frame, patternsize, centers);
+        if (patternfound)
+        {
+          //  cornerSubPix(gray, centers, Size(1, 1), Size(-1, -1),
+            //                  TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
+
+            cv::drawChessboardCorners(frame, patternsize, cv::Mat(centers), patternfound);
+            // imshow("window", frame);
+           //int key = cv::waitKey(0) & 0xff;
+            cv::solvePnP(cv::Mat(obj_points), cv::Mat(centers), cameraMatrix, distortionCoefficients, rvec, tvec,false,cv::SOLVEPNP_ITERATIVE);
+           // cout <<"Rotation vetor = "<<endl<<" " <<rvec<<endl<<endl;
+
+
+            cv::Mat R;
+            cv::Rodrigues(rvec, R); // R is 3x3
+            R_target2cam.push_back(R);
+            t_target2cam.push_back(tvec*1);
+            cv::Mat T = cv::Mat::eye(4, 4, R.type()); // T is 4x4
+            T(cv::Range(0, 3), cv::Range(0, 3)) = R * 1; // copies R into T
+            T(cv::Range(0, 3), cv::Range(3, 4)) = tvec * 1; // copies tvec into T
+
+            std::cout << "T = " << std::endl << " " << T << std::endl << std::endl;
+
+        }
+        std::cout << patternfound << std::endl;
+    }
+}
 
 

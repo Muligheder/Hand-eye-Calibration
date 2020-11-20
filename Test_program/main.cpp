@@ -1440,7 +1440,7 @@ int main(int argc, char* argv[])
     // Target in the robot base
     std::vector<double> new_q = init_q;
     new_q[0] += 0.2;
-    print(init_q);
+    print(new_q);
     /**
     * Move asynchronously in joint space to new_q, we specify asynchronous behavior by setting the async parameter to
     * 'true'. Try to set the async parameter to 'false' to observe a default synchronous movement, which cannot be
@@ -1467,7 +1467,7 @@ int main(int argc, char* argv[])
 
     // Move to initial joint position with a regular moveJ
     rtde_control.moveJ(init_q);
-    print(init_q);
+
     // Stop the RTDE control script
     rtde_control.stopScript();
     return 0;

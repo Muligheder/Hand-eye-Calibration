@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.5)
 
 # The name of the project.
-project(eit-plugin)
+project(Robot_control)
 
 # Used to resolve absolute path names
 set(ROOT ${CMAKE_CURRENT_SOURCE_DIR})
@@ -50,12 +50,29 @@ set(CMAKE_AUTOUIC ON)
 # RTDE
 find_package(ur_rtde REQUIRED)
 
+# OpenCV
+find_package(OpenCV REQUIRED )
+
+# GLFW
+find_package(PkgConfig REQUIRED)
+pkg_search_module(GLFW REQUIRED glfw3)
+include_directories(${GLFW_INCLUDE_DIRS})
+
+# PCL
+find_package(PCL 1.2 REQUIRED)
+include_directories(${PCL_INCLUDE_DIRS})
+link_directories(${PCL_LIBRARY_DIRS})
+add_definitions(${PCL_DEFINITIONS})
+
+# RS LIBARY
+find_package(realsense2)
+
 # Add the source files to build
 set(SrcFiles Plugin.cpp Plugin.hpp Plugin.json resources.qrc)
 
 # The shared library to build:
 add_library(Plugin MODULE ${SrcFiles})
-target_link_libraries(Plugin PUBLIC ${ROBWORKSTUDIO_LIBRARIES} ${ROBWORK_LIBRARIES} PRIVATE ur_rtde::rtde)
+target_link_libraries(Plugin PUBLIC ${ROBWORKSTUDIO_LIBRARIES} ${ROBWORK_LIBRARIES} PRIVATE ur_rtde::rtde PRIVATE realsense2::realsense2 ${OpenCV_LIBS} ${PCL_LIBRARIES} ${GLFW_LIBRARIES})
 target_include_directories(Plugin PUBLIC ${ROBWORKSTUDIO_INCLUDE_DIRS} ${ROBWORK_INCLUDE_DIRS})
 
 message("-- " ${PROJECT_NAME} " done!")

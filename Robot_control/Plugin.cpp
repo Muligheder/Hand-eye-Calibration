@@ -51,9 +51,13 @@ Plugin::Plugin():
     pLayout->addWidget(_btn9, row++, 0);
     connect(_btn9, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
-    _btn10 = new QPushButton("Extrating T-Matrix");
+    _btn10 = new QPushButton("Extrating Camera T-Matrix");
     pLayout->addWidget(_btn10, row++, 0);
     connect(_btn10, SIGNAL(clicked()), this, SLOT(clickEvent()));
+
+    _btn11 = new QPushButton("Extrating Robot T-Matrix");
+    pLayout->addWidget(_btn11, row++, 0);
+    connect(_btn11, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
 
     pLayout->setRowStretch(row,1);
@@ -127,6 +131,8 @@ void Plugin::clickEvent()
         Take_picture();
     else if(obj == _btn10)
         Analyze_images();
+    else if(obj == _btn11)
+        TransformationRobot();
 
 }
 
@@ -147,9 +153,9 @@ void Plugin::connectRobot()
         std::cout << "Receive interface:\t";
         ur_robot_receive = new ur_rtde::RTDEReceiveInterface(ur_robot_ip);
         std::cout << "Connected!" << std::endl;
-        std::cout << "IO interface:\t";
-        ur_robot_io = new ur_rtde::RTDEIOInterface(ur_robot_ip);
-        std::cout << "Connected!" << std::endl;
+//        std::cout << "IO interface:\t";
+//        ur_robot_io = new ur_rtde::RTDEIOInterface(ur_robot_ip);
+//        std::cout << "Connected!" << std::endl;
 
         ur_robot_exists = true;
         std::cout << "Robot ready!" << std::endl;
@@ -351,20 +357,12 @@ void Plugin::MoveInToolSpace()
 
 void Plugin::write_vector_to_file(const std::vector<double>& myVector, std::string filename)
 {
-//    std::ofstream ofs(filename, std::ios::out | std::ofstream::binary);
-//    std::ostream_iterator<char> osi{ ofs };
-//    const char* beginByte = (char*)&myVector[0];
-
-//    const char* endByte = (char*)&myVector.back() + sizeof(double);
-//    std::copy(beginByte, endByte, osi);
-
     std::ofstream ofs(filename, std::ios::app | std::ofstream::binary);
-    ofs << "{";
-    for(size_t i = 0; i < myVector.size()-3; i++)
+    for(size_t i = 0; i < myVector.size()-1; i++)
 
-        ofs << myVector[i] << ", ";
+        ofs << myVector[i] << " ";
 
-    ofs << myVector[myVector.size()-3]<< "}" << std::endl;
+    ofs << myVector[myVector.size()-1]<< std::endl;
 }
 
 void Plugin::printQ()
@@ -390,9 +388,9 @@ void Plugin::printTCP()
 void Plugin::printArray(std::vector<double> input)
 {
     std::cout << "{ ";
-    for(size_t i = 0; i < input.size(); i++)
+    for(size_t i = 0; i < input.size()-1; i++)
         std::cout << input[i] << ", ";
-    std::cout << input[input.size()] << " }" << std::endl;
+    std::cout << input[input.size()-1] << " }" << std::endl;
 }
 
 void Plugin::createPathRRTConnect(std::vector<double> from, std::vector<double> to, double epsilon, std::vector<std::vector<double>> &path, rw::kinematics::State state)
@@ -429,7 +427,7 @@ void Plugin::Take_picture()
     // Create a configuration for configuring the pipeline with a non default profile
     rs2::config cfg;
     // Add pose stream
-    cfg.enable_stream(RS2_STREAM_COLOR, 640, 480, RS2_FORMAT_BGR8, 30);
+    cfg.enable_stream(RS2_STREAM_COLOR, 960, 540, RS2_FORMAT_BGR8, 60);
 
     // Start pipeline with chosen configuration
     pipe.start(cfg);
@@ -442,6 +440,17 @@ void Plugin::Take_picture()
     //        frames = pipe.wait_for_frames();
     //    }
 
+
+    cv::Size patternsize(6, 9); //number of centers
+    std::vector<cv::Point2f> centers; //this will be filled by the detected centers
+    double cell_size = 20;
+    std::vector<cv::Point3f> obj_points;
+    for (int i = 0; i < patternsize.height; ++i)
+        for (int j = 0; j < patternsize.width; ++j)
+            obj_points.push_back(cv::Point3f(double(j*cell_size),
+                                             double(i*cell_size), 0.f));
+
+
     while(true)
     {
         // std::cerr << "lets begin.." << std::endl;
@@ -450,7 +459,7 @@ void Plugin::Take_picture()
         rs2::frame color_frame = frames.get_color_frame();
 
         // Creating OpenCV Matrix from a color image
-        cv::Mat color(cv::Size(640, 480), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+        cv::Mat color(cv::Size(960, 540), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
 
         // save Image
         if(color.empty())
@@ -463,13 +472,25 @@ void Plugin::Take_picture()
 
         key =  cvWaitKey(25);
 
-        if( key == '1')      //CAPTURING IMAGE FROM CAM 1
+        if( key == '1')      //CAPTURING IMAGE FROM CAM
         {
-            sprintf(filename, "/home/anders/Hand-eye-Calibration/Robot_control/workcell/Images/0-%d.jpg", c);
-            imshow("CAMERA 1", color);
-            cv::imwrite(filename, color);
-            std::cout << "Cam 1 image captured   = " << c << std::endl;
-            c++;
+            bool patternfound = cv::findChessboardCorners(color, patternsize, centers);
+            if (patternfound)
+            {
+                sprintf(filename, "/home/anders/Hand-eye-Calibration/Robot_control/workcell/Images/0-%d.jpg", c);
+                cv::imwrite(filename, color);
+                cv::drawChessboardCorners(color, patternsize, cv::Mat(centers), patternfound);
+                cv::imshow("CAMERA 1", color);    
+                std::cout << "Cam 1 image captured   = " << c << std::endl;
+                std::vector<double> fromQ = ur_robot_receive->getActualTCPPose();
+
+                write_vector_to_file(fromQ,"test.txt");
+
+
+                c++;
+            }
+            std::cout << patternfound << std::endl;
+
         }
 
         if(key == 27)
@@ -486,14 +507,54 @@ void Plugin::Take_picture()
 
 
 }
+void Plugin::TransformationRobot()
+{
+    std::vector<cv::Mat> R_gripper2base;
+    std::vector<cv::Mat> t_gripper2base;
+    if(!ur_robot_exists)
+    {
+        std::cout << "Robot not connected..." << std::endl;
+        return;
+    }
+
+    if(ur_robot_teach_mode)
+    {
+        std::cout << "Teach mode enabled..." << std::endl;
+        return;
+    }
+    std::vector<double> actualL=ur_robot_receive->getActualTCPPose();
+    printArray(actualL);
+    std::cout << " <-- TCP POSE" << std::endl;
+
+    std::vector<double> RzRyRx(actualL.end() - 3, actualL.end());
+    printArray(RzRyRx);
+    std::cout << " <-- RzRyRx" << std::endl;
+
+    cv::Vec3d theta;
+
+    theta[0]=RzRyRx[0];
+    theta[1]=RzRyRx[1];
+    theta[2]=RzRyRx[2];
+    std::cout << theta << std::endl;
+
+    cv::Mat robot_rot = eulerAnglesToRotationMatrix(theta);
+    cv::Mat robot_tr = (cv::Mat_<double>(3, 1)<< actualL[0],actualL[1],actualL[2]);
+
+    t_gripper2base.push_back(robot_tr);
+    R_gripper2base.push_back(robot_rot);
+    std::cout << "R_gripper2base = " << std::endl << " " << R_gripper2base[0] << std::endl << std::endl;
+    std::cout << "t_gripper2base = " << std::endl << " " << t_gripper2base[0] << std::endl << std::endl;
+}
+
 
 
 void Plugin::Analyze_images()
 {
     // Camera calibration information
 
+    // from example
     std::vector<double> distortionCoefficients(5);  // camera distortion
-    distortionCoefficients[0] = 9.6349551984637724e-02;
+   /* distortionCoefficients[0] = 9.6349551984637724e-02;
     distortionCoefficients[1] = -3.3260675111130217e-01;
     distortionCoefficients[2] = 0;
     distortionCoefficients[3] = 0;
@@ -503,6 +564,18 @@ void Plugin::Analyze_images()
     double f_y = 1.2993539019658076e+03; // Focal length in y axis (usually the same?)
     double c_x = 960; // Camera primary point x
     double c_y = 540; // Camera primary point y
+    */
+    // My camera
+    distortionCoefficients[0] = 1.83375015854836e-01;
+    distortionCoefficients[1] = -5.65327823162079e-01;
+    distortionCoefficients[2] = -1.45305093610659e-04;
+    distortionCoefficients[3] = 5.0213176291436e-04;
+    distortionCoefficients[4] = 5.08288383483887e-01;
+
+    double f_x = 6.8233544921875e+02; // Focal length in x axis
+    double f_y = 6.82471923828125e+02; // Focal length in y axis (usually the same?)
+    double c_x = 960/2; // Camera primary point x
+    double c_y = 540/2; // Camera primary point y
 
     cv::Mat cameraMatrix(3, 3, CV_32FC1);
     cameraMatrix.at<float>(0, 0) = f_x;
@@ -531,9 +604,9 @@ void Plugin::Analyze_images()
     std::vector<cv::Mat> images;
     size_t num_images = fn.size(); //number of bmp files in images folder
     std::cout << "number of images"<< num_images<<std::endl;
-    cv::Size patternsize(5, 7); //number of centers
+    cv::Size patternsize(6, 9); //number of centers
     std::vector<cv::Point2f> centers; //this will be filled by the detected centers
-    float cell_size = 30;
+    float cell_size = 20;
     std::vector<cv::Point3f> obj_points;
 
     R_gripper2base.reserve(num_images);
@@ -559,8 +632,8 @@ void Plugin::Analyze_images()
         cv::Mat gray;
         cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
 
-        //  imshow("window",gray);
-        // waitKey(0);
+//          cv::imshow("window",gray);
+//         cv::waitKey(0);
 
         bool patternfound = cv::findChessboardCorners(frame, patternsize, centers);
         if (patternfound)
@@ -569,8 +642,8 @@ void Plugin::Analyze_images()
             //                  TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
 
             cv::drawChessboardCorners(frame, patternsize, cv::Mat(centers), patternfound);
-            // imshow("window", frame);
-           //int key = cv::waitKey(0) & 0xff;
+          //   cv::imshow("window", frame);
+          // int key = cv::waitKey(0) & 0xff;
             cv::solvePnP(cv::Mat(obj_points), cv::Mat(centers), cameraMatrix, distortionCoefficients, rvec, tvec,false,cv::SOLVEPNP_ITERATIVE);
            // cout <<"Rotation vetor = "<<endl<<" " <<rvec<<endl<<endl;
 
@@ -590,4 +663,95 @@ void Plugin::Analyze_images()
     }
 }
 
+
+cv::Mat Plugin::eulerAnglesToRotationMatrix(cv::Vec3d &theta)
+{
+    // Calculate rotation about x axis
+    cv::Mat R_x = (cv::Mat_<double>(3, 3) <<
+        1, 0, 0,
+        0, cos(theta[2]), -sin(theta[2]),
+        0, sin(theta[2]), cos(theta[2])
+        );
+
+    // Calculate rotation about y axis
+    cv::Mat R_y = (cv::Mat_<double>(3, 3) <<
+        cos(theta[1]), 0, sin(theta[1]),
+        0, 1, 0,
+        -sin(theta[1]), 0, cos(theta[1])
+        );
+
+    // Calculate rotation about z axis
+    cv::Mat R_z = (cv::Mat_<double>(3, 3) <<
+        cos(theta[0]), -sin(theta[0]), 0,
+        sin(theta[0]), cos(theta[0]), 0,
+        0, 0, 1);
+
+    // Combined rotation matrix
+    cv::Mat R = R_z * R_y * R_x;
+
+    return R;
+
+}
+
+double Plugin::rad2deg(double radian) {
+    double pi = 3.14159;
+    return(radian * (180 / pi));
+}
+
+double Plugin::deg2rad(double degree) {
+    double pi = 3.14159;
+    return(degree * (pi / 180));
+}
+
+// Checks if a matrix is a valid rotation matrix.
+bool Plugin::isRotationMatrix(cv::Mat &R)
+{
+    cv::Mat Rt;
+    cv::transpose(R, Rt);
+    cv::Mat shouldBeIdentity = Rt * R;
+    cv::Mat I = cv::Mat::eye(3, 3, shouldBeIdentity.type());
+
+    return  cv::norm(I, shouldBeIdentity) < 1e-6;
+
+}
+
+// Calculates rotation matrix to euler angles.
+cv::Vec3d Plugin::rotationMatrixToEulerAngles(cv::Mat &R)
+{
+
+    assert(isRotationMatrix(R));
+
+    double sy = sqrt(R.at<double>(0, 0) * R.at<double>(0, 0) + R.at<double>(1, 0) * R.at<double>(1, 0));
+
+    bool singular = sy < 1e-6; // If
+
+    double x, y, z;
+    if (!singular)
+    {
+        x = atan2(R.at<double>(2, 1), R.at<double>(2, 2));
+        y = atan2(-R.at<double>(2, 0), sy);
+        z = atan2(R.at<double>(1, 0), R.at<double>(0, 0));
+    }
+    else
+    {
+        x = atan2(-R.at<double>(1, 2), R.at<double>(1, 1));
+        y = atan2(-R.at<double>(2, 0), sy);
+        z = 0;
+    }
+    return cv::Vec3d(rad2deg(x), rad2deg(y), rad2deg(z));
+
+
+}
+
+cv::Mat Plugin::ReverseVector(cv::Mat &v)
+{
+
+    cv::Mat RV = cv::Mat_<float>(3,1);
+
+    RV.at<float>(0,0)=v.at<float>(0,2);
+    RV.at<float>(0,1)=v.at<float>(0,1);
+    RV.at<float>(0,2)=v.at<float>(0,0);
+
+    return RV;
+}
 

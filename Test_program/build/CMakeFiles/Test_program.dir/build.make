@@ -57,38 +57,38 @@ include CMakeFiles/Test_program.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/Test_program.dir/flags.make
 
-CMakeFiles/Test_program.dir/main.cpp.o: CMakeFiles/Test_program.dir/flags.make
-CMakeFiles/Test_program.dir/main.cpp.o: ../main.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Hand-eye-Calibration/Test_program/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Test_program.dir/main.cpp.o"
-	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Test_program.dir/main.cpp.o -c /home/anders/Hand-eye-Calibration/Test_program/main.cpp
+CMakeFiles/Test_program.dir/src/main.cpp.o: CMakeFiles/Test_program.dir/flags.make
+CMakeFiles/Test_program.dir/src/main.cpp.o: ../src/main.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Hand-eye-Calibration/Test_program/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Test_program.dir/src/main.cpp.o"
+	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Test_program.dir/src/main.cpp.o -c /home/anders/Hand-eye-Calibration/Test_program/src/main.cpp
 
-CMakeFiles/Test_program.dir/main.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Test_program.dir/main.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Hand-eye-Calibration/Test_program/main.cpp > CMakeFiles/Test_program.dir/main.cpp.i
+CMakeFiles/Test_program.dir/src/main.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Test_program.dir/src/main.cpp.i"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Hand-eye-Calibration/Test_program/src/main.cpp > CMakeFiles/Test_program.dir/src/main.cpp.i
 
-CMakeFiles/Test_program.dir/main.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Test_program.dir/main.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Hand-eye-Calibration/Test_program/main.cpp -o CMakeFiles/Test_program.dir/main.cpp.s
+CMakeFiles/Test_program.dir/src/main.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Test_program.dir/src/main.cpp.s"
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Hand-eye-Calibration/Test_program/src/main.cpp -o CMakeFiles/Test_program.dir/src/main.cpp.s
 
-CMakeFiles/Test_program.dir/main.cpp.o.requires:
+CMakeFiles/Test_program.dir/src/main.cpp.o.requires:
 
-.PHONY : CMakeFiles/Test_program.dir/main.cpp.o.requires
+.PHONY : CMakeFiles/Test_program.dir/src/main.cpp.o.requires
 
-CMakeFiles/Test_program.dir/main.cpp.o.provides: CMakeFiles/Test_program.dir/main.cpp.o.requires
-	$(MAKE) -f CMakeFiles/Test_program.dir/build.make CMakeFiles/Test_program.dir/main.cpp.o.provides.build
-.PHONY : CMakeFiles/Test_program.dir/main.cpp.o.provides
+CMakeFiles/Test_program.dir/src/main.cpp.o.provides: CMakeFiles/Test_program.dir/src/main.cpp.o.requires
+	$(MAKE) -f CMakeFiles/Test_program.dir/build.make CMakeFiles/Test_program.dir/src/main.cpp.o.provides.build
+.PHONY : CMakeFiles/Test_program.dir/src/main.cpp.o.provides
 
-CMakeFiles/Test_program.dir/main.cpp.o.provides.build: CMakeFiles/Test_program.dir/main.cpp.o
+CMakeFiles/Test_program.dir/src/main.cpp.o.provides.build: CMakeFiles/Test_program.dir/src/main.cpp.o
 
 
 # Object files for target Test_program
 Test_program_OBJECTS = \
-"CMakeFiles/Test_program.dir/main.cpp.o"
+"CMakeFiles/Test_program.dir/src/main.cpp.o"
 
 # External object files for target Test_program
 Test_program_EXTERNAL_OBJECTS =
 
-Test_program: CMakeFiles/Test_program.dir/main.cpp.o
+Test_program: CMakeFiles/Test_program.dir/src/main.cpp.o
 Test_program: CMakeFiles/Test_program.dir/build.make
 Test_program: /usr/local/lib/librealsense2.so.2.38.1
 Test_program: /usr/local/lib/libopencv_gapi.so.4.5.0
@@ -285,7 +285,7 @@ Test_program: /usr/lib/x86_64-linux-gnu/libvtkTestingRendering-6.3.so.6.3.0
 Test_program: /usr/lib/x86_64-linux-gnu/libvtkViewsContext2D-6.3.so.6.3.0
 Test_program: /usr/lib/x86_64-linux-gnu/libvtkViewsGeovis-6.3.so.6.3.0
 Test_program: /usr/lib/x86_64-linux-gnu/libvtkWrappingJava-6.3.so.6.3.0
-Test_program: /usr/lib/x86_64-linux-gnu/librtde.so.1.3.2
+Test_program: /usr/lib/x86_64-linux-gnu/librtde.so.1.3.6
 Test_program: /usr/local/lib/libopencv_shape.so.4.5.0
 Test_program: /usr/local/lib/libopencv_highgui.so.4.5.0
 Test_program: /usr/local/lib/libopencv_datasets.so.4.5.0
@@ -427,7 +427,7 @@ CMakeFiles/Test_program.dir/build: Test_program
 
 .PHONY : CMakeFiles/Test_program.dir/build
 
-CMakeFiles/Test_program.dir/requires: CMakeFiles/Test_program.dir/main.cpp.o.requires
+CMakeFiles/Test_program.dir/requires: CMakeFiles/Test_program.dir/src/main.cpp.o.requires
 
 .PHONY : CMakeFiles/Test_program.dir/requires
 

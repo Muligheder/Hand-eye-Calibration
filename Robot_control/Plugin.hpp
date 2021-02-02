@@ -85,6 +85,7 @@ private slots:
     void printQ();
     void printTCP();
     void MoveInToolSpace();
+    void TransformationRobot();
 
 
     // Start thread
@@ -110,9 +111,17 @@ private slots:
     void Take_picture();
     void Analyze_images();
 
+    // Utility functions
+    cv::Mat eulerAnglesToRotationMatrix(cv::Vec3d &theta);
+    double rad2deg(double radian);
+    double deg2rad(double degree);
+    bool isRotationMatrix(cv::Mat &R);
+    cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R);
+    cv::Mat ReverseVector(cv::Mat &v);
+
 private:
     // Qt buttons
-    QPushButton *_btn0,*_btn1,*_btn2,*_btn3,*_btn4, *_btn5, *_btn6, *_btn7, *_btn8, *_btn9, *_btn10;
+    QPushButton *_btn0,*_btn1,*_btn2,*_btn3,*_btn4, *_btn5, *_btn6, *_btn7, *_btn8, *_btn9, *_btn10, *_btn11;
 
     // RobWorkStudio interface
     rw::proximity::CollisionDetector::Ptr collisionDetector;

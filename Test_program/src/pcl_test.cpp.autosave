@@ -1,0 +1,372 @@
+//// PCL EXAMPLE WITH REALSENSE
+//#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
+//#include "/home/anders/librealsense/examples/example.hpp" // Include short list of convenience functions for rendering
+
+//#include <iostream>
+
+
+
+//using namespace std;
+
+//#include <algorithm>            // std::min, std::max
+//#include <opencv2/opencv.hpp>
+//#include <iostream>
+
+//#include <pcl/point_types.h>
+//#include <pcl/filters/passthrough.h>
+//#include <pcl/io/pcd_io.h>
+//#include <pcl/point_types.h>
+//#include <pcl/visualization/cloud_viewer.h>
+
+//#include <boost/date_time/posix_time/posix_time.hpp>
+//#include <boost/thread/thread.hpp>
+//#include <string>
+
+//typedef pcl::PointXYZRGB P_pcl;
+//typedef pcl::PointCloud<P_pcl> point_cloud;
+//typedef point_cloud::Ptr ptr_cloud;
+
+//using namespace cv;
+
+
+//// Get RGB values based on normals - texcoords, normals value [u v]
+//std::tuple<uint8_t, uint8_t, uint8_t> get_texcolor(rs2::video_frame texture, rs2::texture_coordinate texcoords)
+//{
+//    const int w = texture.get_width(), h = texture.get_height();
+
+//    // convert normals [u v] to basic coords [x y]
+//    int x = std::min(std::max(int(texcoords.u*w + .5f), 0), w - 1);
+//    int y = std::min(std::max(int(texcoords.v*h + .5f), 0), h - 1);
+
+//    int idx = x * texture.get_bytes_per_pixel() + y * texture.get_stride_in_bytes();
+//    const auto texture_data = reinterpret_cast<const uint8_t*>(texture.get_data());
+//    return std::tuple<uint8_t, uint8_t, uint8_t>(texture_data[idx], texture_data[idx+1], texture_data[idx+2]);
+//}
+
+
+//ptr_cloud points_to_pcl(const rs2::points& points, const rs2::video_frame& color){
+
+//    // OpenCV Mat for showing the rgb color image, just as part of processing
+//    Mat colorr(Size(640, 480), CV_8UC3, (void*)color.get_data(), Mat::AUTO_STEP);
+//    namedWindow("Display Image", WINDOW_AUTOSIZE );
+//    imshow("Display Image", colorr);
+
+//    auto sp = points.get_profile().as<rs2::video_stream_profile>();
+//    ptr_cloud cloud(new point_cloud);
+
+//    // Config of PCL Cloud object
+//    cloud->width = static_cast<uint32_t>(sp.width());
+//    cloud->height = static_cast<uint32_t>(sp.height());
+//    cloud->is_dense = false;
+//    cloud->points.resize(points.size());
+
+//    auto tex_coords = points.get_texture_coordinates();
+//    auto vertices = points.get_vertices();
+
+//    // Iterating through all points and setting XYZ coordinates
+//    // and RGB values
+//    for (int i = 0; i < points.size(); ++i)
+//    {
+//        cloud->points[i].x = vertices[i].x;
+//        cloud->points[i].y = vertices[i].y;
+//        cloud->points[i].z = vertices[i].z;
+
+//        std::tuple<uint8_t, uint8_t, uint8_t> current_color;
+//        current_color = get_texcolor(color, tex_coords[i]);
+
+//        // Reversed order- 2-1-0 because of BGR model used in camera
+//        cloud->points[i].r = std::get<2>(current_color);
+//        cloud->points[i].g = std::get<1>(current_color);
+//        cloud->points[i].b = std::get<0>(current_color);
+
+//    }
+
+//   return cloud;
+//}
+
+
+
+
+
+
+//int main(int argc, char * argv[]) try
+//{
+//    // Create a simple OpenGL window for rendering:
+//    window app(1280, 720, "RealSense Pointcloud Example");
+//    // Construct an object to manage view state
+//    glfw_state app_state;
+//    // register callbacks to allow manipulation of the pointcloud
+//    register_glfw_callbacks(app, app_state);
+
+//    // Declare pointcloud object, for calculating pointclouds and texture mappings
+//    rs2::pointcloud pc;
+//    // We want the points object to be persistent so we can display the last cloud when a frame drops
+//    rs2::points points;
+
+//    // Declare RealSense pipeline, encapsulating the actual device and sensors
+//    rs2::pipeline pipe;
+//    // Start streaming with default recommended configuration
+//    pipe.start();
+
+//    while(app) // Application still alive?
+//    {
+//        // Wait for the next set of frames from the camera
+//        auto frames = pipe.wait_for_frames();
+
+//        auto color = frames.get_color_frame();
+
+//        // For cameras that don't have RGB sensor, we'll map the pointcloud to infrared instead of color
+//        if (!color)
+//            color = frames.get_infrared_frame();
+
+//        // Tell pointcloud object to map to this color frame
+//        pc.map_to(color);
+
+//        auto depth = frames.get_depth_frame();
+
+//        // Generate the pointcloud and texture mappings
+//        points = pc.calculate(depth);
+
+//        // Upload the color frame to OpenGL
+//        app_state.tex.upload(color);
+
+//        // Draw the pointcloud
+//        draw_pointcloud(app.width(), app.height(), app_state, points);
+
+//        //std::cout <<"I did it" <<std::endl;
+//        ptr_cloud cloud = points_to_pcl(points, color);
+//        pcl::io::savePCDFileASCII("cloud_test.pcd", *cloud);
+
+
+//         //  waitKey(0);
+
+
+//    }
+
+//    return EXIT_SUCCESS;
+//}
+//catch (const rs2::error & e)
+//{
+//    std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n    " << e.what() << std::endl;
+//    return EXIT_FAILURE;
+//}
+//catch (const std::exception & e)
+//{
+//    std::cerr << e.what() << std::endl;
+//    return EXIT_FAILURE;
+//}
+
+
+
+#include <librealsense2/rs.hpp> // Include RealSense Cross Platform API
+#include "/home/anders/librealsense/examples/example.hpp"        // Include short list of convenience functions for rendering
+
+#include <algorithm>            // std::min, std::max
+
+// Helper functions
+void register_glfw_callbacks(window& app, glfw_state& app_state);
+
+#include <pcl/point_types.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/kdtree/kdtree_flann.h>
+
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/thread/thread.hpp>
+#include <string>
+
+#include <opencv2/opencv.hpp>
+
+typedef pcl::PointXYZRGB P_pcl;
+typedef pcl::PointCloud<P_pcl> point_cloud;
+typedef point_cloud::Ptr ptr_cloud;
+
+std::tuple<uint8_t, uint8_t, uint8_t> get_texcolor(rs2::video_frame texture, rs2::texture_coordinate texcoords)
+{
+    const int w = texture.get_width(), h = texture.get_height();
+
+    // convert normals [u v] to basic coords [x y]
+    int x = std::min(std::max(int(texcoords.u*w + .5f), 0), w - 1);
+    int y = std::min(std::max(int(texcoords.v*h + .5f), 0), h - 1);
+
+    int idx = x * texture.get_bytes_per_pixel() + y * texture.get_stride_in_bytes();
+    const auto texture_data = reinterpret_cast<const uint8_t*>(texture.get_data());
+    return std::tuple<uint8_t, uint8_t, uint8_t>(texture_data[idx], texture_data[idx+1], texture_data[idx+2]);
+}
+
+
+ptr_cloud points_to_pcl(const rs2::points& points, const rs2::video_frame& color){
+
+    // OpenCV Mat for showing the rgb color image, just as part of processing
+    cv::Mat colorr(cv::Size(640, 480), CV_8UC3, (void*)color.get_data(), cv::Mat::AUTO_STEP);
+    namedWindow("Display Image", cv::WINDOW_AUTOSIZE );
+    imshow("Display Image", colorr);
+
+    auto sp = points.get_profile().as<rs2::video_stream_profile>();
+    ptr_cloud cloud(new point_cloud);
+
+    // Config of PCL Cloud object
+    cloud->width = static_cast<uint32_t>(sp.width());
+    cloud->height = static_cast<uint32_t>(sp.height());
+    cloud->is_dense = false;
+    cloud->points.resize(points.size());
+
+    auto tex_coords = points.get_texture_coordinates();
+    auto vertices = points.get_vertices();
+
+    // Iterating through all points and setting XYZ coordinates
+    // and RGB values
+    for (int i = 0; i < points.size(); ++i)
+    {
+        cloud->points[i].x = vertices[i].x;
+        cloud->points[i].y = vertices[i].y;
+        cloud->points[i].z = vertices[i].z;
+
+        std::tuple<uint8_t, uint8_t, uint8_t> current_color;
+        current_color =get_texcolor(color, tex_coords[i]);
+
+        // Reversed order- 2-1-0 because of BGR model used in camera
+        cloud->points[i].r = std::get<2>(current_color);
+        cloud->points[i].g = std::get<1>(current_color);
+        cloud->points[i].b = std::get<0>(current_color);
+
+    }
+
+   return cloud;
+}
+
+void pp_callback(const pcl::visualization::PointPickingEvent& event, void* viewer_void)
+{
+   std::cout << "Picking event active" << std::endl;
+   if(event.getPointIndex() != -1)
+   {
+       float x, y, z;
+       event.getPoint(x, y, z);
+       std::cout << x << "; " << y << "; " << z << std::endl;
+   }
+}
+
+int main(int argc, char * argv[]) try
+{
+    // Create a simple OpenGL window for rendering:
+    window app(1280, 720, "RealSense Pointcloud Example");
+    // Construct an object to manage view state
+    glfw_state app_state;
+    // register callbacks to allow manipulation of the pointcloud
+    register_glfw_callbacks(app, app_state);
+
+    // Declare pointcloud object, for calculating pointclouds and texture mappings
+    rs2::pointcloud pc;
+    // We want the points object to be persistent so we can display the last cloud when a frame drops
+    rs2::points points;
+
+    // Declare RealSense pipeline, encapsulating the actual device and sensors
+    rs2::pipeline pipe;
+    // Start streaming with default recommended configuration
+    pipe.start();
+
+    while (app) // Application still alive?
+    {
+        // Wait for the next set of frames from the camera
+        auto frames = pipe.wait_for_frames();
+
+        auto color = frames.get_color_frame();
+
+        // For cameras that don't have RGB sensor, we'll map the pointcloud to infrared instead of color
+        if (!color)
+            color = frames.get_infrared_frame();
+
+        // Tell pointcloud object to map to this color frame
+        pc.map_to(color);
+
+        auto depth = frames.get_depth_frame();
+
+        // Generate the pointcloud and texture mappings
+        points = pc.calculate(depth);
+
+        // Upload the color frame to OpenGL
+        app_state.tex.upload(color);
+
+        // Draw the pointcloud
+        draw_pointcloud(app.width(), app.height(), app_state, points);
+
+
+    }
+    auto frames = pipe.wait_for_frames();
+    auto color1 = frames.get_color_frame();
+
+
+
+    // Save current point cloud
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
+    std::cout <<"I did it" <<std::endl;
+    ptr_cloud cloud = points_to_pcl(points, color1);
+
+    // filter the everthing out with a distance further than 1m.
+    pcl::PassThrough<pcl::PointXYZRGB> pass;
+    pass.setInputCloud (cloud);
+    pass.setFilterFieldName ("z");
+    pass.setFilterLimits (0.0, 1.0);
+    //pass.setFilterLimitsNegative (true);
+    pass.filter (*cloud_filtered);
+
+    //Saving the point cloud
+    pcl::io::savePCDFileASCII("cloud_test.pcd", *cloud_filtered);
+
+
+    // Vizualize point cloud and generate point clicking event
+
+    //Given a point cloud:
+    //ptr_cloud cloud = points_to_pcl(points, color1);
+
+    //A Kdtree is then generated to perform an efficient range search:
+    pcl::KdTreeFLANN<pcl::PointXYZRGB> kdtree;
+    kdtree.setInputCloud (cloud_filtered);
+
+    //Then, given a point and a radius:
+    pcl::PointXYZRGB searchPoint(0.1,0.1,0.5);
+    float radius = 0.5;
+
+    // Get all points within the radius distance of the point given (searchPoint)
+    std::vector<int> pointIdxRadiusSearch; //to store index of surrounding points
+    std::vector<float> pointRadiusSquaredDistance; // to store distance to surrounding points
+
+    if ( kdtree.radiusSearch (searchPoint, radius, pointIdxRadiusSearch, pointRadiusSquaredDistance) > 0 )
+    {
+        for (size_t i = 0; i < pointIdxRadiusSearch.size (); ++i)
+            std::cout << "    "  <<   cloud_filtered->points[ pointIdxRadiusSearch[i] ].x
+                    << " " << cloud_filtered->points[ pointIdxRadiusSearch[i] ].y
+                    << " " << cloud_filtered->points[ pointIdxRadiusSearch[i] ].z
+                    << " (squared distance: " << pointRadiusSquaredDistance[i] << ")" << std::endl;
+    }
+
+    //Print all the surrounding points and their distance to the searchPoint
+
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_cluster (new pcl::PointCloud<pcl::PointXYZRGB>);
+    for (size_t i = 0; i < pointIdxRadiusSearch.size (); ++i)
+        cloud_cluster->points.push_back(cloud->points[ pointIdxRadiusSearch[i] ]);
+    cloud_cluster->width = cloud_cluster->points.size ();
+    cloud_cluster->height = 1;
+    cloud_cluster->is_dense = true;
+
+    pcl::visualization::PCLVisualizer visualizer("PCL visualizer");
+    visualizer.setBackgroundColor (1, 1, 1);
+    //visualizer.addCoordinateSystem (1.0);
+    visualizer.registerPointPickingCallback(pp_callback, (void*)&visualizer);
+    visualizer.addPointCloud<pcl::PointXYZRGB> (cloud_filtered, "sample cloud");
+   // visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 5, "sample cloud");
+    visualizer.spin();
+    return EXIT_SUCCESS;
+}
+catch (const rs2::error & e)
+{
+    std::cerr << "RealSense error calling " << e.get_failed_function() << "(" << e.get_failed_args() << "):\n    " << e.what() << std::endl;
+    return EXIT_FAILURE;
+}
+catch (const std::exception & e)
+{
+    std::cerr << e.what() << std::endl;
+    return EXIT_FAILURE;
+}

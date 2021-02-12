@@ -1,4 +1,4 @@
-# Install script for directory: /home/anders/Hand-eye-Calibration/Robot_control
+# Install script for directory: /home/anders/Master/Hand-eye-Calibration/Robot_control
 
 # Set the install prefix
 if(NOT DEFINED CMAKE_INSTALL_PREFIX)
@@ -45,5 +45,5 @@ endif()
 
 string(REPLACE ";" "\n" CMAKE_INSTALL_MANIFEST_CONTENT
        "${CMAKE_INSTALL_MANIFEST_FILES}")
-file(WRITE "/home/anders/Hand-eye-Calibration/Robot_control/build/${CMAKE_INSTALL_MANIFEST}"
+file(WRITE "/home/anders/Master/Hand-eye-Calibration/Robot_control/build/${CMAKE_INSTALL_MANIFEST}"
      "${CMAKE_INSTALL_MANIFEST_CONTENT}")

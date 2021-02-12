@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Plugin_t {
-    QByteArrayData data[52];
-    char stringdata0[692];
+    QByteArrayData data[51];
+    char stringdata0[669];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -47,43 +47,42 @@ QT_MOC_LITERAL(11, 127, 15), // "MoveInToolSpace"
 QT_MOC_LITERAL(12, 143, 19), // "TransformationRobot"
 QT_MOC_LITERAL(13, 163, 15), // "startRobotMimic"
 QT_MOC_LITERAL(14, 179, 17), // "startRobotControl"
-QT_MOC_LITERAL(15, 197, 22), // "startRobotControlRoute"
-QT_MOC_LITERAL(16, 220, 14), // "startHomeRobot"
-QT_MOC_LITERAL(17, 235, 6), // "invKin"
-QT_MOC_LITERAL(18, 242, 19), // "std::vector<double>"
-QT_MOC_LITERAL(19, 262, 12), // "connectRobot"
-QT_MOC_LITERAL(20, 275, 9), // "stopRobot"
-QT_MOC_LITERAL(21, 285, 8), // "stopSync"
-QT_MOC_LITERAL(22, 294, 15), // "teachModeToggle"
-QT_MOC_LITERAL(23, 310, 15), // "getConfDistance"
-QT_MOC_LITERAL(24, 326, 10), // "printArray"
-QT_MOC_LITERAL(25, 337, 7), // "addMove"
-QT_MOC_LITERAL(26, 345, 20), // "write_vector_to_file"
-QT_MOC_LITERAL(27, 366, 8), // "myVector"
-QT_MOC_LITERAL(28, 375, 11), // "std::string"
-QT_MOC_LITERAL(29, 387, 8), // "filename"
-QT_MOC_LITERAL(30, 396, 16), // "printDeviceNames"
-QT_MOC_LITERAL(31, 413, 20), // "rw::models::WorkCell"
-QT_MOC_LITERAL(32, 434, 8), // "workcell"
-QT_MOC_LITERAL(33, 443, 20), // "createPathRRTConnect"
-QT_MOC_LITERAL(34, 464, 34), // "std::vector<std::vector<doubl..."
-QT_MOC_LITERAL(35, 499, 12), // "Take_picture"
-QT_MOC_LITERAL(36, 512, 14), // "Analyze_images"
-QT_MOC_LITERAL(37, 527, 27), // "eulerAnglesToRotationMatrix"
-QT_MOC_LITERAL(38, 555, 7), // "cv::Mat"
-QT_MOC_LITERAL(39, 563, 10), // "cv::Vec3d&"
-QT_MOC_LITERAL(40, 574, 5), // "theta"
-QT_MOC_LITERAL(41, 580, 7), // "rad2deg"
-QT_MOC_LITERAL(42, 588, 6), // "radian"
-QT_MOC_LITERAL(43, 595, 7), // "deg2rad"
-QT_MOC_LITERAL(44, 603, 6), // "degree"
-QT_MOC_LITERAL(45, 610, 16), // "isRotationMatrix"
-QT_MOC_LITERAL(46, 627, 8), // "cv::Mat&"
-QT_MOC_LITERAL(47, 636, 1), // "R"
-QT_MOC_LITERAL(48, 638, 27), // "rotationMatrixToEulerAngles"
-QT_MOC_LITERAL(49, 666, 9), // "cv::Vec3d"
-QT_MOC_LITERAL(50, 676, 13), // "ReverseVector"
-QT_MOC_LITERAL(51, 690, 1) // "v"
+QT_MOC_LITERAL(15, 197, 14), // "startHomeRobot"
+QT_MOC_LITERAL(16, 212, 6), // "invKin"
+QT_MOC_LITERAL(17, 219, 19), // "std::vector<double>"
+QT_MOC_LITERAL(18, 239, 12), // "connectRobot"
+QT_MOC_LITERAL(19, 252, 9), // "stopRobot"
+QT_MOC_LITERAL(20, 262, 8), // "stopSync"
+QT_MOC_LITERAL(21, 271, 15), // "teachModeToggle"
+QT_MOC_LITERAL(22, 287, 15), // "getConfDistance"
+QT_MOC_LITERAL(23, 303, 10), // "printArray"
+QT_MOC_LITERAL(24, 314, 7), // "addMove"
+QT_MOC_LITERAL(25, 322, 20), // "write_vector_to_file"
+QT_MOC_LITERAL(26, 343, 8), // "myVector"
+QT_MOC_LITERAL(27, 352, 11), // "std::string"
+QT_MOC_LITERAL(28, 364, 8), // "filename"
+QT_MOC_LITERAL(29, 373, 16), // "printDeviceNames"
+QT_MOC_LITERAL(30, 390, 20), // "rw::models::WorkCell"
+QT_MOC_LITERAL(31, 411, 8), // "workcell"
+QT_MOC_LITERAL(32, 420, 20), // "createPathRRTConnect"
+QT_MOC_LITERAL(33, 441, 34), // "std::vector<std::vector<doubl..."
+QT_MOC_LITERAL(34, 476, 12), // "Take_picture"
+QT_MOC_LITERAL(35, 489, 14), // "Analyze_images"
+QT_MOC_LITERAL(36, 504, 27), // "eulerAnglesToRotationMatrix"
+QT_MOC_LITERAL(37, 532, 7), // "cv::Mat"
+QT_MOC_LITERAL(38, 540, 10), // "cv::Vec3d&"
+QT_MOC_LITERAL(39, 551, 5), // "theta"
+QT_MOC_LITERAL(40, 557, 7), // "rad2deg"
+QT_MOC_LITERAL(41, 565, 6), // "radian"
+QT_MOC_LITERAL(42, 572, 7), // "deg2rad"
+QT_MOC_LITERAL(43, 580, 6), // "degree"
+QT_MOC_LITERAL(44, 587, 16), // "isRotationMatrix"
+QT_MOC_LITERAL(45, 604, 8), // "cv::Mat&"
+QT_MOC_LITERAL(46, 613, 1), // "R"
+QT_MOC_LITERAL(47, 615, 27), // "rotationMatrixToEulerAngles"
+QT_MOC_LITERAL(48, 643, 9), // "cv::Vec3d"
+QT_MOC_LITERAL(49, 653, 13), // "ReverseVector"
+QT_MOC_LITERAL(50, 667, 1) // "v"
 
     },
     "Plugin\0clickEvent\0\0stateChangedListener\0"
@@ -91,14 +90,13 @@ QT_MOC_LITERAL(51, 690, 1) // "v"
     "RunRobotControl\0RunHomeRobot\0printQ\0"
     "printTCP\0MoveInToolSpace\0TransformationRobot\0"
     "startRobotMimic\0startRobotControl\0"
-    "startRobotControlRoute\0startHomeRobot\0"
-    "invKin\0std::vector<double>\0connectRobot\0"
-    "stopRobot\0stopSync\0teachModeToggle\0"
-    "getConfDistance\0printArray\0addMove\0"
-    "write_vector_to_file\0myVector\0std::string\0"
-    "filename\0printDeviceNames\0"
-    "rw::models::WorkCell\0workcell\0"
-    "createPathRRTConnect\0"
+    "startHomeRobot\0invKin\0std::vector<double>\0"
+    "connectRobot\0stopRobot\0stopSync\0"
+    "teachModeToggle\0getConfDistance\0"
+    "printArray\0addMove\0write_vector_to_file\0"
+    "myVector\0std::string\0filename\0"
+    "printDeviceNames\0rw::models::WorkCell\0"
+    "workcell\0createPathRRTConnect\0"
     "std::vector<std::vector<double> >&\0"
     "Take_picture\0Analyze_images\0"
     "eulerAnglesToRotationMatrix\0cv::Mat\0"
@@ -115,7 +113,7 @@ static const uint qt_meta_data_Plugin[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      32,   14, // methods
+      31,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -123,38 +121,37 @@ static const uint qt_meta_data_Plugin[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  174,    2, 0x08 /* Private */,
-       3,    1,  175,    2, 0x08 /* Private */,
-       6,    0,  178,    2, 0x08 /* Private */,
-       7,    0,  179,    2, 0x08 /* Private */,
-       8,    0,  180,    2, 0x08 /* Private */,
-       9,    0,  181,    2, 0x08 /* Private */,
-      10,    0,  182,    2, 0x08 /* Private */,
-      11,    0,  183,    2, 0x08 /* Private */,
-      12,    0,  184,    2, 0x08 /* Private */,
-      13,    0,  185,    2, 0x08 /* Private */,
-      14,    0,  186,    2, 0x08 /* Private */,
-      15,    0,  187,    2, 0x08 /* Private */,
-      16,    0,  188,    2, 0x08 /* Private */,
-      17,    2,  189,    2, 0x08 /* Private */,
-      19,    0,  194,    2, 0x08 /* Private */,
-      20,    0,  195,    2, 0x08 /* Private */,
-      21,    0,  196,    2, 0x08 /* Private */,
-      22,    0,  197,    2, 0x08 /* Private */,
-      23,    2,  198,    2, 0x08 /* Private */,
-      24,    1,  203,    2, 0x08 /* Private */,
-      25,    4,  206,    2, 0x08 /* Private */,
-      26,    2,  215,    2, 0x08 /* Private */,
-      30,    1,  220,    2, 0x08 /* Private */,
-      33,    8,  223,    2, 0x08 /* Private */,
-      35,    0,  240,    2, 0x08 /* Private */,
-      36,    0,  241,    2, 0x08 /* Private */,
-      37,    1,  242,    2, 0x08 /* Private */,
-      41,    1,  245,    2, 0x08 /* Private */,
-      43,    1,  248,    2, 0x08 /* Private */,
-      45,    1,  251,    2, 0x08 /* Private */,
-      48,    1,  254,    2, 0x08 /* Private */,
-      50,    1,  257,    2, 0x08 /* Private */,
+       1,    0,  169,    2, 0x08 /* Private */,
+       3,    1,  170,    2, 0x08 /* Private */,
+       6,    0,  173,    2, 0x08 /* Private */,
+       7,    0,  174,    2, 0x08 /* Private */,
+       8,    0,  175,    2, 0x08 /* Private */,
+       9,    0,  176,    2, 0x08 /* Private */,
+      10,    0,  177,    2, 0x08 /* Private */,
+      11,    0,  178,    2, 0x08 /* Private */,
+      12,    0,  179,    2, 0x08 /* Private */,
+      13,    0,  180,    2, 0x08 /* Private */,
+      14,    0,  181,    2, 0x08 /* Private */,
+      15,    0,  182,    2, 0x08 /* Private */,
+      16,    2,  183,    2, 0x08 /* Private */,
+      18,    0,  188,    2, 0x08 /* Private */,
+      19,    0,  189,    2, 0x08 /* Private */,
+      20,    0,  190,    2, 0x08 /* Private */,
+      21,    0,  191,    2, 0x08 /* Private */,
+      22,    2,  192,    2, 0x08 /* Private */,
+      23,    1,  197,    2, 0x08 /* Private */,
+      24,    4,  200,    2, 0x08 /* Private */,
+      25,    2,  209,    2, 0x08 /* Private */,
+      29,    1,  214,    2, 0x08 /* Private */,
+      32,    8,  217,    2, 0x08 /* Private */,
+      34,    0,  234,    2, 0x08 /* Private */,
+      35,    0,  235,    2, 0x08 /* Private */,
+      36,    1,  236,    2, 0x08 /* Private */,
+      40,    1,  239,    2, 0x08 /* Private */,
+      42,    1,  242,    2, 0x08 /* Private */,
+      44,    1,  245,    2, 0x08 /* Private */,
+      47,    1,  248,    2, 0x08 /* Private */,
+      49,    1,  251,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -169,26 +166,25 @@ static const uint qt_meta_data_Plugin[] = {
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Void,
-    0x80000000 | 18, 0x80000000 | 18, 0x80000000 | 18,    2,    2,
-    QMetaType::Void,
+    0x80000000 | 17, 0x80000000 | 17, 0x80000000 | 17,    2,    2,
     QMetaType::Void,
     QMetaType::Void,
     QMetaType::Void,
-    QMetaType::Double, 0x80000000 | 18, 0x80000000 | 18,    2,    2,
-    QMetaType::Void, 0x80000000 | 18,    2,
-    0x80000000 | 18, 0x80000000 | 18, QMetaType::Double, QMetaType::Double, QMetaType::Double,    2,    2,    2,    2,
-    QMetaType::Void, 0x80000000 | 18, 0x80000000 | 28,   27,   29,
-    QMetaType::Void, 0x80000000 | 31,   32,
-    QMetaType::Void, 0x80000000 | 18, 0x80000000 | 18, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double, 0x80000000 | 34, 0x80000000 | 4,    2,    2,    2,    2,    2,    2,    2,    2,
+    QMetaType::Void,
+    QMetaType::Double, 0x80000000 | 17, 0x80000000 | 17,    2,    2,
+    QMetaType::Void, 0x80000000 | 17,    2,
+    0x80000000 | 17, 0x80000000 | 17, QMetaType::Double, QMetaType::Double, QMetaType::Double,    2,    2,    2,    2,
+    QMetaType::Void, 0x80000000 | 17, 0x80000000 | 27,   26,   28,
+    QMetaType::Void, 0x80000000 | 30,   31,
+    QMetaType::Void, 0x80000000 | 17, 0x80000000 | 17, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double, 0x80000000 | 33, 0x80000000 | 4,    2,    2,    2,    2,    2,    2,    2,    2,
     QMetaType::Void,
     QMetaType::Void,
-    0x80000000 | 38, 0x80000000 | 39,   40,
-    QMetaType::Double, QMetaType::Double,   42,
-    QMetaType::Double, QMetaType::Double,   44,
-    QMetaType::Bool, 0x80000000 | 46,   47,
-    0x80000000 | 49, 0x80000000 | 46,   47,
-    0x80000000 | 38, 0x80000000 | 46,   51,
+    0x80000000 | 37, 0x80000000 | 38,   39,
+    QMetaType::Double, QMetaType::Double,   41,
+    QMetaType::Double, QMetaType::Double,   43,
+    QMetaType::Bool, 0x80000000 | 45,   46,
+    0x80000000 | 48, 0x80000000 | 45,   46,
+    0x80000000 | 37, 0x80000000 | 45,   50,
 
        0        // eod
 };
@@ -210,35 +206,34 @@ void Plugin::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 8: _t->TransformationRobot(); break;
         case 9: _t->startRobotMimic(); break;
         case 10: _t->startRobotControl(); break;
-        case 11: _t->startRobotControlRoute(); break;
-        case 12: _t->startHomeRobot(); break;
-        case 13: { std::vector<double> _r = _t->invKin((*reinterpret_cast< std::vector<double>(*)>(_a[1])),(*reinterpret_cast< std::vector<double>(*)>(_a[2])));
+        case 11: _t->startHomeRobot(); break;
+        case 12: { std::vector<double> _r = _t->invKin((*reinterpret_cast< std::vector<double>(*)>(_a[1])),(*reinterpret_cast< std::vector<double>(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< std::vector<double>*>(_a[0]) = std::move(_r); }  break;
-        case 14: _t->connectRobot(); break;
-        case 15: _t->stopRobot(); break;
-        case 16: _t->stopSync(); break;
-        case 17: _t->teachModeToggle(); break;
-        case 18: { double _r = _t->getConfDistance((*reinterpret_cast< std::vector<double>(*)>(_a[1])),(*reinterpret_cast< std::vector<double>(*)>(_a[2])));
+        case 13: _t->connectRobot(); break;
+        case 14: _t->stopRobot(); break;
+        case 15: _t->stopSync(); break;
+        case 16: _t->teachModeToggle(); break;
+        case 17: { double _r = _t->getConfDistance((*reinterpret_cast< std::vector<double>(*)>(_a[1])),(*reinterpret_cast< std::vector<double>(*)>(_a[2])));
             if (_a[0]) *reinterpret_cast< double*>(_a[0]) = std::move(_r); }  break;
-        case 19: _t->printArray((*reinterpret_cast< std::vector<double>(*)>(_a[1]))); break;
-        case 20: { std::vector<double> _r = _t->addMove((*reinterpret_cast< std::vector<double>(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3])),(*reinterpret_cast< double(*)>(_a[4])));
+        case 18: _t->printArray((*reinterpret_cast< std::vector<double>(*)>(_a[1]))); break;
+        case 19: { std::vector<double> _r = _t->addMove((*reinterpret_cast< std::vector<double>(*)>(_a[1])),(*reinterpret_cast< double(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3])),(*reinterpret_cast< double(*)>(_a[4])));
             if (_a[0]) *reinterpret_cast< std::vector<double>*>(_a[0]) = std::move(_r); }  break;
-        case 21: _t->write_vector_to_file((*reinterpret_cast< const std::vector<double>(*)>(_a[1])),(*reinterpret_cast< std::string(*)>(_a[2]))); break;
-        case 22: _t->printDeviceNames((*reinterpret_cast< const rw::models::WorkCell(*)>(_a[1]))); break;
-        case 23: _t->createPathRRTConnect((*reinterpret_cast< std::vector<double>(*)>(_a[1])),(*reinterpret_cast< std::vector<double>(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3])),(*reinterpret_cast< double(*)>(_a[4])),(*reinterpret_cast< double(*)>(_a[5])),(*reinterpret_cast< double(*)>(_a[6])),(*reinterpret_cast< std::vector<std::vector<double> >(*)>(_a[7])),(*reinterpret_cast< rw::kinematics::State(*)>(_a[8]))); break;
-        case 24: _t->Take_picture(); break;
-        case 25: _t->Analyze_images(); break;
-        case 26: { cv::Mat _r = _t->eulerAnglesToRotationMatrix((*reinterpret_cast< cv::Vec3d(*)>(_a[1])));
+        case 20: _t->write_vector_to_file((*reinterpret_cast< const std::vector<double>(*)>(_a[1])),(*reinterpret_cast< std::string(*)>(_a[2]))); break;
+        case 21: _t->printDeviceNames((*reinterpret_cast< const rw::models::WorkCell(*)>(_a[1]))); break;
+        case 22: _t->createPathRRTConnect((*reinterpret_cast< std::vector<double>(*)>(_a[1])),(*reinterpret_cast< std::vector<double>(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3])),(*reinterpret_cast< double(*)>(_a[4])),(*reinterpret_cast< double(*)>(_a[5])),(*reinterpret_cast< double(*)>(_a[6])),(*reinterpret_cast< std::vector<std::vector<double> >(*)>(_a[7])),(*reinterpret_cast< rw::kinematics::State(*)>(_a[8]))); break;
+        case 23: _t->Take_picture(); break;
+        case 24: _t->Analyze_images(); break;
+        case 25: { cv::Mat _r = _t->eulerAnglesToRotationMatrix((*reinterpret_cast< cv::Vec3d(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< cv::Mat*>(_a[0]) = std::move(_r); }  break;
-        case 27: { double _r = _t->rad2deg((*reinterpret_cast< double(*)>(_a[1])));
+        case 26: { double _r = _t->rad2deg((*reinterpret_cast< double(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< double*>(_a[0]) = std::move(_r); }  break;
-        case 28: { double _r = _t->deg2rad((*reinterpret_cast< double(*)>(_a[1])));
+        case 27: { double _r = _t->deg2rad((*reinterpret_cast< double(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< double*>(_a[0]) = std::move(_r); }  break;
-        case 29: { bool _r = _t->isRotationMatrix((*reinterpret_cast< cv::Mat(*)>(_a[1])));
+        case 28: { bool _r = _t->isRotationMatrix((*reinterpret_cast< cv::Mat(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 30: { cv::Vec3d _r = _t->rotationMatrixToEulerAngles((*reinterpret_cast< cv::Mat(*)>(_a[1])));
+        case 29: { cv::Vec3d _r = _t->rotationMatrixToEulerAngles((*reinterpret_cast< cv::Mat(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< cv::Vec3d*>(_a[0]) = std::move(_r); }  break;
-        case 31: { cv::Mat _r = _t->ReverseVector((*reinterpret_cast< cv::Mat(*)>(_a[1])));
+        case 30: { cv::Mat _r = _t->ReverseVector((*reinterpret_cast< cv::Mat(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< cv::Mat*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
@@ -272,13 +267,13 @@ int Plugin::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 32)
+        if (_id < 31)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 32;
+        _id -= 31;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 32)
+        if (_id < 31)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 32;
+        _id -= 31;
     }
     return _id;
 }

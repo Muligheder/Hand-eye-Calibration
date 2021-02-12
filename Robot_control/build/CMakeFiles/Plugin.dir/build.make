@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/anders/Hand-eye-Calibration/Robot_control
+CMAKE_SOURCE_DIR = /home/anders/Master/Hand-eye-Calibration/Robot_control
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/anders/Hand-eye-Calibration/Robot_control/build
+CMAKE_BINARY_DIR = /home/anders/Master/Hand-eye-Calibration/Robot_control/build
 
 # Include any dependencies generated for this target.
 include CMakeFiles/Plugin.dir/depend.make
@@ -59,16 +59,16 @@ include CMakeFiles/Plugin.dir/flags.make
 
 CMakeFiles/Plugin.dir/Plugin.cpp.o: CMakeFiles/Plugin.dir/flags.make
 CMakeFiles/Plugin.dir/Plugin.cpp.o: ../Plugin.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Plugin.dir/Plugin.cpp.o"
-	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Plugin.dir/Plugin.cpp.o -c /home/anders/Hand-eye-Calibration/Robot_control/Plugin.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Master/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Plugin.dir/Plugin.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Plugin.dir/Plugin.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Robot_control/Plugin.cpp
 
 CMakeFiles/Plugin.dir/Plugin.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Plugin.dir/Plugin.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Hand-eye-Calibration/Robot_control/Plugin.cpp > CMakeFiles/Plugin.dir/Plugin.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Robot_control/Plugin.cpp > CMakeFiles/Plugin.dir/Plugin.cpp.i
 
 CMakeFiles/Plugin.dir/Plugin.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Plugin.dir/Plugin.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Hand-eye-Calibration/Robot_control/Plugin.cpp -o CMakeFiles/Plugin.dir/Plugin.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Robot_control/Plugin.cpp -o CMakeFiles/Plugin.dir/Plugin.cpp.s
 
 CMakeFiles/Plugin.dir/Plugin.cpp.o.requires:
 
@@ -83,16 +83,16 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o.provides.build: CMakeFiles/Plugin.dir/Plugin.
 
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: CMakeFiles/Plugin.dir/flags.make
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: Plugin_autogen/mocs_compilation.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o"
-	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o -c /home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/mocs_compilation.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Master/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/mocs_compilation.cpp
 
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/mocs_compilation.cpp > CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/mocs_compilation.cpp > CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.i
 
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/mocs_compilation.cpp -o CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/mocs_compilation.cpp -o CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.s
 
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o.requires:
 
@@ -107,16 +107,16 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o.provides.build: CMak
 
 CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.o: CMakeFiles/Plugin.dir/flags.make
 CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.o: Plugin_autogen/EWIEGA46WW/qrc_resources.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.o"
-	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.o -c /home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Master/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.o"
+	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp
 
 CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.i"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp > CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.i
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp > CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.i
 
 CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.s"
-	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp -o CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.s
+	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp -o CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.s
 
 CMakeFiles/Plugin.dir/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp.o.requires:
 
@@ -594,7 +594,7 @@ Plugin_EXTERNAL_OBJECTS =
 ../libs/libPlugin.so: /usr/lib/x86_64-linux-gnu/libproj.so
 ../libs/libPlugin.so: /usr/lib/x86_64-linux-gnu/libvtkCommonCore-6.3.so.6.3.0
 ../libs/libPlugin.so: CMakeFiles/Plugin.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/anders/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX shared module ../libs/libPlugin.so"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/anders/Master/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX shared module ../libs/libPlugin.so"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/Plugin.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.
@@ -613,6 +613,6 @@ CMakeFiles/Plugin.dir/clean:
 .PHONY : CMakeFiles/Plugin.dir/clean
 
 CMakeFiles/Plugin.dir/depend:
-	cd /home/anders/Hand-eye-Calibration/Robot_control/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/anders/Hand-eye-Calibration/Robot_control /home/anders/Hand-eye-Calibration/Robot_control /home/anders/Hand-eye-Calibration/Robot_control/build /home/anders/Hand-eye-Calibration/Robot_control/build /home/anders/Hand-eye-Calibration/Robot_control/build/CMakeFiles/Plugin.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/anders/Master/Hand-eye-Calibration/Robot_control/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/anders/Master/Hand-eye-Calibration/Robot_control /home/anders/Master/Hand-eye-Calibration/Robot_control /home/anders/Master/Hand-eye-Calibration/Robot_control/build /home/anders/Master/Hand-eye-Calibration/Robot_control/build /home/anders/Master/Hand-eye-Calibration/Robot_control/build/CMakeFiles/Plugin.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/Plugin.dir/depend
 

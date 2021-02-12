@@ -6,13 +6,13 @@
 
 #IncludeRegexTransform: 
 
-/home/anders/Hand-eye-Calibration/Robot_control/Plugin.cpp
+/home/anders/Master/Hand-eye-Calibration/Robot_control/Plugin.cpp
 Plugin.hpp
-/home/anders/Hand-eye-Calibration/Robot_control/Plugin.hpp
+/home/anders/Master/Hand-eye-Calibration/Robot_control/Plugin.hpp
 /home/anders/librealsense/examples/example.hpp
 -
 
-/home/anders/Hand-eye-Calibration/Robot_control/Plugin.hpp
+/home/anders/Master/Hand-eye-Calibration/Robot_control/Plugin.hpp
 rw/rw.hpp
 -
 rwlibs/simulation/GLFrameGrabber25D.hpp
@@ -76,9 +76,9 @@ opencv2/aruco/charuco.hpp
 librealsense2/rs.hpp
 -
 
-/home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/moc_Plugin.cpp
+/home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/moc_Plugin.cpp
 ../../../Plugin.hpp
-/home/anders/Hand-eye-Calibration/Robot_control/Plugin.hpp
+/home/anders/Master/Hand-eye-Calibration/Robot_control/Plugin.hpp
 QtCore/qbytearray.h
 -
 QtCore/qmetatype.h
@@ -86,11 +86,11 @@ QtCore/qmetatype.h
 QtCore/qplugin.h
 -
 
-/home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp
+/home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/qrc_resources.cpp
 
-/home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/mocs_compilation.cpp
+/home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/mocs_compilation.cpp
 EWIEGA46WW/moc_Plugin.cpp
-/home/anders/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/moc_Plugin.cpp
+/home/anders/Master/Hand-eye-Calibration/Robot_control/build/Plugin_autogen/EWIEGA46WW/moc_Plugin.cpp
 
 /home/anders/librealsense/examples/example.hpp
 librealsense2/rs.hpp

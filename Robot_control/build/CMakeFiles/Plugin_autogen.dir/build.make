@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/anders/Hand-eye-Calibration/Robot_control
+CMAKE_SOURCE_DIR = /home/anders/Master/Hand-eye-Calibration/Robot_control
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/anders/Hand-eye-Calibration/Robot_control/build
+CMAKE_BINARY_DIR = /home/anders/Master/Hand-eye-Calibration/Robot_control/build
 
 # Utility rule file for Plugin_autogen.
 
@@ -54,8 +54,8 @@ CMAKE_BINARY_DIR = /home/anders/Hand-eye-Calibration/Robot_control/build
 include CMakeFiles/Plugin_autogen.dir/progress.make
 
 CMakeFiles/Plugin_autogen: ../plugin.png
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/anders/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC, UIC and RCC for target Plugin"
-	/usr/bin/cmake -E cmake_autogen /home/anders/Hand-eye-Calibration/Robot_control/build/CMakeFiles/Plugin_autogen.dir ""
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/anders/Master/Hand-eye-Calibration/Robot_control/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic MOC, UIC and RCC for target Plugin"
+	/usr/bin/cmake -E cmake_autogen /home/anders/Master/Hand-eye-Calibration/Robot_control/build/CMakeFiles/Plugin_autogen.dir ""
 
 Plugin_autogen: CMakeFiles/Plugin_autogen
 Plugin_autogen: CMakeFiles/Plugin_autogen.dir/build.make
@@ -72,6 +72,6 @@ CMakeFiles/Plugin_autogen.dir/clean:
 .PHONY : CMakeFiles/Plugin_autogen.dir/clean
 
 CMakeFiles/Plugin_autogen.dir/depend:
-	cd /home/anders/Hand-eye-Calibration/Robot_control/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/anders/Hand-eye-Calibration/Robot_control /home/anders/Hand-eye-Calibration/Robot_control /home/anders/Hand-eye-Calibration/Robot_control/build /home/anders/Hand-eye-Calibration/Robot_control/build /home/anders/Hand-eye-Calibration/Robot_control/build/CMakeFiles/Plugin_autogen.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/anders/Master/Hand-eye-Calibration/Robot_control/build && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/anders/Master/Hand-eye-Calibration/Robot_control /home/anders/Master/Hand-eye-Calibration/Robot_control /home/anders/Master/Hand-eye-Calibration/Robot_control/build /home/anders/Master/Hand-eye-Calibration/Robot_control/build /home/anders/Master/Hand-eye-Calibration/Robot_control/build/CMakeFiles/Plugin_autogen.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : CMakeFiles/Plugin_autogen.dir/depend
 

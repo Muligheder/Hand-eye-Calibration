@@ -1,5 +1,5 @@
 #include "Plugin.hpp"
-    #include "/home/anders/librealsense/examples/example.hpp" // Include short list of convenience functions for rendering
+#include "/home/anders/librealsense/examples/example.hpp" // Include short list of convenience functions for rendering
 Plugin::Plugin():
     rws::RobWorkStudioPlugin("Plugin", QIcon(":/plugin.png"))
 {

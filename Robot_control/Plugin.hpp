@@ -89,7 +89,7 @@ private slots:
     // Start thread
     void startRobotMimic();
     void startRobotControl();
-    void startRobotControlRoute();
+    //void startRobotControlRoute();
     void startHomeRobot();
 
     // Manage

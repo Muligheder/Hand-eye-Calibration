@@ -1,11 +1,11 @@
 Info,  T0: this is my info call
-Info,  T0: Load /home/anders/Hand-eye-Calibration/Robot_control/workcell/objects/bottom_plate.obj
+Info,  T0: Load /home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/objects/bottom_plate.obj
 Debug, T0: Assimp 4.1.0 amd64 gcc debug shared singlethreaded
 Info,  T0: Found a matching importer for this file format: Wavefront Object Importer.
-Info,  T0: Import root directory is '/home/anders/Hand-eye-Calibration/Robot_control/workcell/objects/'
+Info,  T0: Import root directory is '/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/objects/'
 Error, T0: OBJ: Unable to locate material file bottom_plate.mtl
-Info,  T0: OBJ: Opening fallback material file /home/anders/Hand-eye-Calibration/Robot_control/workcell/objects/bottom_plate.mtl
-Error, T0: OBJ: Unable to locate fallback material file /home/anders/Hand-eye-Calibration/Robot_control/workcell/objects/bottom_plate.mtl
+Info,  T0: OBJ: Opening fallback material file /home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/objects/bottom_plate.mtl
+Error, T0: OBJ: Unable to locate fallback material file /home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/objects/bottom_plate.mtl
 Error, T0: OBJ: failed to locate material 96,96,96, creating new material
 Info,  T0: Entering post processing pipeline
 Debug, T0: Generate spatially-sorted vertex cache

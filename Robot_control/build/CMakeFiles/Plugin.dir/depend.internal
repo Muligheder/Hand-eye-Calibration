@@ -389,6 +389,7 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QAction
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QDockWidget
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QGridLayout
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLabel
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMainWindow
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QPushButton
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget
@@ -397,7 +398,9 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qactiongroup.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdockwidget.h
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qframe.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qgridlayout.h
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlabel.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayout.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayoutitem.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmainwindow.h
@@ -951,6 +954,8 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o
  /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/pathplanners/rrt/RRTPlanner.hpp
  /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/pathplanners/rrt/RRTQToQPlanner.hpp
  /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/proximitystrategies/ProximityStrategyFactory.hpp
+ /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/FrameGrabber25D.hpp
+ /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/GLFrameGrabber25D.hpp
  /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/RobWorkStudio.hpp
  /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/RobWorkStudioConfig.hpp
  /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/rws/RWStudioView3D.hpp
@@ -1349,6 +1354,7 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QAction
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QDockWidget
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QGridLayout
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLabel
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMainWindow
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QPushButton
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget
@@ -1357,7 +1363,9 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qactiongroup.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdockwidget.h
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qframe.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qgridlayout.h
+ /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlabel.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayout.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayoutitem.h
  /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmainwindow.h
@@ -1910,6 +1918,8 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o
  /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/pathplanners/rrt/RRTPlanner.hpp
  /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/pathplanners/rrt/RRTQToQPlanner.hpp
  /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/proximitystrategies/ProximityStrategyFactory.hpp
+ /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/FrameGrabber25D.hpp
+ /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/GLFrameGrabber25D.hpp
  /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/RobWorkStudio.hpp
  /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/RobWorkStudioConfig.hpp
  /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/rws/RWStudioView3D.hpp

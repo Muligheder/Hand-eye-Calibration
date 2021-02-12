@@ -236,7 +236,7 @@ Plugin_EXTERNAL_OBJECTS =
 ../libs/libPlugin.so: /usr/lib/x86_64-linux-gnu/libpthread.so
 ../libs/libPlugin.so: /usr/lib/x86_64-linux-gnu/libboost_test_exec_monitor.a
 ../libs/libPlugin.so: /usr/lib/x86_64-linux-gnu/libboost_unit_test_framework.so
-../libs/libPlugin.so: /usr/lib/x86_64-linux-gnu/librtde.so.1.3.2
+../libs/libPlugin.so: /usr/lib/x86_64-linux-gnu/librtde.so.1.3.6
 ../libs/libPlugin.so: /usr/local/lib/librealsense2.so.2.38.1
 ../libs/libPlugin.so: /usr/local/lib/libopencv_gapi.so.4.5.0
 ../libs/libPlugin.so: /usr/local/lib/libopencv_stitching.so.4.5.0

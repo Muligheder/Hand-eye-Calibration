@@ -1,5 +1,5 @@
 #include "Plugin.hpp"
-#include "/home/anders/librealsense/examples/example.hpp" // Include short list of convenience functions for rendering
+    #include "/home/anders/librealsense/examples/example.hpp" // Include short list of convenience functions for rendering
 Plugin::Plugin():
     rws::RobWorkStudioPlugin("Plugin", QIcon(":/plugin.png"))
 {
@@ -11,13 +11,24 @@ Plugin::Plugin():
     // Define button layout
     int row = 0;
 
+    // Initiation
+    QLabel *label_init = new QLabel(this);
+    label_init->setText("Initiation");
+    pLayout->addWidget(label_init,row++,0);
+
+
+
     _btn0 = new QPushButton("Connect");
     pLayout->addWidget(_btn0, row++, 0);
     connect(_btn0, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
-    _btn1 = new QPushButton("Start robot mimic");
+    _btn1 = new QPushButton("Synchronize movement");
     pLayout->addWidget(_btn1, row++, 0);
     connect(_btn1, SIGNAL(clicked()), this, SLOT(clickEvent()));
+
+    _btn_stop_sync = new QPushButton("Stop synchronized movement");
+    pLayout->addWidget(_btn_stop_sync, row++, 0);
+    connect(_btn_stop_sync, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
     _btn2 = new QPushButton("Start robot control");
     pLayout->addWidget(_btn2, row++, 0);
@@ -66,6 +77,7 @@ Plugin::Plugin():
     ur_robot_exists = false;
     ur_robot_teach_mode = false;
     ur_robot_stopped = true;
+    rws_robot_synced = false;
 }
 
 Plugin::~Plugin()
@@ -86,11 +98,22 @@ void Plugin::open(rw::models::WorkCell* workcell)
     // If workcell exists
     if (workcell != NULL)
     {
+        // print device info
+        printDeviceNames(*workcell);
         // Get rws info
         rws_wc = workcell;
-        rws_state = rws_wc->getDefaultState();
-        rws_robot = rws_wc->findDevice<rw::models::SerialDevice>("UR-6-85-5-A");
+        //rw::kinematics::State s = rws_state = rws_wc->getDefaultState();
+        rws_state       = rws_wc->getDefaultState();
+        //rw::models::SerialDevice::Ptr rws_robot = rws_wc->findDevice<rw::models::SerialDevice>("UR5e_2018");
+        rws_robot       = rws_wc->findDevice<rw::models::SerialDevice>("UR5e_2018");
+        rws_robot_base  = rws_wc->findFrame<rw::kinematics::Frame>("UR5e_2018.Base");
+        rws_table       = rws_wc->findFrame<rw::kinematics::Frame>("Table");
 
+        if(rws_robot == NULL)
+        {
+                std::cout << "Couldn't locate rws_robot!" << std::endl;
+                return;
+        }
         // Use rws collision checker
         collisionDetector = rw::common::ownedPtr(new rw::proximity::CollisionDetector(rws_wc, rwlibs::proximitystrategies::ProximityStrategyFactory::makeDefaultCollisionStrategy()));
     }
@@ -133,6 +156,8 @@ void Plugin::clickEvent()
         Analyze_images();
     else if(obj == _btn11)
         TransformationRobot();
+    else if(obj == _btn_stop_sync)
+        stopSync();
 
 }
 
@@ -153,9 +178,9 @@ void Plugin::connectRobot()
         std::cout << "Receive interface:\t";
         ur_robot_receive = new ur_rtde::RTDEReceiveInterface(ur_robot_ip);
         std::cout << "Connected!" << std::endl;
-//        std::cout << "IO interface:\t";
-//        ur_robot_io = new ur_rtde::RTDEIOInterface(ur_robot_ip);
-//        std::cout << "Connected!" << std::endl;
+        std::cout << "IO interface:\t";
+        ur_robot_io = new ur_rtde::RTDEIOInterface(ur_robot_ip);
+        std::cout << "Connected!" << std::endl;
 
         ur_robot_exists = true;
         std::cout << "Robot ready!" << std::endl;
@@ -164,7 +189,18 @@ void Plugin::connectRobot()
         std::cout << "Already connected..." << std::endl;
 }
 
-std::vector<double> Plugin::addMove(std::vector<double> position, double acceleration = 0.5, double velocity = 0.5)
+void Plugin::printDeviceNames(const rw::models::WorkCell& workcell)
+{
+    std::cout << "Workcell " << workcell << " contains devices:" << std::endl;
+    for(const rw::models::Device::CPtr device : workcell.getDevices()) {
+        std::cout << "- " << device->getName() << std::endl;
+    }
+}
+
+
+
+
+std::vector<double> Plugin::addMove(std::vector<double> position, double acceleration = 0.5, double velocity = 0.5, double blend = 0.2)
 {
     std::vector<double> move = { acceleration, velocity };
     std::vector<double> position_and_move;
@@ -173,6 +209,9 @@ std::vector<double> Plugin::addMove(std::vector<double> position, double acceler
     position_and_move.insert( position_and_move.end(), move.begin(), move.end() );
     return position_and_move;
 }
+
+
+
 
 void Plugin::RunRobotControl()
 {
@@ -219,13 +258,16 @@ void Plugin::teachModeToggle()
         {
             ur_robot->endTeachMode();
             std::cout << "Disabling teach mode!" << std::endl;
+           // printArray(ur_robot_receive->getActualTCPPose());
             ur_robot_teach_mode = false;
         }
         else
         {
             ur_robot->teachMode();
             std::cout << "Enabling teach mode!" << std::endl;
+           // printArray(ur_robot_receive->getActualTCPPose());
             ur_robot_teach_mode = true;
+
         }
     }
     else
@@ -240,7 +282,8 @@ void Plugin::RunRobotMimic()
         return;
     }
 
-    while(true)
+    rws_robot_synced = true;
+    while(rws_robot_synced)
     {
         std::vector<double> currentQ = ur_robot_receive->getActualQ();
         rw::kinematics::State s = rws_state;
@@ -274,11 +317,34 @@ void Plugin::startHomeRobot()
 void Plugin::stopRobot()
 {
     std::cout << "Stopping robot..." << std::endl;
+    ur_robot->stopL();
+    ur_robot->stopJ();
     ur_robot_stopped = true;
+}
+
+void Plugin::stopSync()
+{
+    std::cout << "Stopping robot sync..." << std::endl;
+    rws_robot_synced = false;
 }
 
 void Plugin::RunHomeRobot()
 {
+    std::vector<std::vector<double>> route;
+    //generatePythonRoute(route);
+    printArray(route[0]);
+
+    std::cout << "Homing robot..." << std::endl;
+    rw::kinematics::State tmp_state = rws_state.clone();
+
+    //std::vector<std::vector<double>> path;
+    //std::vector<double> fromQ = ur_robot_receive->getActualQ();
+    std::vector<double> fromQ = rws_robot->getQ(tmp_state).toStdVector();
+    std::vector<double> toQ = invKin(fromQ, placeApproachL_RW);
+    rws_robot->setQ(toQ, tmp_state);
+    getRobWorkStudio()->setState(tmp_state);
+
+    /*
     if(!ur_robot_exists)
     {
         std::cout << "Robot not connected..." << std::endl;
@@ -303,11 +369,12 @@ void Plugin::RunHomeRobot()
 
     std::cout << "Moving robot..." << std::endl;
     std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    ur_robot->moveJ(path);
+    ur_robot->moveJ(path);*/
 }
 
 void Plugin::MoveInToolSpace()
 {
+    /*
     if(!ur_robot_exists)
     {
         std::cout << "Robot not connected..." << std::endl;
@@ -351,8 +418,51 @@ void Plugin::MoveInToolSpace()
 //    path.clear();
 //    path.push_back(NewCrazy);
 //    ur_robot->moveL(path);
-//    write_vector_to_file(NewCrazy,"test.txt");
+//    write_vector_to_file(NewCrazy,"test.txt");*/
 
+   // ur_rtde::RTDEControlInterface rtde_control("192.168.1.210");
+    //ur_rtde::RTDEReceiveInterface rtde_receive("192.168.1.210");
+    std::vector<double> init_q = ur_robot_receive->getActualQ();
+    printArray(init_q);
+
+    // Target in the robot base
+    std::vector<double> new_q = init_q;
+    new_q[0] += 0.2;
+    printArray(new_q);
+    /**
+    * Move asynchronously in joint space to new_q, we specify asynchronous behavior by setting the async parameter to
+    * 'true'. Try to set the async parameter to 'false' to observe a default synchronous movement, which cannot be
+    * stopped by the stopJ function due to the blocking behaviour.
+    */
+
+    ur_robot->moveJ(new_q, 1.05, 1.4);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    // Stop the movement before it reaches new_q
+    ur_robot->stopJ(0.5);
+
+    // Target 10 cm up in the Z-Axis of the TCP
+    std::vector<double> target = ur_robot_receive->getActualTCPPose();
+    printArray(target);
+    target[2] += 0.10;
+    printArray(target);
+    /**
+    * Move asynchronously in cartesian space to target, we specify asynchronous behavior by setting the async parameter
+    * to 'true'. Try to set the async parameter to 'false' to observe a default synchronous movement, which cannot be
+    * stopped by the stopL function due to the blocking behaviour.
+    */
+
+    ur_robot->moveL(target, 0.25, 0.5);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+    // Stop the movement before it reaches target
+    ur_robot->stopL(0.5);
+    printArray(target);
+
+
+    // Move to initial joint position with a regular moveJ
+    ur_robot->moveJ(init_q);
+    printArray(init_q);
+    // Stop the RTDE control script
+    //ur_robot->stopScript();
 }
 
 void Plugin::write_vector_to_file(const std::vector<double>& myVector, std::string filename)
@@ -393,7 +503,7 @@ void Plugin::printArray(std::vector<double> input)
     std::cout << input[input.size()-1] << " }" << std::endl;
 }
 
-void Plugin::createPathRRTConnect(std::vector<double> from, std::vector<double> to, double epsilon, std::vector<std::vector<double>> &path, rw::kinematics::State state)
+void Plugin::createPathRRTConnect(std::vector<double> from, std::vector<double> to, double epsilon, double velocity, double acceleration, double blend, std::vector<std::vector<double>> &path, rw::kinematics::State state)
 {
     rw::pathplanning::PlannerConstraint constraint = rw::pathplanning::PlannerConstraint::make(collisionDetector.get(), rws_robot, state);
     rw::pathplanning::QSampler::Ptr sampler = rw::pathplanning::QSampler::makeConstrained(rw::pathplanning::QSampler::makeUniform(rws_robot), constraint.getQConstraintPtr());
@@ -406,10 +516,87 @@ void Plugin::createPathRRTConnect(std::vector<double> from, std::vector<double> 
     std::cout << "Found path of size " << qpath.size() << '!' << std::endl;
 
     path.clear();
+    int index = 0;
     for(const auto &q : qpath)
     {
-        path.push_back(addMove(q.toStdVector()));
+        std::vector<double> q_copy = q.toStdVector();
+        if(index < qpath.size()-2)
+        {
+            path.push_back(addMove(q_copy, velocity, acceleration, blend));
+            std::cout << "This is not last point" << std::endl;
+        }
+        else
+        {
+            path.push_back(addMove(q_copy, velocity, acceleration, 0));
+            std::cout << "This is last point" << std::endl;
+            //printArray(q.toStdVector());
+        }
+        index++;
     }
+}
+
+std::vector<double> Plugin::invKin(std::vector<double> startQ, std::vector<double> goalL)
+{
+    double theta = 22.5 * (M_PI / 180);
+
+    // Duplicate state
+    rw::kinematics::State tmp_state = rws_state.clone();
+
+    // Create solver
+    const rw::invkin::ClosedFormIKSolverUR solver(rws_robot, tmp_state);
+
+    // Create goal transform object
+    std::cout << "Goal (TCP):" << std::endl;
+    printArray(goalL);
+
+    const rw::math::Transform3D<> homeT = rws_robot_base->wTf(tmp_state);
+    //const rw::math::Transform3D<> homeT = rws_table->wTf(tmp_state);
+
+    const rw::math::Transform3D<> Tcorrection(
+            rw::math::Vector3D<>(0, 0, 0),
+            rw::math::RPY<>(-theta, 0, 0));
+
+    const rw::math::Transform3D<> Tdesired(
+            rw::math::Vector3D<>(goalL[0], goalL[1], goalL[2]),
+            rw::math::RPY<>(goalL[3], goalL[4], goalL[5]));
+
+    const rw::math::Transform3D<> Tdesired_wtf = Tcorrection*Tdesired;
+
+    const std::vector<rw::math::Q> solutions = solver.solve(Tdesired_wtf, tmp_state);
+    std::cout << "Found " << solutions.size() << " inverse kinematic solutions!" << std::endl;
+
+    // Use shorted config distance
+    int best_solution_index = 0;
+    double best_solution_distance = 99999;
+    int index = 0;
+    for(const auto &solution : solutions)
+    {
+        rws_robot->setQ(solution, tmp_state);
+        //getRobWorkStudio()->setState(tmp_state);
+        if( !collisionDetector->inCollision(tmp_state,NULL,true) )
+        {
+            double solution_distance = getConfDistance(startQ, solution.toStdVector());
+            if(solution_distance < best_solution_distance)
+            {
+                best_solution_index = index;
+                best_solution_distance = solution_distance;
+            }
+        }
+        index++;
+    }
+
+    return solutions[best_solution_index].toStdVector();
+}
+
+double Plugin::getConfDistance(std::vector<double> a, std::vector<double> b)
+{
+    double sum = 0;
+    for(size_t i = 0; i<a.size(); i++)
+    {
+        sum += pow((a[i] - b[i]),2);
+    }
+    sum = sqrt(sum);
+    return sum;
 }
 
 void Plugin::Take_picture()

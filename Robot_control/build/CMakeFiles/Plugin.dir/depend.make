@@ -388,6 +388,7 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtGui/qwin
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QAction
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QDockWidget
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QGridLayout
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLabel
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMainWindow
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QPushButton
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget
@@ -396,7 +397,9 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qactiongroup.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdockwidget.h
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qframe.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qgridlayout.h
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlabel.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayout.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayoutitem.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmainwindow.h
@@ -950,6 +953,8 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/share/robwork-1.2/cmake/../../../includ
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/pathplanners/rrt/RRTPlanner.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/pathplanners/rrt/RRTQToQPlanner.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/proximitystrategies/ProximityStrategyFactory.hpp
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/FrameGrabber25D.hpp
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/GLFrameGrabber25D.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/RobWorkStudio.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/RobWorkStudioConfig.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/rws/RWStudioView3D.hpp
@@ -1348,6 +1353,7 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QAction
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QDockWidget
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QGridLayout
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLabel
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMainWindow
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QPushButton
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QWidget
@@ -1356,7 +1362,9 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qactiongroup.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qboxlayout.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qdockwidget.h
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qframe.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qgridlayout.h
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlabel.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayout.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayoutitem.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmainwindow.h
@@ -1909,6 +1917,8 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/share/robwork-
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/pathplanners/rrt/RRTPlanner.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/pathplanners/rrt/RRTQToQPlanner.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/proximitystrategies/ProximityStrategyFactory.hpp
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/FrameGrabber25D.hpp
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/GLFrameGrabber25D.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/RobWorkStudio.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/RobWorkStudioConfig.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/rws/RWStudioView3D.hpp

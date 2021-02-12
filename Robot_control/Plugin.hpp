@@ -3,6 +3,7 @@
 
 // RobWork includes
 #include <rw/rw.hpp>
+#include <rwlibs/simulation/GLFrameGrabber25D.hpp>
 
 // RobWorkStudio includes
 #include <RobWorkStudio.hpp>
@@ -24,18 +25,15 @@
 // Qt includes
 #include <QPushButton>
 #include <QGridLayout>
+#include <QLabel>
 
 // Standard includes
 #include <iostream>
 #include <thread>
 #include <utility>
-#include <fstream>
-#include <iostream>
-#include <sstream>
-#include <string>
-#include <ctime>
-#include <cstdio>
-#include <stdio.h>
+#include <chrono>
+#include <cmath>
+#include <tuple>
 
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -91,21 +89,26 @@ private slots:
     // Start thread
     void startRobotMimic();
     void startRobotControl();
+    void startRobotControlRoute();
     void startHomeRobot();
 
     // Manage
+    std::vector<double> invKin(std::vector<double>, std::vector<double>);
     void connectRobot();
     void stopRobot();
+    void stopSync();
     void teachModeToggle();
 
 
     // Assistive
+    double getConfDistance(std::vector<double>, std::vector<double>);
     void printArray(std::vector<double>);
-    std::vector<double> addMove(std::vector<double>, double, double);
+    std::vector<double> addMove(std::vector<double>, double, double, double);
     void write_vector_to_file(const std::vector<double>& myVector, std::string filename);
+    void printDeviceNames(const rw::models::WorkCell& workcell);
 
     // Planning
-    void createPathRRTConnect(std::vector<double>, std::vector<double>, double, std::vector<std::vector<double>>&, rw::kinematics::State);
+    void createPathRRTConnect(std::vector<double>, std::vector<double>, double, double, double, double, std::vector<std::vector<double>>&, rw::kinematics::State);
 
     // Camera API
     void Take_picture();
@@ -121,13 +124,17 @@ private slots:
 
 private:
     // Qt buttons
-    QPushButton *_btn0,*_btn1,*_btn2,*_btn3,*_btn4, *_btn5, *_btn6, *_btn7, *_btn8, *_btn9, *_btn10, *_btn11;
+    QPushButton *_btn0,*_btn1,*_btn2,*_btn3,*_btn4, *_btn5, *_btn6, *_btn7, *_btn8, *_btn9, *_btn10, *_btn11, *_btn_stop_sync;
+    //Base Shift
+    double theta = 22.5 * (M_PI / 180);
 
     // RobWorkStudio interface
     rw::proximity::CollisionDetector::Ptr collisionDetector;
     rw::models::WorkCell::Ptr rws_wc;
     rw::kinematics::State rws_state;
-    rw::models::Device::Ptr rws_robot;
+    rw::models::SerialDevice::Ptr rws_robot;
+    rw::kinematics::Frame::Ptr rws_robot_base;
+    rw::kinematics::Frame::Ptr rws_table;
 
     // UR interface
     std::string ur_robot_ip = "192.168.1.210";
@@ -142,17 +149,20 @@ private:
     std::vector<double> homeTCP =   { -0.06489, -0.50552,  0.48784, -1.74588,  2.61176,  0.00493 };
     std::vector<double> homeQ =     {  1.777145, -1.58239, 1.58379, -3.20074, -1.61651, 0.0158763 };
 
+
     // Positions                      X           Y       Z          Rx         RY        RZ
     std::vector<double> MoveHome =  { 0.0417281, -0.7792, 0.0548525, 0.847933, -2.26498, -0.279166 };
     std::vector<double> MoveX =     { 0.0500000, -0.7792, 0.0548525, 0.847933, -2.26498, -0.279166 };
     std::vector<double> MoveZ =     { 0.0500000, -0.7792, 0.0800000, 0.847933, -2.26498, -0.279166 };
     std::vector<double> MoveY =     { 0.0500000, -0.9000, 0.0800000, 0.847933, -2.26498, -0.279166 };
     std::vector<double> Crazy =     { 0.0000000, 0.00000, 0.5000000, 0.847933, -2.26498, -0.279166 };
+    std::vector<double> placeApproachL_RW =   { 0.45, -0.5, 0.25, -1.5708, 0, -3.14159 };
 
     // Flags
     std::atomic_bool ur_robot_exists;
     std::atomic_bool ur_robot_stopped;
     std::atomic_bool ur_robot_teach_mode;
+    std::atomic_bool rws_robot_synced;
 
     // Threads
     std::thread control_thread;

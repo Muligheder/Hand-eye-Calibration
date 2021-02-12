@@ -7,8 +7,6 @@
 // Standard includes
 #include <iostream>
 #include <thread>
-#include <utility>
-#include <thread>
 #include <chrono>
 
 using namespace ur_rtde;
@@ -21,6 +19,7 @@ int main(int argc, char* argv[])
     RTDEControlInterface rtde_control("192.168.1.210");
     RTDEReceiveInterface rtde_receive("192.168.1.210");
     std::vector<double> init_q = rtde_receive.getActualQ();
+    print(init_q);
 
     // Target in the robot base
     std::vector<double> new_q = init_q;
@@ -39,6 +38,7 @@ int main(int argc, char* argv[])
 
     // Target 10 cm up in the Z-Axis of the TCP
     std::vector<double> target = rtde_receive.getActualTCPPose();
+    print(target);
     target[2] += 0.10;
 
     /**
@@ -48,12 +48,15 @@ int main(int argc, char* argv[])
     */
 
     rtde_control.moveL(target, 0.25, 0.5);
+    print(target);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
     // Stop the movement before it reaches target
     rtde_control.stopL(0.5);
 
+
     // Move to initial joint position with a regular moveJ
     rtde_control.moveJ(init_q);
+    print(init_q);
 
     // Stop the RTDE control script
     rtde_control.stopScript();
@@ -68,4 +71,5 @@ void print(std::vector<double> const &input)
 
     }
     std::cout << "}";
+    std::cout << std::endl;
 }

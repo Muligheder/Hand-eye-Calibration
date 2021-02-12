@@ -15,6 +15,8 @@ Plugin.hpp
 /home/anders/Hand-eye-Calibration/Robot_control/Plugin.hpp
 rw/rw.hpp
 -
+rwlibs/simulation/GLFrameGrabber25D.hpp
+-
 RobWorkStudio.hpp
 -
 rws/RobWorkStudioPlugin.hpp
@@ -37,25 +39,19 @@ QPushButton
 -
 QGridLayout
 -
+QLabel
+-
 iostream
 -
 thread
 -
 utility
 -
-fstream
+chrono
 -
-iostream
+cmath
 -
-sstream
--
-string
--
-ctime
--
-cstdio
--
-stdio.h
+tuple
 -
 opencv2/opencv.hpp
 -
@@ -2540,6 +2536,10 @@ qdockwidget.h
 qgridlayout.h
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qgridlayout.h
 
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/QLabel
+qlabel.h
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlabel.h
+
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/QMainWindow
 qmainwindow.h
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qmainwindow.h
@@ -2600,6 +2600,12 @@ QtWidgets/qtwidgetsglobal.h
 QtWidgets/qwidget.h
 -
 
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qframe.h
+QtWidgets/qtwidgetsglobal.h
+-
+QtWidgets/qwidget.h
+-
+
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qgridlayout.h
 QtWidgets/qtwidgetsglobal.h
 -
@@ -2608,6 +2614,12 @@ QtWidgets/qlayout.h
 QtWidgets/qwidget.h
 -
 limits.h
+-
+
+/usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlabel.h
+QtWidgets/qtwidgetsglobal.h
+-
+QtWidgets/qframe.h
 -
 
 /usr/include/x86_64-linux-gnu/qt5/QtWidgets/qlayout.h
@@ -8262,6 +8274,22 @@ rw/proximity/CollisionToleranceStrategy.hpp
 rw/proximity/DistanceMultiStrategy.hpp
 -
 rw/proximity/DistanceStrategy.hpp
+-
+
+/usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/FrameGrabber25D.hpp
+rw/core/Ptr.hpp
+-
+rw/geometry/PointCloud.hpp
+-
+
+/usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/GLFrameGrabber25D.hpp
+FrameGrabber25D.hpp
+/usr/share/robwork-1.2/cmake/../../../include/robwork-1.2/rwlibs/simulation/FrameGrabber25D.hpp
+rw/core/Ptr.hpp
+-
+rw/graphics/SceneViewer.hpp
+-
+rw/math/Transform3D.hpp
 -
 
 /usr/share/robworkstudio-1.2/cmake/../../../include/robworkstudio-1.2/RobWorkStudio.hpp

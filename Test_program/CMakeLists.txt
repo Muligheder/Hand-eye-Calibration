@@ -15,13 +15,9 @@ find_package(realsense2)
 find_package(OpenCV REQUIRED )
 include_directories(${OpenCV_INCLUDE_DIRS})
 
-
-
-
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 include_directories(${GLFW_INCLUDE_DIRS})
-
 
 find_package(PCL 1.4 REQUIRED)
 

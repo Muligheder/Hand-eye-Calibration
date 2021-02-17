@@ -59,7 +59,7 @@ int main(int argc, char* argv[])
     print(init_q);
 
     // Stop the RTDE control script
-    rtde_control.stopScript();
+    //rtde_control.stopScript();
     return 0;
 }
 void print(std::vector<double> const &input)

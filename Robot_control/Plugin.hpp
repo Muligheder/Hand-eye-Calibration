@@ -137,7 +137,7 @@ private:
     rw::kinematics::Frame::Ptr rws_table;
 
     // UR interface
-    std::string ur_robot_ip = "192.168.1.210";
+    std::string ur_robot_ip = "192.168.0.200";
     ur_rtde::RTDEControlInterface   *ur_robot;
     ur_rtde::RTDEIOInterface        *ur_robot_io;
     ur_rtde::RTDEReceiveInterface   *ur_robot_receive;

@@ -106,6 +106,7 @@ private slots:
     std::vector<double> addMove(std::vector<double>, double, double, double);
     void write_vector_to_file(const std::vector<double>& myVector, std::string filename);
     void printDeviceNames(const rw::models::WorkCell& workcell);
+    void moveToJ(std::vector<double>, double, double);
 
     // Planning
     void createPathRRTConnect(std::vector<double>, std::vector<double>, double, double, double, double, std::vector<std::vector<double>>&, rw::kinematics::State);
@@ -145,9 +146,9 @@ private:
     // Positions                       j0        j1        j2        j3        j4        j5
     std::vector<double> gripQ =     {  1.03566, -1.18752,  1.98773, -2.39819, -1.55003, -1.74102 };
     std::vector<double> gripTCP =   { -0.15573, -0.52874,  0.17813,  1.77626, -2.57197,  0.04202 };
-    //std::vector<double> homeQ =     {  1.17810, -1.57080,  1.57080, -1.57080, -1.57080, -1.57080 };
+    std::vector<double> homeQ =     {  0, -1.57080,  -1.57080, 0, 1.57080, 0 };
     std::vector<double> homeTCP =   { -0.06489, -0.50552,  0.48784, -1.74588,  2.61176,  0.00493 };
-    std::vector<double> homeQ =     {  1.777145, -1.58239, 1.58379, -3.20074, -1.61651, 0.0158763 };
+    //std::vector<double> homeQ =     {  1.777145, -1.58239, 1.58379, -3.20074, -1.61651, 0.0158763 };
 
 
     // Positions                      X           Y       Z          Rx         RY        RZ

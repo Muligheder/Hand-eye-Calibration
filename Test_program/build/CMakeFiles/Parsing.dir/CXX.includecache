@@ -1,0 +1,24 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/anders/Master/Hand-eye-Calibration/Test_program/src/parsing_tcp_data.cpp
+iostream
+-
+fstream
+-
+sstream
+-
+string
+-
+vector
+-
+iterator
+-
+algorithm
+-
+

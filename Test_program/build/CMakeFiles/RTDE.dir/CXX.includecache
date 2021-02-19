@@ -1,0 +1,22 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/anders/Master/Hand-eye-Calibration/Test_program/src/ur_robot_rtde_test.cpp
+ur_rtde/rtde_control_interface.h
+-
+ur_rtde/rtde_receive_interface.h
+-
+ur_rtde/rtde_io_interface.h
+-
+iostream
+-
+thread
+-
+chrono
+-
+

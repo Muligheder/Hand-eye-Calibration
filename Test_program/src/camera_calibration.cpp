@@ -22,8 +22,8 @@ int main()
   for(int i{0}; i<CHECKERBOARD[1]; i++)
   {
     for(int j{0}; j<CHECKERBOARD[0]; j++)
-      objp.push_back(cv::Point3f(j,i,0));
-
+      objp.push_back(cv::Point3f(j*20,i*20,0));
+    std::cout << objp << std::endl;
   }
 
 
@@ -31,7 +31,7 @@ int main()
   // Extracting path of individual image stored in a given directory
   std::vector<cv::String> images;
   // Path of the folder containing checkerboard images
-  std::string path = "/home/anders/Hand-eye-Calibration/Robot_control/workcell/Images_20/*.jpg";
+  std::string path = "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/*.jpg";
 
   cv::glob(path, images);
 

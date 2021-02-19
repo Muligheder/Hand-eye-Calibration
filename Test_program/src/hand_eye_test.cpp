@@ -94,8 +94,13 @@ int main()
     std::vector<Mat> t_gripper2base;
     std::vector<Mat> R_target2cam;
     std::vector<Mat> t_target2cam;
-    Mat R_cam2gripper = (Mat_<float>(3, 3));
-    Mat t_cam2gripper = (Mat_<float>(3, 1));
+
+
+    cv::Mat R_cam2gripper_TSAI = (cv::Mat_<float>(3, 3));
+    cv::Mat R_cam2gripper_HORAUD = (cv::Mat_<float>(3, 3));
+    cv::Mat R_cam2gripper_PARK = (cv::Mat_<float>(3, 3));
+    cv::Mat R_cam2gripper_ANDREFF = (cv::Mat_<float>(3, 3));
+    cv::Mat R_cam2gripper_DAN = (cv::Mat_<float>(3, 3));
 
     cv::Mat t_cam2gripper_TSAI = (cv::Mat_<float>(3, 1));
     cv::Mat t_cam2gripper_HORAUD = (cv::Mat_<float>(3, 1));
@@ -104,15 +109,15 @@ int main()
     cv::Mat t_cam2gripper_DAN = (cv::Mat_<float>(3, 1));
 
     vector<String> fn;
-    glob("/home/anders/Hand-eye-Calibration/Test_program/build/poses_and_images/images/*.bmp", fn, false);
+    glob("/home/anders/Master/Hand-eye-Calibration/Test_program/build/poses_and_images/images/*.bmp", fn, false);
 
     vector<Mat> images;
     size_t num_images = fn.size(); //number of bmp files in images folder
     cout << "number of images"<< num_images<<endl;
     Size patternsize(5, 7); //number of centers
-    vector<Point2f> centers; //this will be filled by the detected centers
+    std::vector<Point2f> centers; //this will be filled by the detected centers
     float cell_size = 30;
-    vector<Point3f> obj_points;
+    std::vector<Point3f> obj_points;
 
     R_gripper2base.reserve(num_images);
     t_gripper2base.reserve(num_images);
@@ -204,6 +209,17 @@ int main()
     Mat robot_rot_09 = eulerAnglesToRotationMatrix(theta_09);
     Mat robot_rot_10 = eulerAnglesToRotationMatrix(theta_10);
 
+    cout<< "robot_rot_01" <<endl << robot_rot_01<< endl << endl;
+    cout<< "robot_rot_02" <<endl << robot_rot_02<< endl << endl;
+    cout<< "robot_rot_03" <<endl << robot_rot_03<< endl << endl;
+    cout<< "robot_rot_04" <<endl << robot_rot_04<< endl << endl;
+    cout<< "robot_rot_05" <<endl << robot_rot_05<< endl << endl;
+    cout<< "robot_rot_06" <<endl << robot_rot_06<< endl << endl;
+    cout<< "robot_rot_07" <<endl << robot_rot_07<< endl << endl;
+    cout<< "robot_rot_08" <<endl << robot_rot_08<< endl << endl;
+    cout<< "robot_rot_09" <<endl << robot_rot_09<< endl << endl;
+    cout<< "robot_rot_10" <<endl << robot_rot_10<< endl << endl;
+
     //    const Mat robot_tr_01 = (Mat_<float>(3, 1) << 781.2, 338.59, 903.48);
     //    const Mat robot_tr_02 = (Mat_<float>(3, 1) << 867.65, 382.52, 884.42);
     //    const Mat robot_tr_03 = (Mat_<float>(3, 1) << 856.91, 172.99, 964.61);
@@ -226,6 +242,17 @@ int main()
      Mat robot_tr_08 = (Mat_<float>(3, 1) << -1073.8, -128.3, 438.5);
      Mat robot_tr_09 = (Mat_<float>(3, 1) << -1073.8, -128.3, 438.5);
      Mat robot_tr_10 = (Mat_<float>(3, 1) << -1171.5, -166.3, 630.0);
+
+     cout<< "Translation 1" <<endl << robot_tr_01<< endl << endl;
+     cout<< "Translation 2" <<endl << robot_tr_02<< endl << endl;
+     cout<< "Translation 3" <<endl << robot_tr_03<< endl << endl;
+     cout<< "Translation 4" <<endl << robot_tr_04<< endl << endl;
+     cout<< "Translation 5" <<endl << robot_tr_05<< endl << endl;
+     cout<< "Translation 6" <<endl << robot_tr_06<< endl << endl;
+     cout<< "Translation 7" <<endl << robot_tr_07<< endl << endl;
+     cout<< "Translation 8" <<endl << robot_tr_08<< endl << endl;
+     cout<< "Translation 9" <<endl << robot_tr_09<< endl << endl;
+     cout<< "Translation 10" <<endl << robot_tr_10<< endl << endl;
 
 //     //Reverse the translation vector from XYZ to ZYX
 //     robot_tr_01= ReverseVector(robot_tr_01);
@@ -277,8 +304,8 @@ int main()
     cout << t_gripper2base.size() << " t_gripper2base"<<endl;
     cout << R_target2cam.size() << " R_target2cam"<<endl;
     cout << R_target2cam.size() << " t_target2cam"<<endl;
-    cout << R_cam2gripper.size() << " R_cam2gripper"<<endl;
-    cout << t_cam2gripper.size() << " t_cam2gripper"<<endl<<endl;
+    //cout << R_cam2gripper.size() << " R_cam2gripper"<<endl;
+    //cout << t_cam2gripper.size() << " t_cam2gripper"<<endl<<endl;
 
     cout << "Input to calibrateHandEyed: "<<endl;
     cout << "R_gripper2base = "<< endl <<" " << R_gripper2base[4] << endl<< endl;
@@ -290,23 +317,41 @@ int main()
 
 
 
-    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper, t_cam2gripper_TSAI, CALIB_HAND_EYE_TSAI);
-    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper, t_cam2gripper_HORAUD, CALIB_HAND_EYE_HORAUD);
-    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper, t_cam2gripper_ANDREFF, CALIB_HAND_EYE_ANDREFF);
-    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper, t_cam2gripper_PARK, CALIB_HAND_EYE_PARK);
-    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper, t_cam2gripper_DAN, CALIB_HAND_EYE_DANIILIDIS);
+    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper_TSAI, t_cam2gripper_TSAI, CALIB_HAND_EYE_TSAI);
+    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper_HORAUD, t_cam2gripper_HORAUD, CALIB_HAND_EYE_HORAUD);
+    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper_ANDREFF, t_cam2gripper_ANDREFF, CALIB_HAND_EYE_ANDREFF);
+    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper_PARK, t_cam2gripper_PARK, CALIB_HAND_EYE_PARK);
+    calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper_DAN, t_cam2gripper_DAN, CALIB_HAND_EYE_DANIILIDIS);
+    Vec3f R_cam2gripper_rT = rotationMatrixToEulerAngles(R_cam2gripper_TSAI);
+    Vec3f R_cam2gripper_rH = rotationMatrixToEulerAngles(R_cam2gripper_HORAUD);
+    Vec3f R_cam2gripper_rA = rotationMatrixToEulerAngles(R_cam2gripper_ANDREFF);
+    Vec3f R_cam2gripper_rP = rotationMatrixToEulerAngles(R_cam2gripper_PARK);
+    Vec3f R_cam2gripper_rD = rotationMatrixToEulerAngles(R_cam2gripper_DAN);
 
-    Vec3f R_cam2gripper_r = rotationMatrixToEulerAngles(R_cam2gripper);
+    //Rotation
+    cout << "R_cam2gripper_TSAI = " << endl << " " << R_cam2gripper_TSAI << endl << endl;
+    cout << "R_cam2gripper_rT = " << endl << " " << R_cam2gripper_rT << endl << endl;
 
-    cout << "R_cam2gripper = " << endl << " " << R_cam2gripper << endl << endl;
-    cout << "R_cam2gripper_r = " << endl << " " << R_cam2gripper_r << endl << endl;
-  //  cout << "t_cam2gripper = " << endl << " " << t_cam2gripper << endl << endl;
+    cout << "R_cam2gripper_HORAUD = " << endl << " " << R_cam2gripper_HORAUD << endl << endl;
+    cout << "R_cam2gripper_rH = " << endl << " " << R_cam2gripper_rH << endl << endl;
+
+    cout << "R_cam2gripper_ANDREFF = " << endl << " " << R_cam2gripper_ANDREFF << endl << endl;
+    cout << "R_cam2gripper_rA = " << endl << " " << R_cam2gripper_rA << endl << endl;
+
+    cout << "R_cam2gripper_PARK = " << endl << " " << R_cam2gripper_PARK << endl << endl;
+    cout << "R_cam2gripper_rP = " << endl << " " << R_cam2gripper_rP << endl << endl;
+
+    cout << "R_cam2gripper_DAN = " << endl << " " << R_cam2gripper_DAN << endl << endl;
+    cout << "R_cam2gripper_rD = " << endl << " " << R_cam2gripper_rD << endl << endl;
+
+    // Translation
     cout << "t_cam2gripper_TSAI = " << endl << " " << t_cam2gripper_TSAI << endl << endl;
     cout << "t_cam2gripper_HORAUD = " << endl << " " << t_cam2gripper_HORAUD << endl << endl;
     cout << "t_cam2gripper_PARK = " << endl << " " << t_cam2gripper_PARK << endl << endl;
     cout << "t_cam2gripper_ANDREFF = " << endl << " " << t_cam2gripper_ANDREFF << endl << endl;
     cout << "t_cam2gripper_DAN = " << endl << " " << t_cam2gripper_DAN << endl << endl;
 }
+
 
 Mat eulerAnglesToRotationMatrix(Vec3f &theta)
 {

@@ -54,7 +54,7 @@ Plugin::Plugin():
     pLayout->addWidget(_btn7, row++, 0);
     connect(_btn7, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
-    _btn8 = new QPushButton("Move In X");
+    _btn8 = new QPushButton("Easy Home");
     pLayout->addWidget(_btn8, row++, 0);
     connect(_btn8, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
@@ -372,9 +372,8 @@ void Plugin::RunHomeRobot()
     ur_robot->moveJ(path);*/
 }
 
-void Plugin::MoveInToolSpace()
+void Plugin::moveToJ(std::vector<double> goal, double acceleration, double velocity)
 {
-    /*
     if(!ur_robot_exists)
     {
         std::cout << "Robot not connected..." << std::endl;
@@ -387,82 +386,28 @@ void Plugin::MoveInToolSpace()
         return;
     }
 
-    std::vector<double> home = addMove(MoveHome, 0.1, 0.1);
-    std::vector<double> NewX = addMove(MoveX, 0.1, 0.1);
-    std::vector<double> NewZ = addMove(MoveZ, 0.1, 0.1);
-    std::vector<double> NewY = addMove(MoveY, 0.1, 0.1);
-  //  std::vector<double> NewCrazy = addMove(Crazy, 0.1, 0.1);
+    std::cout << "Moving to location" << std::endl;
+    ur_robot->moveJ(goal, acceleration, velocity);
+}
 
-    std::vector<std::vector<double>> path;
+void Plugin::MoveInToolSpace()
+{
 
-    path.clear();
-    path.push_back(NewZ);
-    ur_robot->moveL(path);
-    write_vector_to_file(NewZ,"test.txt");
+    if(!ur_robot_exists)
+    {
+        std::cout << "Robot not connected..." << std::endl;
+        return;
+    }
 
-    path.clear();
-    path.push_back(NewX);
-    ur_robot->moveL(path);
-    write_vector_to_file(NewX,"test.txt");
-
-    path.clear();
-    path.push_back(NewY);
-    ur_robot->moveL(path);
-    write_vector_to_file(NewY,"test.txt");
-
-    path.clear();
-    path.push_back(home);
-    ur_robot->moveL(path);
-    write_vector_to_file(home,"test.txt");
-
-//    path.clear();
-//    path.push_back(NewCrazy);
-//    ur_robot->moveL(path);
-//    write_vector_to_file(NewCrazy,"test.txt");*/
-
-   // ur_rtde::RTDEControlInterface rtde_control("192.168.1.210");
-    //ur_rtde::RTDEReceiveInterface rtde_receive("192.168.1.210");
-    std::vector<double> init_q = ur_robot_receive->getActualQ();
-    printArray(init_q);
-
-    // Target in the robot base
-    std::vector<double> new_q = init_q;
-    new_q[0] += 0.2;
-    printArray(new_q);
-    /**
-    * Move asynchronously in joint space to new_q, we specify asynchronous behavior by setting the async parameter to
-    * 'true'. Try to set the async parameter to 'false' to observe a default synchronous movement, which cannot be
-    * stopped by the stopJ function due to the blocking behaviour.
-    */
-
-    ur_robot->moveJ(new_q, 1.05, 1.4);
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    // Stop the movement before it reaches new_q
-    ur_robot->stopJ(0.5);
-
-    // Target 10 cm up in the Z-Axis of the TCP
-    std::vector<double> target = ur_robot_receive->getActualTCPPose();
-    printArray(target);
-    target[2] += 0.10;
-    printArray(target);
-    /**
-    * Move asynchronously in cartesian space to target, we specify asynchronous behavior by setting the async parameter
-    * to 'true'. Try to set the async parameter to 'false' to observe a default synchronous movement, which cannot be
-    * stopped by the stopL function due to the blocking behaviour.
-    */
-
-    ur_robot->moveL(target, 0.25, 0.5);
-    std::this_thread::sleep_for(std::chrono::milliseconds(200));
-    // Stop the movement before it reaches target
-    ur_robot->stopL(0.5);
-    printArray(target);
+    if(ur_robot_teach_mode)
+    {
+        std::cout << "Teach mode enabled..." << std::endl;
+        return;
+    }
 
 
-    // Move to initial joint position with a regular moveJ
-    ur_robot->moveJ(init_q);
-    printArray(init_q);
-    // Stop the RTDE control script
-    //ur_robot->stopScript();
+    moveToJ(homeQ, 0.8, 0.8);
+    //write_vector_to_file(home,"test.txt");
 }
 
 void Plugin::write_vector_to_file(const std::vector<double>& myVector, std::string filename)
@@ -664,12 +609,13 @@ void Plugin::Take_picture()
             bool patternfound = cv::findChessboardCorners(color, patternsize, centers);
             if (patternfound)
             {
-                sprintf(filename, "/home/anders/Hand-eye-Calibration/Robot_control/workcell/Images/0-%d.jpg", c);
+                sprintf(filename, "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/0-%d.jpg", c);
                 cv::imwrite(filename, color);
                 cv::drawChessboardCorners(color, patternsize, cv::Mat(centers), patternfound);
                 cv::imshow("CAMERA 1", color);    
                 std::cout << "Cam 1 image captured   = " << c << std::endl;
                 std::vector<double> fromQ = ur_robot_receive->getActualTCPPose();
+                printArray(fromQ);
 
                 write_vector_to_file(fromQ,"test.txt");
 

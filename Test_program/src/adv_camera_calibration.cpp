@@ -193,7 +193,7 @@ int main(int argc, char *argv[])
    // {
         Mat image, imageCopy;
         vector<cv::String> fn;
-        glob("/home/anders/Test_program/build/images/*.jpg", fn, false);
+        glob("/home/anders/Master/Hand-eye-Calibration/Test_program/build/images/*.jpg", fn, false);
 
         vector<Mat> images;
         size_t count = fn.size(); //number of png files in images folder

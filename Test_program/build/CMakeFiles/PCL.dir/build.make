@@ -60,15 +60,15 @@ include CMakeFiles/PCL.dir/flags.make
 CMakeFiles/PCL.dir/src/pcl_test.cpp.o: CMakeFiles/PCL.dir/flags.make
 CMakeFiles/PCL.dir/src/pcl_test.cpp.o: ../src/pcl_test.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Master/Hand-eye-Calibration/Test_program/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/PCL.dir/src/pcl_test.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/PCL.dir/src/pcl_test.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Test_program/src/pcl_test.cpp
+	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/PCL.dir/src/pcl_test.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Test_program/src/pcl_test.cpp
 
 CMakeFiles/PCL.dir/src/pcl_test.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/PCL.dir/src/pcl_test.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Test_program/src/pcl_test.cpp > CMakeFiles/PCL.dir/src/pcl_test.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Test_program/src/pcl_test.cpp > CMakeFiles/PCL.dir/src/pcl_test.cpp.i
 
 CMakeFiles/PCL.dir/src/pcl_test.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/PCL.dir/src/pcl_test.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Test_program/src/pcl_test.cpp -o CMakeFiles/PCL.dir/src/pcl_test.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Test_program/src/pcl_test.cpp -o CMakeFiles/PCL.dir/src/pcl_test.cpp.s
 
 CMakeFiles/PCL.dir/src/pcl_test.cpp.o.requires:
 

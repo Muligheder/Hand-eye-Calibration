@@ -1,5 +1,7 @@
-#include "Plugin.hpp"
+﻿#include "Plugin.hpp"
 #include "/home/anders/librealsense/examples/example.hpp" // Include short list of convenience functions for rendering
+
+
 Plugin::Plugin():
     rws::RobWorkStudioPlugin("Plugin", QIcon(":/plugin.png"))
 {
@@ -66,7 +68,7 @@ Plugin::Plugin():
     pLayout->addWidget(_btn10, row++, 0);
     connect(_btn10, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
-    _btn11 = new QPushButton("Extrating Robot T-Matrix");
+    _btn11 = new QPushButton("PCL");
     pLayout->addWidget(_btn11, row++, 0);
     connect(_btn11, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
@@ -93,6 +95,7 @@ void Plugin::initialize()
 
 void Plugin::open(rw::models::WorkCell* workcell)
 {
+
     std::cout << "Start of open()" << std::endl;
 
     // If workcell exists
@@ -155,7 +158,7 @@ void Plugin::clickEvent()
     else if(obj == _btn10)
         Analyze_images();
     else if(obj == _btn11)
-        TransformationRobot();
+        PCL();
     else if(obj == _btn_stop_sync)
         stopSync();
 
@@ -210,6 +213,24 @@ std::vector<double> Plugin::addMove(std::vector<double> position, double acceler
     return position_and_move;
 }
 
+void Plugin::import3DPoint(std::vector<double> &point)
+{
+
+        std::vector<std::vector<double>> v;
+        std::ifstream in( "test1.txt" );
+        std::string record;
+
+        while ( std::getline( in, record ) )
+        {
+            std::istringstream is( record );
+            std::vector<double> row( ( std::istream_iterator<double>( is ) ),
+                                     std::istream_iterator<double>() );
+            v.push_back( row );
+        }
+        for(auto && p : v){
+          point.insert(point.end(), p.begin(), p.end());
+        }
+}
 
 
 
@@ -227,27 +248,68 @@ void Plugin::RunRobotControl()
         return;
     }
 
-    std::vector<double> grip = addMove(gripQ, 0.2, 0.2);
-    std::vector<double> home = addMove(homeQ);
 
+    std::vector<double> point;
+    import3DPoint(point);
+    printArray(point);
+
+    // Camera to target
+    std::vector<double> cTt = point;
+
+    // target to camera
+    std::vector<double> tTc  = Pose_inv(cTt);
+
+    // Camera to Gripper from visp
+    std::vector<double> gTc = {-0.008496624885,  0.01004966999,  0.1188209676,  -0.026702465,  -0.03330274707,  -2.335288144};
+    // Camera to Gripper from openCV
+    //std::vector<double> gTc = {-0.007333253944998697,  0.00941774561076744,  0.1150842076108506,  -0.0114279, -0.0131705, -2.33678};
+
+    // Gripper to Camera
+    std::vector<double> cTg = Pose_inv(gTc);
+
+    // base to gripper getActualTCPPose()
+    //std::vector<double> bTg = {0.50643, -0.136141, 0.643752, -2.84425, -1.22914, -0.0897504};
+    std::vector<double> bTg = ur_robot_receive->getActualTCPPose();
+
+    // gripper to base
+    std::vector<double> gTb = Pose_inv(bTg);
+
+    // base to camera bTt=bTg*cTg⁻1*cTt
+    std::vector<double> bTc = ur_robot->poseTrans(bTg,gTc);
+
+    // base to target
+    std::vector<double> bTt = ur_robot->poseTrans(bTc,cTt);
+
+    // Offset
+    std::vector<double> bTt_offset = ur_robot->poseTrans(bTt,cTg);
+
+    // RRT Between points
     std::vector<std::vector<double>> path;
+    std::vector<double> fromQ = ur_robot_receive->getActualQ();
+    std::vector<double> toQ = invKin(fromQ,bTt_offset);
+    rw::kinematics::State tmp_state = rws_state.clone();
+    createPathRRTConnect(fromQ, toQ, 0.05, 0.8, 0.8, 0.02, path, tmp_state);
+    path.push_back(addMove(toQ, 0.4, 0.4, 0));
 
-    ur_robot_stopped = false;
-    while(!ur_robot_stopped)
-    {
-        // Open and move down
-        path.clear();
-        ur_robot_io->setStandardDigitalOut(0,OPEN);
-        path.push_back(grip);
-        ur_robot->moveJ(path);
+    std::cout << "Moving robot..." << std::endl;
 
-        // Close and move up
-        ur_robot_io->setStandardDigitalOut(0,CLOSE);
-        path.clear();
-        path.push_back(home);
-        ur_robot->moveJ(path);
-    }
-    // ur_robot->stopScript(); // Stops further actions
+
+    ur_robot->moveJ(path);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
+
+
+//    QMatrix4x4 tranform;
+//    transform.translate();
+//    transform.rotate(QQuarternioin::from);
+//    QMatrix4x4 t = transoform * transform2;
+
+//    QTransform
+
+//    printArray(target);
+//    std::cout << "Moving robot..." << std::endl;
+//    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+//    ur_robot->moveL(target,0.5,0.5);
+//    std::cout << "Location reached.." << std::endl;
 }
 
 void Plugin::teachModeToggle()
@@ -405,9 +467,11 @@ void Plugin::MoveInToolSpace()
         return;
     }
 
+    std::vector<double> bTg = {0.50643, -0.136141, 0.643752, -2.84425, -1.22914, -0.0897504};
+    std::cout << "Moving to location" << std::endl;
+    ur_robot->moveJ_IK(bTg);
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
-    moveToJ(homeQ, 0.8, 0.8);
-    //write_vector_to_file(home,"test.txt");
 }
 
 void Plugin::write_vector_to_file(const std::vector<double>& myVector, std::string filename)
@@ -482,7 +546,8 @@ void Plugin::createPathRRTConnect(std::vector<double> from, std::vector<double> 
 
 std::vector<double> Plugin::invKin(std::vector<double> startQ, std::vector<double> goalL)
 {
-    double theta = 22.5 * (M_PI / 180);
+    //double theta = 22.5 * (M_PI / 180);
+
 
     // Duplicate state
     rw::kinematics::State tmp_state = rws_state.clone();
@@ -494,20 +559,20 @@ std::vector<double> Plugin::invKin(std::vector<double> startQ, std::vector<doubl
     std::cout << "Goal (TCP):" << std::endl;
     printArray(goalL);
 
-    const rw::math::Transform3D<> homeT = rws_robot_base->wTf(tmp_state);
+    //const rw::math::Transform3D<> homeT = rws_robot_base->wTf(tmp_state);
     //const rw::math::Transform3D<> homeT = rws_table->wTf(tmp_state);
 
-    const rw::math::Transform3D<> Tcorrection(
-            rw::math::Vector3D<>(0, 0, 0),
-            rw::math::RPY<>(-theta, 0, 0));
+//    const rw::math::Transform3D<> Tcorrection(
+//            rw::math::Vector3D<>(0, 0, 0),
+//            rw::math::RPY<>(-theta, 0, 0));
 
     const rw::math::Transform3D<> Tdesired(
             rw::math::Vector3D<>(goalL[0], goalL[1], goalL[2]),
-            rw::math::RPY<>(goalL[3], goalL[4], goalL[5]));
+            rw::math::EAA<>(goalL[3], goalL[4], goalL[5]));
 
-    const rw::math::Transform3D<> Tdesired_wtf = Tcorrection*Tdesired;
+    //const rw::math::Transform3D<> Tdesired_wtf = Tcorrection*Tdesired;
 
-    const std::vector<rw::math::Q> solutions = solver.solve(Tdesired_wtf, tmp_state);
+    const std::vector<rw::math::Q> solutions = solver.solve(Tdesired, tmp_state);
     std::cout << "Found " << solutions.size() << " inverse kinematic solutions!" << std::endl;
 
     // Use shorted config distance
@@ -559,7 +624,7 @@ void Plugin::Take_picture()
     // Create a configuration for configuring the pipeline with a non default profile
     rs2::config cfg;
     // Add pose stream
-    cfg.enable_stream(RS2_STREAM_COLOR, 960, 540, RS2_FORMAT_BGR8, 60);
+    cfg.enable_stream(RS2_STREAM_COLOR, 1920, 1080, RS2_FORMAT_BGR8, 30);
 
     // Start pipeline with chosen configuration
     pipe.start(cfg);
@@ -573,9 +638,9 @@ void Plugin::Take_picture()
     //    }
 
 
-    cv::Size patternsize(6, 9); //number of centers
+    cv::Size patternsize(5, 8); //number of centers
     std::vector<cv::Point2f> centers; //this will be filled by the detected centers
-    double cell_size = 20;
+    double cell_size = 28.6666666666;
     std::vector<cv::Point3f> obj_points;
     for (int i = 0; i < patternsize.height; ++i)
         for (int j = 0; j < patternsize.width; ++j)
@@ -591,7 +656,7 @@ void Plugin::Take_picture()
         rs2::frame color_frame = frames.get_color_frame();
 
         // Creating OpenCV Matrix from a color image
-        cv::Mat color(cv::Size(960, 540), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+        cv::Mat color(cv::Size(1920, 1080), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
 
         // save Image
         if(color.empty())
@@ -600,19 +665,31 @@ void Plugin::Take_picture()
             break;
         }
         usleep(5);
-        cv::imshow("Lidar Camera L515", color);
+        cv::namedWindow("L515", cv::WINDOW_NORMAL);
+        cv::resizeWindow("L515", cv::Size(960,540));
+        cv::imshow("L515", color);
 
         key =  cvWaitKey(25);
 
         if( key == '1')      //CAPTURING IMAGE FROM CAM
         {
+//            rs2::frameset frames;
+//                for(int i = 0; i < 30; i++)
+//                {
+//                    //Wait for all configured streams to produce a frame
+//                    frames = pipe.wait_for_frames();
+//                }
+
             bool patternfound = cv::findChessboardCorners(color, patternsize, centers);
             if (patternfound)
             {
-                sprintf(filename, "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/0-%d.jpg", c);
+                sprintf(filename, "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/%02d.bmp", c);
                 cv::imwrite(filename, color);
                 cv::drawChessboardCorners(color, patternsize, cv::Mat(centers), patternfound);
-                cv::imshow("CAMERA 1", color);    
+
+                cv::namedWindow("CAMERA 1", cv::WINDOW_NORMAL);
+                cv::resizeWindow("CAMERA 1", cv::Size(960, 540));
+                cv::imshow("CAMERA 1", color);
                 std::cout << "Cam 1 image captured   = " << c << std::endl;
                 std::vector<double> fromQ = ur_robot_receive->getActualTCPPose();
                 printArray(fromQ);
@@ -888,3 +965,222 @@ cv::Mat Plugin::ReverseVector(cv::Mat &v)
     return RV;
 }
 
+std::vector<double> Plugin::Pose_inv(std::vector<double> v)
+{
+    // Initialze
+    cv::Mat t_Inverse(3, 1, CV_64F), R_Inverse(3, 1, CV_64F), R_Inverse_result(3, 1, CV_64F);
+    cv::Mat Rodrigues_Inverse;
+    cv::Mat t = (cv::Mat_<double>(3, 1)<< v[0],v[1],v[2]);
+    cv::Mat R = (cv::Mat_<double>(3, 1)<< v[3],v[4],v[5]);
+
+    //std::cout <<std::endl << "R " << std::endl << R << std::endl;
+    //std::cout <<std::endl << "t " << std::endl << t << std::endl;
+
+    // from 3x1 rotvec to 3x3 rotm
+    cv::Rodrigues(R,Rodrigues_Inverse);
+
+    //std::cout <<std::endl << "Rodrigues_Inverse " << std::endl << Rodrigues_Inverse << std::endl;
+
+    // create inverse T
+    R_Inverse=Rodrigues_Inverse.t();// Inverse Rotation
+    t_Inverse= -R_Inverse * t; // Inverse translation
+
+    //std::cout <<std::endl << "R_inverse " << std::endl << R_Inverse << std::endl;
+    //std::cout <<std::endl << "t_Inverse " << std::endl << t_Inverse << std::endl;
+
+    cv::Rodrigues(R_Inverse,R_Inverse_result);
+    //std::cout <<std::endl << "R_Inverse_result " << std::endl << R_Inverse_result << std::endl;
+
+    // cv::Mat --> std::vector
+    std::vector<double>t_inv(t_Inverse.begin<double>(), t_Inverse.end<double>());
+    std::vector<double>R_inv(R_Inverse_result.begin<double>(), R_Inverse_result.end<double>());
+
+//    print(t_inv);
+//    print(R_inv);
+
+    std::vector<double> pose(t_inv);
+        pose.insert(pose.end(), R_inv.begin(), R_inv.end());
+       // printArray(pose);
+    return pose;
+
+}
+
+std::tuple<uint8_t, uint8_t, uint8_t> Plugin::get_texcolor(rs2::video_frame texture, rs2::texture_coordinate texcoords)
+{
+    const int w = texture.get_width(), h = texture.get_height();
+
+    // convert normals [u v] to basic coords [x y]
+    int x = std::min(std::max(int(texcoords.u*w + .5f), 0), w - 1);
+    int y = std::min(std::max(int(texcoords.v*h + .5f), 0), h - 1);
+
+    int idx = x * texture.get_bytes_per_pixel() + y * texture.get_stride_in_bytes();
+    const auto texture_data = reinterpret_cast<const uint8_t*>(texture.get_data());
+    return std::tuple<uint8_t, uint8_t, uint8_t>(texture_data[idx], texture_data[idx+1], texture_data[idx+2]);
+}
+
+ptr_cloud Plugin::points_to_pcl(const rs2::points& points, const rs2::video_frame& color){
+
+    // OpenCV Mat for showing the rgb color image, just as part of processing
+//    cv::Mat colorr(cv::Size(1280, 720), CV_8UC3, (void*)color.get_data(), cv::Mat::AUTO_STEP);
+//    namedWindow("Display Image", cv::WINDOW_AUTOSIZE );
+//    imshow("Display Image", colorr);
+
+    auto sp = points.get_profile().as<rs2::video_stream_profile>();
+    ptr_cloud cloud(new point_cloud);
+
+    // Config of PCL Cloud object
+    cloud->width = static_cast<uint32_t>(sp.width());
+    cloud->height = static_cast<uint32_t>(sp.height());
+    cloud->is_dense = false;
+    cloud->points.resize(points.size());
+
+    auto tex_coords = points.get_texture_coordinates();
+    auto vertices = points.get_vertices();
+
+    // Iterating through all points and setting XYZ coordinates
+    // and RGB values
+    for (int i = 0; i < points.size(); ++i)
+    {
+        cloud->points[i].x = vertices[i].x;
+        cloud->points[i].y = vertices[i].y;
+        cloud->points[i].z = vertices[i].z;
+
+        std::tuple<uint8_t, uint8_t, uint8_t> current_color;
+        current_color =get_texcolor(color, tex_coords[i]);
+
+        // Reversed order- 2-1-0 because of BGR model used in camera
+        cloud->points[i].r = std::get<2>(current_color);
+        cloud->points[i].g = std::get<1>(current_color);
+        cloud->points[i].b = std::get<0>(current_color);
+
+    }
+
+   return cloud;
+}
+
+void pp_callback(const pcl::visualization::PointPickingEvent& event, void *viewer_void)
+{
+   std::ofstream myfile;
+   myfile.open("test1.txt", std::ofstream::out | std::ofstream::trunc);
+   std::cout << "Picking event active" << std::endl;
+   std::vector<double> fromQ;
+   if(event.getPointIndex() != -1)
+   {
+       float x, y, z;
+       event.getPoint(x, y, z);
+       fromQ={x,y,z,0,0,0};
+
+       std::ofstream myfile("test1.txt", std::ios::app | std::ofstream::binary);
+       for(size_t i = 0; i < fromQ.size()-1; i++)
+
+           myfile << fromQ[i] << " ";
+
+       myfile << fromQ[fromQ.size()-1]<< std::endl;
+
+       std::cout << x << ", " << y << ", " << z << std::endl;
+   }
+}
+
+void Plugin::PCL()
+{
+    char key;
+//    // Create a simple OpenGL window for rendering:
+//    window app(1280, 720, "RealSense Pointcloud Example");
+//    // Construct an object to manage view state
+//    glfw_state app_state;
+//    // register callbacks to allow manipulation of the pointcloud
+//    register_glfw_callbacks(app, app_state);
+
+    // Declare pointcloud object, for calculating pointclouds and texture mappings
+    rs2::pointcloud pc;
+    // We want the points object to be persistent so we can display the last cloud when a frame drops
+    rs2::points points;
+
+    // Declare RealSense pipeline, encapsulating the actual device and sensors
+    rs2::pipeline pipe;
+
+    // Start streaming with default recommended configuration
+    pipe.start();
+
+    pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
+
+    while (!viewer.wasStopped()) // Application still alive?
+    {
+
+        // Wait for the next set of frames from the camera
+        auto frames = pipe.wait_for_frames();
+
+        auto color = frames.get_color_frame();
+
+        // For cameras that don't have RGB sensor, we'll map the pointcloud to infrared instead of color
+        if (!color)
+            color = frames.get_infrared_frame();
+
+        // Tell pointcloud object to map to this color frame
+        pc.map_to(color);
+
+        auto depth = frames.get_depth_frame();
+
+        // Generate the pointcloud and texture mappings
+        points = pc.calculate(depth);
+
+        ptr_cloud cloud = points_to_pcl(points, color);
+        viewer.removeAllPointClouds();
+        viewer.addPointCloud<pcl::PointXYZRGB> (cloud, "Sample cloud",0);
+        viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "Sample cloud");
+        viewer.initCameraParameters();
+        viewer.spinOnce(100);
+
+
+        // Upload the color frame to OpenGL
+        //app_state.tex.upload(color);
+
+        // Draw the pointcloud
+       // draw_pointcloud(app.width(), app.height(), app_state, points);
+
+
+}
+    viewer.close();
+
+    for (int i = 0; i < 30; i++) {
+        auto frames = pipe.wait_for_frames(); //Drop several frames for auto-exposure
+    }
+    // Wait for the next set of frames from the camera
+    auto frames = pipe.wait_for_frames();
+
+    auto color1 = frames.get_color_frame();
+    if (!color1)
+    {
+        color1 = frames.get_infrared_frame();
+    }
+
+    // Save current point cloud
+    pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
+    //std::cout <<"I did it" <<std::endl;
+    ptr_cloud cloud = points_to_pcl(points, color1);
+
+    // filter everthing out with a distance further than 1m.
+    pcl::PassThrough<pcl::PointXYZRGB> pass;
+    pass.setInputCloud (cloud);
+    pass.setFilterFieldName ("z");
+    pass.setFilterLimits (0.0, 1.0);
+    //pass.setFilterLimitsNegative (true);
+    pass.filter (*cloud_filtered);
+
+    //Saving the point cloud
+    pcl::io::savePCDFileASCII("cloud_test.pcd", *cloud_filtered);
+
+    // Vizualize point cloud and generate point clicking event
+    pcl::visualization::PCLVisualizer visualizer("PCL visualizer");
+    visualizer.setBackgroundColor (0.251, 0.251, 0.251);// Floral white 1, 0.98, 0.94 | Misty Rose 1, 0.912, 0.9 |
+    visualizer.addCoordinateSystem (1.0);
+    visualizer.registerPointPickingCallback(pp_callback, (void*) &visualizer);
+    visualizer.addPointCloud<pcl::PointXYZRGB> (cloud_filtered, "sample cloud",0);
+    visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "sample cloud");
+    visualizer.initCameraParameters();
+    visualizer.spin();
+
+
+
+
+}

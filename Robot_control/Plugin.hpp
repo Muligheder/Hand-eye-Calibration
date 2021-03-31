@@ -21,6 +21,8 @@
 
 // Boost includes
 #include <boost/bind.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
+#include <boost/thread/thread.hpp>
 
 // Qt includes
 #include <QPushButton>
@@ -34,6 +36,8 @@
 #include <chrono>
 #include <cmath>
 #include <tuple>
+#include <string>
+#include <algorithm>
 
 // OpenCV
 #include <opencv2/opencv.hpp>
@@ -47,14 +51,33 @@
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/aruco/charuco.hpp>
 
+// PCL
+#undef foreach
+#include <pcl/point_types.h>
+#include <pcl/filters/passthrough.h>
+#include <pcl/io/pcd_io.h>
+#include <pcl/point_types.h>
+#include <pcl/visualization/cloud_viewer.h>
+#include <pcl/kdtree/kdtree_flann.h>
+#include "pcl/common/eigen.h"
+#include "pcl/common/transforms.h"
+
 // Real sense
 #include <librealsense2/rs.hpp>
+
+//#include <QMatrix4x4>
+//#include <QQuaternion>
+//#include <
 
 
 
 // Extra defines for robot gripper
 #define OPEN true
 #define CLOSE false
+
+typedef pcl::PointXYZRGB P_pcl;
+typedef pcl::PointCloud<P_pcl> point_cloud;
+typedef point_cloud::Ptr ptr_cloud;
 
 class QPushButton;
 
@@ -114,6 +137,7 @@ private slots:
     // Camera API
     void Take_picture();
     void Analyze_images();
+    void PCL();
 
     // Utility functions
     cv::Mat eulerAnglesToRotationMatrix(cv::Vec3d &theta);
@@ -122,6 +146,12 @@ private slots:
     bool isRotationMatrix(cv::Mat &R);
     cv::Vec3d rotationMatrixToEulerAngles(cv::Mat &R);
     cv::Mat ReverseVector(cv::Mat &v);
+    std::vector<double> Pose_inv(std::vector<double> v);
+    void import3DPoint(std::vector<double> &point);
+
+
+    std::tuple<uint8_t, uint8_t, uint8_t> get_texcolor(rs2::video_frame texture, rs2::texture_coordinate texcoords);
+    ptr_cloud points_to_pcl(const rs2::points& points, const rs2::video_frame& color);
 
 private:
     // Qt buttons
@@ -138,7 +168,7 @@ private:
     rw::kinematics::Frame::Ptr rws_table;
 
     // UR interface
-    std::string ur_robot_ip = "192.168.0.200";
+    std::string ur_robot_ip = "192.168.1.210";
     ur_rtde::RTDEControlInterface   *ur_robot;
     ur_rtde::RTDEIOInterface        *ur_robot_io;
     ur_rtde::RTDEReceiveInterface   *ur_robot_receive;
@@ -170,5 +200,7 @@ private:
     std::thread update_thread;
     std::thread home_thread;
 };
+
+void pp_callback(const pcl::visualization::PointPickingEvent& event, void* viewer_void);
 
 #endif /*PLUGIN_HPP*/

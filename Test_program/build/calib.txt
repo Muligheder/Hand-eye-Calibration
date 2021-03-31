@@ -1,6 +1,6 @@
 %YAML:1.0
 ---
-calibration_time: "Fri 16 Oct 2020 03:27:49 PM CEST"
+calibration_time: "Mon 22 Feb 2021 11:34:35 AM CET"
 image_width: 600
 image_height: 500
 flags: 0

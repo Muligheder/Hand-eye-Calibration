@@ -45,6 +45,14 @@ opencv2/highgui/highgui_c.h
 -
 opencv2/aruco/charuco.hpp
 -
+ur_rtde/rtde_control_interface.h
+-
+ur_rtde/rtde_receive_interface.h
+-
+ur_rtde/rtde_io_interface.h
+-
+numeric
+-
 
 /usr/local/include/opencv4/opencv2/aruco.hpp
 opencv2/core.hpp

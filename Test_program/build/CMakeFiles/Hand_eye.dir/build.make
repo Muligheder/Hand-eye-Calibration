@@ -60,15 +60,15 @@ include CMakeFiles/Hand_eye.dir/flags.make
 CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.o: CMakeFiles/Hand_eye.dir/flags.make
 CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.o: ../src/hand_eye_calibration.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Master/Hand-eye-Calibration/Test_program/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Test_program/src/hand_eye_calibration.cpp
+	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Test_program/src/hand_eye_calibration.cpp
 
 CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Test_program/src/hand_eye_calibration.cpp > CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Test_program/src/hand_eye_calibration.cpp > CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.i
 
 CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Test_program/src/hand_eye_calibration.cpp -o CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Test_program/src/hand_eye_calibration.cpp -o CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.s
 
 CMakeFiles/Hand_eye.dir/src/hand_eye_calibration.cpp.o.requires:
 

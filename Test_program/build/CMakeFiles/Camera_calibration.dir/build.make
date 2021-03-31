@@ -60,15 +60,15 @@ include CMakeFiles/Camera_calibration.dir/flags.make
 CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.o: CMakeFiles/Camera_calibration.dir/flags.make
 CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.o: ../src/camera_calibration.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Master/Hand-eye-Calibration/Test_program/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Test_program/src/camera_calibration.cpp
+	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Test_program/src/camera_calibration.cpp
 
 CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Test_program/src/camera_calibration.cpp > CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Test_program/src/camera_calibration.cpp > CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.i
 
 CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Test_program/src/camera_calibration.cpp -o CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Test_program/src/camera_calibration.cpp -o CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.s
 
 CMakeFiles/Camera_calibration.dir/src/camera_calibration.cpp.o.requires:
 

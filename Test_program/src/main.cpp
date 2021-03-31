@@ -45,7 +45,7 @@
 //}
 
 // CHARUCO BOARD EXAMPLE
-/*
+
 #include "opencv2/core.hpp"
 #include <opencv2/core/utility.hpp>
 #include "opencv2/imgproc.hpp"
@@ -134,7 +134,7 @@ void detectCharucoBoardWithCalibrationPose()
 void detectCharucoBoardWithoutCalibration()
 {
     cv::Mat cameraMatrix, distCoeffs;
-    cv::Mat img = cv::imread("/home/anders/Test_program/build/BoardImage.jpg",cv::IMREAD_COLOR);
+    cv::Mat img = cv::imread("/home/anders/Master/Hand-eye-Calibration/Test_program/build/BoardImage.jpg",cv::IMREAD_COLOR);
     std::cout << "image read complete" << std::endl;
     //cv::VideoCapture inputVideo;
     //inputVideo.open(0);
@@ -226,7 +226,7 @@ int main(int argc, char* argv[])
         break;
     }
     return 0;
-}*/
+}
 
 /*
 //! [charucohdr]
@@ -403,7 +403,7 @@ int main(int argc, char* argv[])
     }
     return 0;
 }*/
-int main()
-{
-    return 0;
-}
+//int main()
+//{
+//    return 0;
+//}

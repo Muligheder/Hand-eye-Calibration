@@ -13,7 +13,7 @@
 	<!-- Robot Arm -->
 
     <Frame name="URReference" refframe="Table" type="Movable">
-        <RPY>90 0 0</RPY>
+        <RPY>180 0 0</RPY>
 	<Pos>-0.275 0 0.1351</Pos> <!-- was 117.5 --> <!-- 35 mm  is the black thingy -->
     </Frame>
     <Include file="devices/UR5e_2018/UR5e.xml" />

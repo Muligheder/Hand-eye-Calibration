@@ -23,6 +23,11 @@
 #include <opencv2/highgui/highgui_c.h>
 #include <opencv2/aruco/charuco.hpp>
 
+#include <ur_rtde/rtde_control_interface.h>
+#include <ur_rtde/rtde_receive_interface.h>
+#include <ur_rtde/rtde_io_interface.h>
+
+#include <numeric>
 
 using namespace cv;
 using namespace std;
@@ -33,13 +38,17 @@ float rad2deg(float radian);
 float deg2rad(float degree);
 Mat ReverseVector(Mat &v);
 void print(std::vector<double> const &input);
-int CHECKERBOARD[2]{6,9};
+Vec3f Rad2degV(Vec3f v);
+Vec3f Poly_Scale(Vec3f theta_rv);
+Mat TransposeVector(Vec3f &v);
+std::vector<double> Pose_inv(std::vector<double> v);
+int CHECKERBOARD[2]{8,5};
 
 int main()
 {
 //****************************************************** CAMERA SETUP ************************************************************************************'//
 
-    // Camera calibration information from API
+     //Camera calibration information from API 1920x1080
     std::vector<double> distortionCoefficients(5);  // camera distortion
     distortionCoefficients[0] = 1.83375015854836e-01;
     distortionCoefficients[1] = -5.65327823162079e-01;
@@ -47,25 +56,52 @@ int main()
     distortionCoefficients[3] = 5.0213176291436e-04;
     distortionCoefficients[4] = 5.08288383483887e-01;
 
-    float f_x = 6.8233544921875e+02; // Focal length in x axis
-    float f_y = 6.82471923828125e+02; // Focal length in y axis
-    float c_x = 483.771453857422; // Camera primary point x
-    float c_y = 270.217803955078; // Camera primary point y
+    float f_x = 1364.6708984375; // Focal length in x axis
+    float f_y = 1364.94384765625; // Focal length in y axis
+    float c_x = 967.542907714844; // Camera primary point x
+    float c_y = 540.435607910156; // Camera primary point y
+
+////    // Camera calibration information from calibration 1920x1080
+//    std::vector<double> distortionCoefficients(5);  // camera distortion
+//    distortionCoefficients[0] = 0.152762;
+//    distortionCoefficients[1] = -0.408405;
+//    distortionCoefficients[2] = 0.00366511;
+//    distortionCoefficients[3] = 0.000347318;
+//    distortionCoefficients[4] = 0.25188;
+
+//    float f_x = 1373.745226037709; // Focal length in x axis
+//    float f_y = 1372.453906056477; // Focal length in y axis
+//    float c_x = 966.2194707820457; // Camera primary point x
+//    float c_y = 553.6856848982575; // Camera primary point y
+
+
+//    // Camera calibration information from API   960x540
+//    std::vector<double> distortionCoefficients(5);  // camera distortion
+//    distortionCoefficients[0] = 1.83375015854836e-01;
+//    distortionCoefficients[1] = -5.65327823162079e-01;
+//    distortionCoefficients[2] = -1.45305093610659e-04;
+//    distortionCoefficients[3] = 5.0213176291436e-04;
+//    distortionCoefficients[4] = 5.08288383483887e-01;
+
+//    float f_x = 6.8233544921875e+02; // Focal length in x axis
+//    float f_y = 6.82471923828125e+02; // Focal length in y axis
+//    float c_x = 483.771453857422; // Camera primary point x
+//    float c_y = 270.217803955078; // Camera primary point y
 
 //    //From calibration
 //    std::vector<double> distortionCoefficients(5);  // camera distortion
-//    distortionCoefficients[0] = 0.1483631349257573;
-//    distortionCoefficients[1] = -0.1137807157391542;
-//    distortionCoefficients[2] = 0.007214638913007516;
-//    distortionCoefficients[3] = 0.003111347347643775;
-//    distortionCoefficients[4] = -0.4468245267930271;
+//    distortionCoefficients[0] = 0.1895977955383683;
+//    distortionCoefficients[1] = -0.4229510008378715;
+//    distortionCoefficients[2] = 0.005908837920285038;
+//    distortionCoefficients[3] = 0.002710859932538448;
+//    distortionCoefficients[4] = 0.2606413790013677;
 //    //0.1483631349257573, -0.1137807157391542, 0.007214638913007516, 0.003111347347643775, -0.4468245267930271
 //    //706.4577138648071, 0, 486.8361380817768;    0, 706.5110947768565, 278.5669459125713;    0, 0, 1]
 
-//    float f_x = 706.4577138648071; // Focal length in x axis
-//    float f_y = 706.5110947768565; // Focal length in y axis
-//    float c_x = 486.8361380817768; // Camera primary point x
-//    float c_y = 278.5669459125713; // Camera primary point y
+//    float f_x = 707.6644293843714; // Focal length in x axis
+//    float f_y = 707.715907354843; // Focal length in y axis
+//    float c_x = 486.5038794426711; // Camera primary point x
+//    float c_y = 277.3043843816276; // Camera primary point y
 
     cv::Mat cameraMatrix(3, 3, CV_32FC1);
     cameraMatrix.at<float>(0, 0) = f_x;
@@ -78,6 +114,164 @@ int main()
     cameraMatrix.at<float>(2, 1) = 0.0;
     cameraMatrix.at<float>(2, 2) = 1.0;
    // cout << cameraMatrix << endl;
+
+    cv::Mat rvec(3, 1, CV_64F), tvec(3, 1, CV_64F);
+
+    std::vector<cv::Mat> R_gripper2base;
+    //std::vector<cv::Mat> R_gripper2base_Euler;
+    std::vector<cv::Mat> t_gripper2base;
+    std::vector<cv::Mat> R_target2cam;
+    std::vector<cv::Mat> t_target2cam;
+    cv::Mat R_cam2gripper_TSAI = (cv::Mat_<float>(3, 3));
+    cv::Mat R_cam2gripper_HORAUD = (cv::Mat_<float>(3, 3));
+    cv::Mat R_cam2gripper_PARK = (cv::Mat_<float>(3, 3));
+    cv::Mat R_cam2gripper_ANDREFF = (cv::Mat_<float>(3, 3));
+    cv::Mat R_cam2gripper_DAN = (cv::Mat_<float>(3, 3));
+    cv::Mat t_cam2gripper_TSAI = (cv::Mat_<float>(3, 1));
+    cv::Mat t_cam2gripper_HORAUD = (cv::Mat_<float>(3, 1));
+    cv::Mat t_cam2gripper_PARK = (cv::Mat_<float>(3, 1));
+    cv::Mat t_cam2gripper_ANDREFF = (cv::Mat_<float>(3, 1));
+    cv::Mat t_cam2gripper_DAN = (cv::Mat_<float>(3, 1));
+
+    // Euler
+//    cv::Mat R_cam2gripper_Euler_TSAI = (cv::Mat_<float>(3, 3));
+//    cv::Mat R_cam2gripper_Euler_HORAUD = (cv::Mat_<float>(3, 3));
+//    cv::Mat R_cam2gripper_Euler_PARK = (cv::Mat_<float>(3, 3));
+//    cv::Mat R_cam2gripper_Euler_ANDREFF = (cv::Mat_<float>(3, 3));
+//    cv::Mat R_cam2gripper_Euler_DAN = (cv::Mat_<float>(3, 3));
+//    cv::Mat t_cam2gripper_Euler_TSAI = (cv::Mat_<float>(3, 1));
+//    cv::Mat t_cam2gripper_Euler_HORAUD = (cv::Mat_<float>(3, 1));
+//    cv::Mat t_cam2gripper_Euler_PARK = (cv::Mat_<float>(3, 1));
+//    cv::Mat t_cam2gripper_Euler_ANDREFF = (cv::Mat_<float>(3, 1));
+//    cv::Mat t_cam2gripper_Euler_DAN = (cv::Mat_<float>(3, 1));
+
+      // Creating vector to store vectors of 3D points for each checkerboard image
+      std::vector<std::vector<cv::Point3f> > objpoints;
+
+      // Creating vector to store vectors of 2D points for each checkerboard image
+      std::vector<std::vector<cv::Point2f> > imgpoints;
+
+      // Defining the world coordinates for 3D points
+      std::vector<cv::Point3f> objp;
+
+      // To calculate reprojection error
+      std::vector<double> stdDeviationsIntrinsics,stdDeviationExtrinsics,perViewErrors;
+      cv::Mat rvecs,tvecs;
+      float Cell_size = 28.6666666666;
+
+      for(int i{0}; i<CHECKERBOARD[1]; i++)
+      {
+        for(int j{0}; j<CHECKERBOARD[0]; j++)
+          objp.push_back(cv::Point3f(float(j*Cell_size),float(i*Cell_size),0.f));
+        std::cout << objp << std::endl;
+
+      }
+
+      // Extracting path of individual image stored in a given directory
+      std::vector<cv::String> images;
+      // Path of the folder containing checkerboard images
+      cv::String path = "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/*.bmp";
+
+      cv::glob(path, images,false); // use natSort to get the correct image order or put a 0 before everything
+      std::size_t num_images = images.size();
+      cv::Mat frame, gray;
+      // std::sort(images);
+
+
+      R_gripper2base.reserve(num_images);
+      t_gripper2base.reserve(num_images);
+      R_target2cam.reserve(num_images);
+      t_target2cam.reserve(num_images);
+
+      // vector to store the pixel coordinates of detected checker board corners
+      std::vector<cv::Point2f> corner_pts;
+      bool success;
+
+      // Looping over all the images in the directory
+      for(int i{0}; i<images.size(); i++)
+      {
+        frame = cv::imread(images[i]);
+        cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
+
+        // Finding checker board corners
+        // If desired number of corners are found in the image then success = true
+        success = cv::findChessboardCorners(gray, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE);
+
+        /*
+         * If desired number of corner are detected,
+         * we refine the pixel coordinates and display
+         * them on the images of checker board
+        */
+        if(success)
+        {
+          cv::TermCriteria criteria(cv::TermCriteria::EPS | cv::TermCriteria::COUNT, 30, 0.1);
+
+          // refining pixel coordinates for given 2d points.
+          cv::cornerSubPix(gray,corner_pts,cv::Size(11,11), cv::Size(-1,-1),criteria);
+
+          // Displaying the detected corner points on the checker board
+          cv::drawChessboardCorners(frame, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, success);
+
+          objpoints.push_back(objp);
+          imgpoints.push_back(corner_pts);
+
+          float length = 50.0;
+          int thickness = 3;
+
+          // Finding transformation matrix
+          cv::solvePnP(cv::Mat(objp), cv::Mat(corner_pts), cameraMatrix, distortionCoefficients, rvec, tvec,false,cv::SOLVEPNP_ITERATIVE);
+          cv::drawFrameAxes(frame,cameraMatrix,distortionCoefficients,rvec,tvec,length,thickness);
+          cv::Mat R;
+                     cv::Rodrigues(rvec, R); // R is 3x3
+                     std::cout <<std::endl << "Tvec " << std::endl << tvec/1000 << std::endl;
+                     std::cout <<std::endl << "Rvec " << std::endl << rvec*1 << std::endl;
+                     //R=R.t();// rotation of inverse
+                     //tvec= -R * tvec; // translation of inverse
+                     R_target2cam.push_back(R*1);
+                     t_target2cam.push_back(tvec*1);
+
+                     cv::Mat T = cv::Mat::eye(4, 4, R.type()); // T is 4x4
+                     T(cv::Range(0, 3), cv::Range(0, 3)) = R*1; // copies R into T
+                     T(cv::Range(0, 3), cv::Range(3, 4)) = tvec*1; // copies tvec into T
+
+                     std::cout << "T = " << std::endl << " " << T << std::endl << std::endl;
+
+
+        }
+
+        cv::imshow("Image",frame);
+        cv::waitKey(0);
+
+
+
+      }
+      float Avg_RMS;
+      cv::calibrateCamera(objpoints, imgpoints, cv::Size(gray.rows,gray.cols), cameraMatrix, distortionCoefficients, rvecs, tvecs, stdDeviationsIntrinsics, stdDeviationExtrinsics, perViewErrors,0);
+      //float Avg_RMS = std::accumulate(perViewErrors.begin(), perViewErrors.end(), 0);
+      for (auto& n : perViewErrors)
+          Avg_RMS += n;
+
+      std::cout << "cameraMatrix : " << std::endl <<" "<< cameraMatrix << std::endl << std::endl;
+
+      std::cout << "distCoeffs : ";
+      print(distortionCoefficients);
+      std::cout << std::endl << std::endl;
+      std::cout << "Rotation vector : " << std::endl <<" " << rvecs << std::endl << std::endl;
+      std::cout << "Translation vector : "<< std::endl <<" " << tvecs << std::endl << std::endl;
+
+      std::cout << std::endl << "Size = "<< stdDeviationsIntrinsics.size() << " " << "standard deviation intrinsics = "  << std::endl << std::endl;
+      print(stdDeviationsIntrinsics);
+      std::cout<< std::endl << std::endl;
+
+      std::cout << std::endl << "Size = "<< stdDeviationExtrinsics.size() << " "  << "standard deviation extrinsics = "  << std::endl << std::endl;
+      print(stdDeviationExtrinsics);
+      std::cout<< std::endl << std::endl;
+
+
+      std::cout << std::endl << "Size = "<< perViewErrors.size() << std::endl << "RMS re-projection error estimated for each pattern view = " << std::endl;
+      print(perViewErrors);
+      std::cout<< std::endl << std::endl << "Avg_RMS = " << Avg_RMS/perViewErrors.size() << std::endl << std::endl;
+//*************************** OLD APPROACH *****************************//
 
 //    cv::Mat rvec(3, 1, CV_32F), tvec(3, 1, CV_32F);
 
@@ -97,210 +291,78 @@ int main()
 //    cv::Mat t_cam2gripper_DAN = (cv::Mat_<float>(3, 1));
 
 
-//      // Creating vector to store vectors of 3D points for each checkerboard image
-//      std::vector<std::vector<cv::Point3f> > objpoints;
+//    std::vector<std::string> fn;
+//    cv::glob("/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/*.bmp", fn, false);
 
-//      // Creating vector to store vectors of 2D points for each checkerboard image
-//      std::vector<std::vector<cv::Point2f> > imgpoints;
+//    std::vector<cv::Mat> images;
+//    size_t num_images = fn.size(); //number of bmp files in images folder
+//    std::cout << "number of images "<< num_images<<std::endl;
+//    cv::Size patternsize(5, 8); //number of centers
+//    std::vector<cv::Point2f> centers; //this will be filled by the detected centers
+//    double cell_size = 30;
+//    std::vector<cv::Point3f> obj_points;
 
-//      // Defining the world coordinates for 3D points
-//      std::vector<cv::Point3f> objp;
+//    R_gripper2base.reserve(num_images);
+//    t_gripper2base.reserve(num_images);
+//    R_target2cam.reserve(num_images);
+//    t_target2cam.reserve(num_images);
 
-//      // To calibrate reprojection error
-//      std::vector<double> stdDeviationsIntrinsics,stdDeviationExtrinsics,perViewErrors;
-//      cv::Mat rvecs,tvecs;
+//    for (int i = 0; i < patternsize.height; ++i)
+//        for (int j = 0; j < patternsize.width; ++j)
+//            obj_points.push_back(cv::Point3f(float(j*cell_size),
+//                                         float(i*cell_size), 0.f));
 
-//      for(int i{0}; i<CHECKERBOARD[1]; i++)
-//      {
-//        for(int j{0}; j<CHECKERBOARD[0]; j++)
-//          objp.push_back(cv::Point3f(float(j*20),float(i*20),0.f));
-//       // cout << objp << endl;
+//cout <<"Objectpoints: " <<endl<<obj_points<<endl;
+//cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
 
-//      }
+//    for (size_t i = 0; i < num_images; i++)
+//        images.push_back(cv::imread(fn[i]));
 
-//      // Extracting path of individual image stored in a given directory
-//      std::vector<cv::String> images;
-//      // Path of the folder containing checkerboard images
-//      std::string path = "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/*.jpg";
 
-//      cv::glob(path, images);
-//      std::size_t num_images = images.size();
-//      cv::Mat frame, gray;
+//    cv::Mat frame;
 
-//      R_gripper2base.reserve(num_images);
-//      t_gripper2base.reserve(num_images);
-//      R_target2cam.reserve(num_images);
-//      t_target2cam.reserve(num_images);
-
-//      // vector to store the pixel coordinates of detected checker board corners
-//      std::vector<cv::Point2f> corner_pts;
-//      bool success;
-
-//      // Looping over all the images in the directory
-//      for(int i{0}; i<images.size(); i++)
-//      {
-//        frame = cv::imread(images[i]);
+//    for (size_t i = 0; i < num_images; i++)
+//    {
+//        frame = cv::imread(fn[i]); //source image
+//        cv::Mat gray;
 //        cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
 
-//        // Finding checker board corners
-//        // If desired number of corners are found in the image then success = true
-//        success = cv::findChessboardCorners(gray, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE);
+////          cv::imshow("window",gray);
+////         cv::waitKey(0);
 
-//        /*
-//         * If desired number of corner are detected,
-//         * we refine the pixel coordinates and display
-//         * them on the images of checker board
-//        */
-//        if(success)
+//        bool patternfound = cv::findChessboardCorners(frame, patternsize, centers);
+//        if (patternfound)
 //        {
-//          cv::TermCriteria criteria(CV_TERMCRIT_EPS | CV_TERMCRIT_ITER, 30, 0.0001);
+//            cornerSubPix(gray, centers, Size(1, 1), Size(-1, -1),
+//                              TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.001));
 
-//          // refining pixel coordinates for given 2d points.
-//          cv::cornerSubPix(gray,corner_pts,cv::Size(11,11), cv::Size(-1,-1),criteria);
+//            cv::drawChessboardCorners(frame, patternsize, cv::Mat(centers), patternfound);
+//            // cv::imshow("window", frame);
+//          // int key = cv::waitKey(0) & 0xff;
+//            cv::solvePnP(cv::Mat(obj_points), cv::Mat(centers), cameraMatrix, distortionCoefficients, rvec, tvec,false,cv::SOLVEPNP_ITERATIVE);
+//          //  cout <<"Rotation vetor = "<<endl<<" " << rvec<<endl<<endl;
+//           // cout <<"Tranlation vetor = "<<endl<<" " << tvec<<endl<<endl;
+//           // cout <<"Centers = "<<endl<<" " << centers<<endl<<endl;
 
-//          // Displaying the detected corner points on the checker board
-//          cv::drawChessboardCorners(frame, cv::Size(CHECKERBOARD[0], CHECKERBOARD[1]), corner_pts, success);
+//            cv::Mat R;
+//            cv::Rodrigues(rvec, R); // R is 3x3
+//            R_target2cam.push_back(R*1);
+//            t_target2cam.push_back(tvec*1);
+//            cv::Mat T = cv::Mat::eye(4, 4, R.type()); // T is 4x4
+//            T(cv::Range(0, 3), cv::Range(0, 3)) = R * 1; // copies R into T
+//            T(cv::Range(0, 3), cv::Range(3, 4)) = tvec *1; // copies tvec into T
 
-//          objpoints.push_back(objp);
-//          imgpoints.push_back(corner_pts);
-
-
-//          // Finding transformation matrix
-//          cv::solvePnP(cv::Mat(objp), cv::Mat(corner_pts), cameraMatrix, distortionCoefficients, rvec, tvec,false,cv::SOLVEPNP_ITERATIVE);
-
-//          cv::calibrateCamera(objpoints, imgpoints, cv::Size(gray.rows,gray.cols), cameraMatrix, distortionCoefficients, rvecs, tvecs, stdDeviationsIntrinsics, stdDeviationExtrinsics, perViewErrors,0);
-
-
-
-
-
-//          cv::Mat R;
-//                     cv::Rodrigues(rvec, R); // R is 3x3
-//                     R_target2cam.push_back(R);
-//                     t_target2cam.push_back(tvec*1);
-//                     cv::Mat T = cv::Mat::eye(4, 4, R.type()); // T is 4x4
-//                     T(cv::Range(0, 3), cv::Range(0, 3)) = R * 1; // copies R into T
-//                     T(cv::Range(0, 3), cv::Range(3, 4)) = tvec *1; // copies tvec into T
-
-//                     std::cout << "T = " << std::endl << " " << T << std::endl << std::endl;
+//            std::cout << "T = " << std::endl << " " << T << std::endl << std::endl;
 
 //        }
-
-////        cv::imshow("Image",frame);
-////        cv::waitKey(0);
-
-
-//      }
-
-//      std::cout << "cameraMatrix : " << std::endl <<" "<< cameraMatrix << std::endl << std::endl;
-
-//      std::cout << "distCoeffs : ";
-//      print(distortionCoefficients);
-//      std::cout << std::endl << std::endl;
-//      std::cout << "Rotation vector : " << std::endl <<" " << rvecs << std::endl << std::endl;
-//      std::cout << "Translation vector : "<< std::endl <<" " << tvecs << std::endl << std::endl;
-
-//      std::cout << std::endl << "Size = "<< stdDeviationsIntrinsics.size() << " " << "standard deviation intrinsics = "  << std::endl << std::endl;
-//      print(stdDeviationsIntrinsics);
-//      std::cout<< std::endl << std::endl;
-//      std::cout << std::endl << "Size = "<< stdDeviationExtrinsics.size() << " "  << "standard deviation extrinsics = "  << std::endl << std::endl;
-//      print(stdDeviationExtrinsics);
-//      std::cout<< std::endl << std::endl;
-//      std::cout << std::endl << "Size = "<< perViewErrors.size() << " " << "RMS re-projection error estimated for each pattern view = " << std::endl << std::endl;
-//      print(perViewErrors);
-//      std::cout<< std::endl << std::endl;
-//*************************** OLD APPROACH *****************************//
-
-    cv::Mat rvec(3, 1, CV_32F), tvec(3, 1, CV_32F);
-
-    std::vector<cv::Mat> R_gripper2base;
-    std::vector<cv::Mat> t_gripper2base;
-    std::vector<cv::Mat> R_target2cam;
-    std::vector<cv::Mat> t_target2cam;
-    cv::Mat R_cam2gripper_TSAI = (cv::Mat_<float>(3, 3));
-    cv::Mat R_cam2gripper_HORAUD = (cv::Mat_<float>(3, 3));
-    cv::Mat R_cam2gripper_PARK = (cv::Mat_<float>(3, 3));
-    cv::Mat R_cam2gripper_ANDREFF = (cv::Mat_<float>(3, 3));
-    cv::Mat R_cam2gripper_DAN = (cv::Mat_<float>(3, 3));
-    cv::Mat t_cam2gripper_TSAI = (cv::Mat_<float>(3, 1));
-    cv::Mat t_cam2gripper_HORAUD = (cv::Mat_<float>(3, 1));
-    cv::Mat t_cam2gripper_PARK = (cv::Mat_<float>(3, 1));
-    cv::Mat t_cam2gripper_ANDREFF = (cv::Mat_<float>(3, 1));
-    cv::Mat t_cam2gripper_DAN = (cv::Mat_<float>(3, 1));
-
-
-    std::vector<std::string> fn;
-    cv::glob("/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/*.jpg", fn, false);
-
-    std::vector<cv::Mat> images;
-    size_t num_images = fn.size(); //number of bmp files in images folder
-    std::cout << "number of images "<< num_images<<std::endl;
-    cv::Size patternsize(6, 9); //number of centers
-    std::vector<cv::Point2f> centers; //this will be filled by the detected centers
-    double cell_size = 20;
-    std::vector<cv::Point3f> obj_points;
-
-    R_gripper2base.reserve(num_images);
-    t_gripper2base.reserve(num_images);
-    R_target2cam.reserve(num_images);
-    t_target2cam.reserve(num_images);
-
-    for (int i = 0; i < patternsize.height; ++i)
-        for (int j = 0; j < patternsize.width; ++j)
-            obj_points.push_back(cv::Point3f(float(j*cell_size),
-                                         float(i*cell_size), 0.f));
-
-cout <<"Objectpoints: " <<endl<<obj_points<<endl;
-cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
-
-    for (size_t i = 0; i < num_images; i++)
-        images.push_back(cv::imread(fn[i]));
-
-
-    cv::Mat frame;
-
-    for (size_t i = 0; i < num_images; i++)
-    {
-        frame = cv::imread(fn[i]); //source image
-        cv::Mat gray;
-        cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
-
-//          cv::imshow("window",gray);
-//         cv::waitKey(0);
-
-        bool patternfound = cv::findChessboardCorners(frame, patternsize, centers);
-        if (patternfound)
-        {
-            cornerSubPix(gray, centers, Size(1, 1), Size(-1, -1),
-                              TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.1));
-
-            cv::drawChessboardCorners(frame, patternsize, cv::Mat(centers), patternfound);
-            // cv::imshow("window", frame);
-          // int key = cv::waitKey(0) & 0xff;
-            cv::solvePnP(cv::Mat(obj_points), cv::Mat(centers), cameraMatrix, distortionCoefficients, rvec, tvec,false,cv::SOLVEPNP_ITERATIVE);
-          //  cout <<"Rotation vetor = "<<endl<<" " << rvec<<endl<<endl;
-           // cout <<"Tranlation vetor = "<<endl<<" " << tvec<<endl<<endl;
-           // cout <<"Centers = "<<endl<<" " << centers<<endl<<endl;
-
-            cv::Mat R;
-            cv::Rodrigues(rvec, R); // R is 3x3
-            R_target2cam.push_back(R);
-            t_target2cam.push_back(tvec*1);
-            cv::Mat T = cv::Mat::eye(4, 4, R.type()); // T is 4x4
-            T(cv::Range(0, 3), cv::Range(0, 3)) = R * 1; // copies R into T
-            T(cv::Range(0, 3), cv::Range(3, 4)) = tvec *1; // copies tvec into T
-
-            std::cout << "T = " << std::endl << " " << T << std::endl << std::endl;
-
-        }
-        std::cout << patternfound << std::endl;
-    }
+//        std::cout << patternfound << std::endl;
+//    }
 
 
 //****************************************************** CAMERA DONE ************************************************************************************//
 
 
-    // read data from file and seperate to vector of vector.
+// read data from file and seperate to vector of vector.
            std::vector<std::vector<float>> v;
            std::ifstream in( "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/test.txt" );
            std::string record;
@@ -312,17 +374,90 @@ cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
                                         std::istream_iterator<float>() );
                v.push_back( row );
            }
+//    // from VISP Libary
+//   const Mat cam_tr_01 = (Mat_<float>(3, 1) << 0.315381*1000, -0.021125*1000, 0.722898*1000);
+//   const Mat cam_tr_02 = (Mat_<float>(3, 1) << -0.078425*1000, -0.133783*1000, 0.534473*1000);
+//   const Mat cam_tr_03 = (Mat_<float>(3, 1) << 0.0788305*1000, 0.0721394*1000, 0.535168*1000);
+//   const Mat cam_tr_04 = (Mat_<float>(3, 1) << 0.012403*1000, 0.0111715*1000, 0.417285*1000);
+//   const Mat cam_tr_05 = (Mat_<float>(3, 1) << 0.0876483*1000, 0.0417796*1000, 0.409529*1000);
+//   const Mat cam_tr_06 = (Mat_<float>(3, 1) << 0.114375*1000, 0.103106*1000 , 0.604487*1000);
+//   const Mat cam_tr_07 = (Mat_<float>(3, 1) << 0.236032*1000, 0.0513511*1000, 0.695683*1000);
+//   const Mat cam_tr_08 = (Mat_<float>(3, 1) << 0.0107176*1000, 0.0366413*1000, 0.699486*1000);
+//   const Mat cam_tr_09 = (Mat_<float>(3, 1) << 0.00146471*1000, -0.037318*1000, 0.635741*1000);
+//   const Mat cam_tr_10 = (Mat_<float>(3, 1) << -0.0844981*1000, -0.0571934*1000, 0.376917*1000);
 
-//           for ( const auto &row : v )
-//           {
-//               for ( double x : row ) std::cout << x << ' ';
-//               std::cout << std::endl;
-//           }
+//   const Mat cam_vec_01 = (Mat_<float>(3, 1) << -0.535678, -0.230308, 2.54516);
+//   const Mat cam_vec_02 = (Mat_<float>(3, 1) << -0.0996332, 0.52286, 0.859977);
+//   const Mat cam_vec_03 = (Mat_<float>(3, 1) << -0.999344, 0.424924, -2.4614);
+//   const Mat cam_vec_04 = (Mat_<float>(3, 1) << 0.612053, -0.0443759, 2.53025);
+//   const Mat cam_vec_05 = (Mat_<float>(3, 1) << 0.0162682, -0.414474, -3.11301);
+//   const Mat cam_vec_06 = (Mat_<float>(3, 1) << -0.136851, -0.644572, 3.06214);
+//   const Mat cam_vec_07 = (Mat_<float>(3, 1) << -0.214164, -0.180724, 3.12673);
+//   const Mat cam_vec_08 = (Mat_<float>(3, 1) << 0.307674, -0.2211, 3.03606);
+//   const Mat cam_vec_09 = (Mat_<float>(3, 1) << -0.255442, 1.34404, -2.77981);
+//   const Mat cam_vec_10 = (Mat_<float>(3, 1) << -0.252077, 0.0466144, -0.0542956);
+
+//   cv::Mat cam_rot_01,cam_rot_02,cam_rot_03,cam_rot_04,cam_rot_05,cam_rot_06,cam_rot_07,cam_rot_08,cam_rot_09,cam_rot_10;
+//   cv::Rodrigues(cam_vec_01,cam_rot_01);
+//   cv::Rodrigues(cam_vec_02,cam_rot_02);
+//   cv::Rodrigues(cam_vec_03,cam_rot_03);
+//   cv::Rodrigues(cam_vec_04,cam_rot_04);
+//   cv::Rodrigues(cam_vec_05,cam_rot_05);
+//   cv::Rodrigues(cam_vec_06,cam_rot_06);
+//   cv::Rodrigues(cam_vec_07,cam_rot_07);
+//   cv::Rodrigues(cam_vec_08,cam_rot_08);
+//   cv::Rodrigues(cam_vec_09,cam_rot_09);
+//   cv::Rodrigues(cam_vec_10,cam_rot_10);
+
+//   cout<< "cam_rot_01" <<endl << cam_rot_01<< endl << endl;
+//   cout<< "cam_rot_02" <<endl << cam_rot_02<< endl << endl;
+//   cout<< "cam_rot_03" <<endl << cam_rot_03<< endl << endl;
+//   cout<< "cam_rot_04" <<endl << cam_rot_04<< endl << endl;
+//   cout<< "cam_rot_05" <<endl << cam_rot_05<< endl << endl;
+//   cout<< "cam_rot_06" <<endl << cam_rot_06<< endl << endl;
+//   cout<< "cam_rot_07" <<endl << cam_rot_07<< endl << endl;
+//   cout<< "cam_rot_08" <<endl << cam_rot_08<< endl << endl;
+//   cout<< "cam_rot_09" <<endl << cam_rot_09<< endl << endl;
+//   cout<< "cam_rot_10" <<endl << cam_rot_10<< endl << endl;
+
+//   cout<< "cam_tr_01" <<endl << cam_tr_01<< endl << endl;
+//   cout<< "cam_tr_02" <<endl << cam_tr_02<< endl << endl;
+//   cout<< "cam_tr_03" <<endl << cam_tr_03<< endl << endl;
+//   cout<< "cam_tr_04" <<endl << cam_tr_04<< endl << endl;
+//   cout<< "cam_tr_05" <<endl << cam_tr_05<< endl << endl;
+//   cout<< "cam_tr_06" <<endl << cam_tr_06<< endl << endl;
+//   cout<< "cam_tr_07" <<endl << cam_tr_07<< endl << endl;
+//   cout<< "cam_tr_08" <<endl << cam_tr_08<< endl << endl;
+//   cout<< "cam_tr_09" <<endl << cam_tr_09<< endl << endl;
+//   cout<< "cam_tr_10" <<endl << cam_tr_10<< endl << endl;
 
 
 
 
-    //Part2         z       y       x
+//   R_target2cam.push_back(cam_rot_01);
+//   R_target2cam.push_back(cam_rot_02);
+//   R_target2cam.push_back(cam_rot_03);
+//   R_target2cam.push_back(cam_rot_04);
+//   R_target2cam.push_back(cam_rot_05);
+//   R_target2cam.push_back(cam_rot_06);
+//   R_target2cam.push_back(cam_rot_07);
+//   R_target2cam.push_back(cam_rot_08);
+//   R_target2cam.push_back(cam_rot_09);
+//   R_target2cam.push_back(cam_rot_10);
+
+//   t_target2cam.push_back(cam_tr_01);
+//   t_target2cam.push_back(cam_tr_02);
+//   t_target2cam.push_back(cam_tr_03);
+//   t_target2cam.push_back(cam_tr_04);
+//   t_target2cam.push_back(cam_tr_05);
+//   t_target2cam.push_back(cam_tr_06);
+//   t_target2cam.push_back(cam_tr_07);
+//   t_target2cam.push_back(cam_tr_08);
+//   t_target2cam.push_back(cam_tr_09);
+//   t_target2cam.push_back(cam_tr_10);
+//*************************************************************************************************
+
+// Rodriguez            rx      ry      rz
     Vec3f theta_01{v[0][3],v[0][4],v[0][5]};
     Vec3f theta_02{v[1][3],v[1][4],v[1][5]};
     Vec3f theta_03{v[2][3],v[2][4],v[2][5]};
@@ -344,6 +479,7 @@ cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
     Vec3f theta_19{v[18][3],v[18][4],v[18][5]};
     Vec3f theta_20{v[19][3],v[19][4],v[19][5]};
 
+    cout<< "Before scaling: " <<endl << endl;
     cout<< "theta 1" <<endl << theta_01<< endl << endl;
     cout<< "theta 2" <<endl << theta_02<< endl << endl;
     cout<< "theta 3" <<endl << theta_03<< endl << endl;
@@ -365,27 +501,142 @@ cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
     cout<< "theta 19" <<endl << theta_19<< endl << endl;
     cout<< "theta 20" <<endl << theta_20<< endl << endl;
 
+    theta_01=Poly_Scale(theta_01);
+    theta_02=Poly_Scale(theta_02);
+    theta_03=Poly_Scale(theta_03);
+    theta_04=Poly_Scale(theta_04);
+    theta_05=Poly_Scale(theta_05);
+    theta_06=Poly_Scale(theta_06);
+    theta_07=Poly_Scale(theta_07);
+    theta_08=Poly_Scale(theta_08);
+    theta_09=Poly_Scale(theta_09);
+    theta_10=Poly_Scale(theta_10);
+    theta_11=Poly_Scale(theta_11);
+    theta_12=Poly_Scale(theta_12);
+    theta_13=Poly_Scale(theta_13);
+    theta_14=Poly_Scale(theta_14);
+    theta_15=Poly_Scale(theta_15);
+    theta_16=Poly_Scale(theta_16);
+    theta_17=Poly_Scale(theta_17);
+    theta_18=Poly_Scale(theta_18);
+    theta_19=Poly_Scale(theta_19);
+    theta_20=Poly_Scale(theta_20);
 
-    Mat robot_rot_01 = eulerAnglesToRotationMatrix(theta_01);
-    Mat robot_rot_02 = eulerAnglesToRotationMatrix(theta_02);
-    Mat robot_rot_03 = eulerAnglesToRotationMatrix(theta_03);
-    Mat robot_rot_04 = eulerAnglesToRotationMatrix(theta_04);
-    Mat robot_rot_05 = eulerAnglesToRotationMatrix(theta_05);
-    Mat robot_rot_06 = eulerAnglesToRotationMatrix(theta_06);
-    Mat robot_rot_07 = eulerAnglesToRotationMatrix(theta_07);
-    Mat robot_rot_08 = eulerAnglesToRotationMatrix(theta_08);
-    Mat robot_rot_09 = eulerAnglesToRotationMatrix(theta_09);
-    Mat robot_rot_10 = eulerAnglesToRotationMatrix(theta_10);
-    Mat robot_rot_11 = eulerAnglesToRotationMatrix(theta_11);
-    Mat robot_rot_12 = eulerAnglesToRotationMatrix(theta_12);
-    Mat robot_rot_13 = eulerAnglesToRotationMatrix(theta_13);
-    Mat robot_rot_14 = eulerAnglesToRotationMatrix(theta_14);
-    Mat robot_rot_15 = eulerAnglesToRotationMatrix(theta_15);
-    Mat robot_rot_16 = eulerAnglesToRotationMatrix(theta_16);
-    Mat robot_rot_17 = eulerAnglesToRotationMatrix(theta_17);
-    Mat robot_rot_18 = eulerAnglesToRotationMatrix(theta_18);
-    Mat robot_rot_19 = eulerAnglesToRotationMatrix(theta_19);
-    Mat robot_rot_20 = eulerAnglesToRotationMatrix(theta_20);
+    const cv::Mat theta_scaled_01 = TransposeVector(theta_01);
+    const cv::Mat theta_scaled_02 = TransposeVector(theta_02);
+    const cv::Mat theta_scaled_03 = TransposeVector(theta_03);
+    const cv::Mat theta_scaled_04 = TransposeVector(theta_04);
+    const cv::Mat theta_scaled_05 = TransposeVector(theta_05);
+    const cv::Mat theta_scaled_06 = TransposeVector(theta_06);
+    const cv::Mat theta_scaled_07 = TransposeVector(theta_07);
+    const cv::Mat theta_scaled_08 = TransposeVector(theta_08);
+    const cv::Mat theta_scaled_09 = TransposeVector(theta_09);
+    const cv::Mat theta_scaled_10 = TransposeVector(theta_10);
+    const cv::Mat theta_scaled_11 = TransposeVector(theta_11);
+    const cv::Mat theta_scaled_12 = TransposeVector(theta_12);
+    const cv::Mat theta_scaled_13 = TransposeVector(theta_13);
+    const cv::Mat theta_scaled_14 = TransposeVector(theta_14);
+    const cv::Mat theta_scaled_15 = TransposeVector(theta_15);
+    const cv::Mat theta_scaled_16 = TransposeVector(theta_16);
+    const cv::Mat theta_scaled_17 = TransposeVector(theta_17);
+    const cv::Mat theta_scaled_18 = TransposeVector(theta_18);
+    const cv::Mat theta_scaled_19 = TransposeVector(theta_19);
+    const cv::Mat theta_scaled_20 = TransposeVector(theta_20);
+
+
+    cv::Mat robot_rot_01,robot_rot_02,robot_rot_03,robot_rot_04,robot_rot_05,robot_rot_06,robot_rot_07,robot_rot_08,robot_rot_09,robot_rot_10,robot_rot_11,robot_rot_12,robot_rot_13,robot_rot_14,robot_rot_15,robot_rot_16,robot_rot_17,robot_rot_18,robot_rot_19,robot_rot_20,robot_rot_21,robot_rot_22,robot_rot_23 ;
+    // with scaling
+    cv::Rodrigues(theta_scaled_01,robot_rot_01);
+    cv::Rodrigues(theta_scaled_02,robot_rot_02);
+    cv::Rodrigues(theta_scaled_03,robot_rot_03);
+    cv::Rodrigues(theta_scaled_04,robot_rot_04);
+    cv::Rodrigues(theta_scaled_05,robot_rot_05);
+    cv::Rodrigues(theta_scaled_06,robot_rot_06);
+    cv::Rodrigues(theta_scaled_07,robot_rot_07);
+    cv::Rodrigues(theta_scaled_08,robot_rot_08);
+    cv::Rodrigues(theta_scaled_09,robot_rot_09);
+    cv::Rodrigues(theta_scaled_10,robot_rot_10);
+    cv::Rodrigues(theta_scaled_11,robot_rot_11);
+    cv::Rodrigues(theta_scaled_12,robot_rot_12);
+    cv::Rodrigues(theta_scaled_13,robot_rot_13);
+    cv::Rodrigues(theta_scaled_14,robot_rot_14);
+    cv::Rodrigues(theta_scaled_15,robot_rot_15);
+    cv::Rodrigues(theta_scaled_16,robot_rot_16);
+    cv::Rodrigues(theta_scaled_17,robot_rot_17);
+    cv::Rodrigues(theta_scaled_18,robot_rot_18);
+    cv::Rodrigues(theta_scaled_19,robot_rot_19);
+    cv::Rodrigues(theta_scaled_20,robot_rot_20);
+    // without scaling
+//    cv::Rodrigues(theta_01,robot_rot_01);
+//    cv::Rodrigues(theta_02,robot_rot_02);
+//    cv::Rodrigues(theta_03,robot_rot_03);
+//    cv::Rodrigues(theta_04,robot_rot_04);
+//    cv::Rodrigues(theta_05,robot_rot_05);
+//    cv::Rodrigues(theta_06,robot_rot_06);
+//    cv::Rodrigues(theta_07,robot_rot_07);
+//    cv::Rodrigues(theta_08,robot_rot_08);
+//    cv::Rodrigues(theta_09,robot_rot_09);
+//    cv::Rodrigues(theta_10,robot_rot_10);
+
+
+    cout<< "After scaling: " <<endl << endl;
+    cout<< "theta 1" <<endl << theta_scaled_01<< endl << endl;
+    cout<< "theta 2" <<endl << theta_scaled_02<< endl << endl;
+    cout<< "theta 3" <<endl << theta_scaled_03<< endl << endl;
+    cout<< "theta 4" <<endl << theta_scaled_04<< endl << endl;
+    cout<< "theta 5" <<endl << theta_scaled_05<< endl << endl;
+    cout<< "theta 6" <<endl << theta_scaled_06<< endl << endl;
+    cout<< "theta 7" <<endl << theta_scaled_07<< endl << endl;
+    cout<< "theta 8" <<endl << theta_scaled_08<< endl << endl;
+    cout<< "theta 9" <<endl << theta_scaled_09<< endl << endl;
+    cout<< "theta 10" <<endl << theta_scaled_10<< endl << endl;
+    cout<< "theta 11" <<endl << theta_scaled_11<< endl << endl;
+    cout<< "theta 12" <<endl << theta_scaled_12<< endl << endl;
+    cout<< "theta 13" <<endl << theta_scaled_13<< endl << endl;
+    cout<< "theta 14" <<endl << theta_scaled_14<< endl << endl;
+    cout<< "theta 15" <<endl << theta_scaled_15<< endl << endl;
+    cout<< "theta 16" <<endl << theta_scaled_16<< endl << endl;
+    cout<< "theta 17" <<endl << theta_scaled_17<< endl << endl;
+    cout<< "theta 18" <<endl << theta_scaled_18<< endl << endl;
+    cout<< "theta 19" <<endl << theta_scaled_19<< endl << endl;
+    cout<< "theta 20" <<endl << theta_scaled_20<< endl << endl;
+
+    const Mat robot_tr_01 = (Mat_<float>(3, 1) << v[0][0]*1000,v[0][1]*1000,v[0][2]*1000);
+    const Mat robot_tr_02 = (Mat_<float>(3, 1) << v[1][0]*1000,v[1][1]*1000,v[1][2]*1000);
+    const Mat robot_tr_03 = (Mat_<float>(3, 1) << v[2][0]*1000,v[2][1]*1000,v[2][2]*1000);
+    const Mat robot_tr_04 = (Mat_<float>(3, 1) << v[3][0]*1000,v[3][1]*1000,v[3][2]*1000);
+    const Mat robot_tr_05 = (Mat_<float>(3, 1) << v[4][0]*1000,v[4][1]*1000,v[4][2]*1000);
+    const Mat robot_tr_06 = (Mat_<float>(3, 1) << v[5][0]*1000,v[5][1]*1000,v[5][2]*1000);
+    const Mat robot_tr_07 = (Mat_<float>(3, 1) << v[6][0]*1000,v[6][1]*1000,v[6][2]*1000);
+    const Mat robot_tr_08 = (Mat_<float>(3, 1) << v[7][0]*1000,v[7][1]*1000,v[7][2]*1000);
+    const Mat robot_tr_09 = (Mat_<float>(3, 1) << v[8][0]*1000,v[8][1]*1000,v[8][2]*1000);
+    const Mat robot_tr_10 = (Mat_<float>(3, 1) << v[9][0]*1000,v[9][1]*1000,v[9][2]*1000);
+    const Mat robot_tr_11 = (Mat_<float>(3, 1) << v[10][0]*1000,v[10][1]*1000,v[10][2]*1000);
+    const Mat robot_tr_12 = (Mat_<float>(3, 1) << v[11][0]*1000,v[11][1]*1000,v[11][2]*1000);
+    const Mat robot_tr_13 = (Mat_<float>(3, 1) << v[12][0]*1000,v[12][1]*1000,v[12][2]*1000);
+    const Mat robot_tr_14 = (Mat_<float>(3, 1) << v[13][0]*1000,v[13][1]*1000,v[13][2]*1000);
+    const Mat robot_tr_15 = (Mat_<float>(3, 1) << v[14][0]*1000,v[14][1]*1000,v[14][2]*1000);
+    const Mat robot_tr_16 = (Mat_<float>(3, 1) << v[15][0]*1000,v[15][1]*1000,v[15][2]*1000);
+    const Mat robot_tr_17 = (Mat_<float>(3, 1) << v[16][0]*1000,v[16][1]*1000,v[16][2]*1000);
+    const Mat robot_tr_18 = (Mat_<float>(3, 1) << v[17][0]*1000,v[17][1]*1000,v[17][2]*1000);
+    const Mat robot_tr_19 = (Mat_<float>(3, 1) << v[18][0]*1000,v[18][1]*1000,v[18][2]*1000);
+    const Mat robot_tr_20 = (Mat_<float>(3, 1) << v[19][0]*1000,v[19][1]*1000,v[19][2]*1000);
+
+
+    const Mat a = (Mat_<float>(3, 1) << 500.09,-69.63,483.34);
+    const Mat b = (Mat_<float>(3, 1) << 540.86,-156.31,240.81);
+    double dist_man= cv::norm(a,b,cv::NORM_L2);
+
+    const Mat c = (Mat_<float>(3, 1) << -55.883121,88.315697,380.29547);
+    const Mat d = (Mat_<float>(3, 1) << 0,0,0);
+
+    double dist_pnp= cv::norm(c,d,cv::NORM_L2);
+
+    std::cout << "Manually Distance between first position and origin" << std::endl << std::endl;
+    std::cout << dist_man << std::endl << std::endl;
+
+    std::cout << "Solve_pnp Distance between first position and origin" << std::endl << std::endl;
+    std::cout << dist_pnp << std::endl << std::endl;
 
     cout<< "robot_rot_01" <<endl << robot_rot_01<< endl << endl;
     cout<< "robot_rot_02" <<endl << robot_rot_02<< endl << endl;
@@ -408,50 +659,26 @@ cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
     cout<< "robot_rot_19" <<endl << robot_rot_19<< endl << endl;
     cout<< "robot_rot_20" <<endl << robot_rot_20<< endl << endl;
 
-
-    //Part 2
-     Mat robot_tr_01 = (Mat_<float>(3, 1) << v[0][0]*1000,v[0][1]*1000,v[0][2]*1000);
-     Mat robot_tr_02 = (Mat_<float>(3, 1) << v[1][0]*1000,v[1][1]*1000,v[1][2]*1000);
-     Mat robot_tr_03 = (Mat_<float>(3, 1) << v[2][0]*1000,v[2][1]*1000,v[2][2]*1000);
-     Mat robot_tr_04 = (Mat_<float>(3, 1) << v[3][0]*1000,v[3][1]*1000,v[3][2]*1000);
-     Mat robot_tr_05 = (Mat_<float>(3, 1) << v[4][0]*1000,v[4][1]*1000,v[4][2]*1000);
-     Mat robot_tr_06 = (Mat_<float>(3, 1) << v[5][0]*1000,v[5][1]*1000,v[5][2]*1000);
-     Mat robot_tr_07 = (Mat_<float>(3, 1) << v[6][0]*1000,v[6][1]*1000,v[6][2]*1000);
-     Mat robot_tr_08 = (Mat_<float>(3, 1) << v[7][0]*1000,v[7][1]*1000,v[7][2]*1000);
-     Mat robot_tr_09 = (Mat_<float>(3, 1) << v[8][0]*1000,v[8][1]*1000,v[8][2]*1000);
-     Mat robot_tr_10 = (Mat_<float>(3, 1) << v[9][0]*1000,v[9][1]*1000,v[9][2]*1000);
-     Mat robot_tr_11 = (Mat_<float>(3, 1) << v[10][0]*1000,v[10][1]*1000,v[10][2]*1000);
-     Mat robot_tr_12 = (Mat_<float>(3, 1) << v[11][0]*1000,v[11][1]*1000,v[11][2]*1000);
-     Mat robot_tr_13 = (Mat_<float>(3, 1) << v[12][0]*1000,v[12][1]*1000,v[12][2]*1000);
-     Mat robot_tr_14 = (Mat_<float>(3, 1) << v[13][0]*1000,v[13][1]*1000,v[13][2]*1000);
-     Mat robot_tr_15 = (Mat_<float>(3, 1) << v[14][0]*1000,v[14][1]*1000,v[14][2]*1000);
-     Mat robot_tr_16 = (Mat_<float>(3, 1) << v[15][0]*1000,v[15][1]*1000,v[15][2]*1000);
-     Mat robot_tr_17 = (Mat_<float>(3, 1) << v[16][0]*1000,v[16][1]*1000,v[16][2]*1000);
-     Mat robot_tr_18 = (Mat_<float>(3, 1) << v[17][0]*1000,v[17][1]*1000,v[17][2]*1000);
-     Mat robot_tr_19 = (Mat_<float>(3, 1) << v[18][0]*1000,v[18][1]*1000,v[18][2]*1000);
-     Mat robot_tr_20 = (Mat_<float>(3, 1) << v[19][0]*1000,v[19][1]*1000,v[19][2]*1000);
-
-     cout<< "Translation 1" <<endl << robot_tr_01<< endl << endl;
-     cout<< "Translation 2" <<endl << robot_tr_02<< endl << endl;
-     cout<< "Translation 3" <<endl << robot_tr_03<< endl << endl;
-     cout<< "Translation 4" <<endl << robot_tr_04<< endl << endl;
-     cout<< "Translation 5" <<endl << robot_tr_05<< endl << endl;
-     cout<< "Translation 6" <<endl << robot_tr_06<< endl << endl;
-     cout<< "Translation 7" <<endl << robot_tr_07<< endl << endl;
-     cout<< "Translation 8" <<endl << robot_tr_08<< endl << endl;
-     cout<< "Translation 9" <<endl << robot_tr_09<< endl << endl;
-     cout<< "Translation 10" <<endl << robot_tr_10<< endl << endl;
-     cout<< "Translation 11" <<endl << robot_tr_11<< endl << endl;
-     cout<< "Translation 12" <<endl << robot_tr_12<< endl << endl;
-     cout<< "Translation 13" <<endl << robot_tr_13<< endl << endl;
-     cout<< "Translation 14" <<endl << robot_tr_14<< endl << endl;
-     cout<< "Translation 15" <<endl << robot_tr_15<< endl << endl;
-     cout<< "Translation 16" <<endl << robot_tr_16<< endl << endl;
-     cout<< "Translation 17" <<endl << robot_tr_17<< endl << endl;
-     cout<< "Translation 18" <<endl << robot_tr_18<< endl << endl;
-     cout<< "Translation 19" <<endl << robot_tr_19<< endl << endl;
-     cout<< "Translation 20" <<endl << robot_tr_20<< endl << endl;
-
+    cout<< "Translation 1" <<endl << robot_tr_01<< endl << endl;
+    cout<< "Translation 2" <<endl << robot_tr_02<< endl << endl;
+    cout<< "Translation 3" <<endl << robot_tr_03<< endl << endl;
+    cout<< "Translation 4" <<endl << robot_tr_04<< endl << endl;
+    cout<< "Translation 5" <<endl << robot_tr_05<< endl << endl;
+    cout<< "Translation 6" <<endl << robot_tr_06<< endl << endl;
+    cout<< "Translation 7" <<endl << robot_tr_07<< endl << endl;
+    cout<< "Translation 8" <<endl << robot_tr_08<< endl << endl;
+    cout<< "Translation 9" <<endl << robot_tr_09<< endl << endl;
+    cout<< "Translation 10" <<endl << robot_tr_10<< endl << endl;
+    cout<< "Translation 11" <<endl << robot_tr_11<< endl << endl;
+    cout<< "Translation 12" <<endl << robot_tr_12<< endl << endl;
+    cout<< "Translation 13" <<endl << robot_tr_13<< endl << endl;
+    cout<< "Translation 14" <<endl << robot_tr_14<< endl << endl;
+    cout<< "Translation 15" <<endl << robot_tr_15<< endl << endl;
+    cout<< "Translation 16" <<endl << robot_tr_16<< endl << endl;
+    cout<< "Translation 17" <<endl << robot_tr_17<< endl << endl;
+    cout<< "Translation 18" <<endl << robot_tr_18<< endl << endl;
+    cout<< "Translation 19" <<endl << robot_tr_19<< endl << endl;
+    cout<< "Translation 20" <<endl << robot_tr_20<< endl << endl;
 
     R_gripper2base.push_back(robot_rot_01);
     R_gripper2base.push_back(robot_rot_02);
@@ -474,8 +701,6 @@ cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
     R_gripper2base.push_back(robot_rot_19);
     R_gripper2base.push_back(robot_rot_20);
 
-
-
     t_gripper2base.push_back(robot_tr_01);
     t_gripper2base.push_back(robot_tr_02);
     t_gripper2base.push_back(robot_tr_03);
@@ -497,28 +722,22 @@ cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
     t_gripper2base.push_back(robot_tr_19);
     t_gripper2base.push_back(robot_tr_20);
 
-    //cout << "R_gripper2base = " << endl << " " << R_gripper2base[0] << endl << endl;
-    //cout << "t_gripper2base = " << endl << " " << t_gripper2base[0] << endl << endl;
+//    cout << R_gripper2base.size() << " R_gripper2base"<<endl;
+//    cout << t_gripper2base.size() << " t_gripper2base"<<endl;
+//    cout << R_target2cam.size() << " R_target2cam"<<endl;
+//    cout << R_target2cam.size() << " t_target2cam"<<endl;
+//    cout << t_target2cam[0] << endl << endl;
+//    cout << t_target2cam[1] << endl << endl;
+//    cout << t_target2cam[2] << endl << endl;
+//    cout << t_target2cam[3] << endl << endl;
+//    cout << t_target2cam[4] << endl << endl;
+//    cout << t_target2cam[5] << endl << endl;
+//    cout << t_target2cam[6] << endl << endl;
+//    cout << t_target2cam[7] << endl << endl;
+//    cout << t_target2cam[8] << endl << endl;
+//    cout << t_target2cam[9] << endl << endl;
 
-
-
-    cout << R_gripper2base.size() << " R_gripper2base"<<endl;
-    cout << t_gripper2base.size() << " t_gripper2base"<<endl;
-    cout << R_target2cam.size() << " R_target2cam"<<endl;
-    cout << R_target2cam.size() << " t_target2cam"<<endl;
-    //cout << R_cam2gripper.size() << " R_cam2gripper"<< endl << endl;
-    //cout << t_cam2gripper.size() << " t_cam2gripper"<<endl<<endl;
-
-//    cout << "Input to calibrateHandEyed: "<<endl;
-//    cout << "R_gripper2base = "<< endl <<" " << R_gripper2base[4] << endl<< endl;
-//    cout << "t_gripper2base = "<< endl <<" " << t_gripper2base[4] << endl<< endl;
-//    cout << "R_target2cam = "<< endl <<" " << R_target2cam[4] << endl<< endl;
-//    cout << "t_target2cam = "<< endl <<" " << t_target2cam[4] << endl<< endl;
-
-
-
-
-
+    //**************************** RODRIGUES **************************************************
     calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper_TSAI, t_cam2gripper_TSAI, CALIB_HAND_EYE_TSAI);
     calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper_HORAUD, t_cam2gripper_HORAUD, CALIB_HAND_EYE_HORAUD);
     calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper_ANDREFF, t_cam2gripper_ANDREFF, CALIB_HAND_EYE_ANDREFF);
@@ -530,28 +749,61 @@ cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
     Vec3f R_cam2gripper_rP = rotationMatrixToEulerAngles(R_cam2gripper_PARK);
     Vec3f R_cam2gripper_rD = rotationMatrixToEulerAngles(R_cam2gripper_DAN);
 
-    //Rotation
+    //calibrateHandEye();
+
+    cv::Mat Rodrigues_Tsai, Rodrigues_Horaud, Rodrigues_Park, Rodrigues_Andreff, Rodrigues_Dan;
+    cv::Rodrigues(R_cam2gripper_TSAI,Rodrigues_Tsai);
+    cv::Rodrigues(R_cam2gripper_HORAUD,Rodrigues_Horaud);
+    cv::Rodrigues(R_cam2gripper_PARK,Rodrigues_Park);
+    cv::Rodrigues(R_cam2gripper_ANDREFF,Rodrigues_Andreff);
+    cv::Rodrigues(R_cam2gripper_DAN,Rodrigues_Dan);
+
+
+    // Rotation
     cout << "R_cam2gripper_TSAI = " << endl << " " << R_cam2gripper_TSAI << endl << endl;
     cout << "R_cam2gripper_rT = " << endl << " " << R_cam2gripper_rT << endl << endl;
+    cout << " Rodrigues R_cam2gripper_rT = " << endl << " " << Rad2degV(Rodrigues_Tsai) << endl << endl;
 
     cout << "R_cam2gripper_HORAUD = " << endl << " " << R_cam2gripper_HORAUD << endl << endl;
     cout << "R_cam2gripper_rH = " << endl << " " << R_cam2gripper_rH << endl << endl;
-
-    cout << "R_cam2gripper_ANDREFF = " << endl << " " << R_cam2gripper_ANDREFF << endl << endl;
-    cout << "R_cam2gripper_rA = " << endl << " " << R_cam2gripper_rA << endl << endl;
+    cout << " Rodrigues R_cam2gripper_rH = " << endl << " " << Rad2degV(Rodrigues_Horaud) << endl << endl;
 
     cout << "R_cam2gripper_PARK = " << endl << " " << R_cam2gripper_PARK << endl << endl;
     cout << "R_cam2gripper_rP = " << endl << " " << R_cam2gripper_rP << endl << endl;
+    cout << " Rodrigues R_cam2gripper_rP = " << endl << " " << Rad2degV(Rodrigues_Park) << endl << endl;
+
+    cout << "R_cam2gripper_ANDREFF = " << endl << " " << R_cam2gripper_ANDREFF << endl << endl;
+    cout << "R_cam2gripper_rA = " << endl << " " << R_cam2gripper_rA << endl << endl;
+    cout << " Rodrigues R_cam2gripper_rA = " << endl << " " << Rad2degV(Rodrigues_Andreff) << endl << endl;
 
     cout << "R_cam2gripper_DAN = " << endl << " " << R_cam2gripper_DAN << endl << endl;
     cout << "R_cam2gripper_rD = " << endl << " " << R_cam2gripper_rD << endl << endl;
+    cout << " Rodrigues R_cam2gripper_rD = " << endl << " " << Rad2degV(Rodrigues_Dan) << endl << endl;
 
     // Translation
-    cout << "t_cam2gripper_TSAI = " << endl << " " << t_cam2gripper_TSAI << endl << endl;
-    cout << "t_cam2gripper_HORAUD = " << endl << " " << t_cam2gripper_HORAUD << endl << endl;
-    cout << "t_cam2gripper_PARK = " << endl << " " << t_cam2gripper_PARK << endl << endl;
-    cout << "t_cam2gripper_ANDREFF = " << endl << " " << t_cam2gripper_ANDREFF << endl << endl;
-    cout << "t_cam2gripper_DAN = " << endl << " " << t_cam2gripper_DAN << endl << endl;
+    cout << "t_cam2gripper_TSAI = " << endl << " " << t_cam2gripper_TSAI/1000 << endl << endl;
+    cout << "t_cam2gripper_HORAUD = " << endl << " " << t_cam2gripper_HORAUD/1000 << endl << endl;
+    cout << "t_cam2gripper_PARK = " << endl << " " << t_cam2gripper_PARK/1000 << endl << endl;
+    cout << "t_cam2gripper_ANDREFF = " << endl << " " << t_cam2gripper_ANDREFF/1000 << endl << endl;
+    cout << "t_cam2gripper_DAN = " << endl << " " << t_cam2gripper_DAN/1000 << endl << endl;
+
+    // Inverse transformation
+    cv::Mat t_Inverse(3, 1, CV_64F);
+    cv::Mat R_Inverse, Rodrigues_Horaud_Inverse;
+
+    R_Inverse=R_cam2gripper_HORAUD.t();// rotation of inverse
+    t_Inverse= -R_Inverse * t_cam2gripper_HORAUD; // translation of inverse
+
+    Vec3f R_cam2gripper_Inverse = rotationMatrixToEulerAngles(R_Inverse);
+
+    cv::Rodrigues(R_Inverse,Rodrigues_Horaud_Inverse);
+
+    cout << "R_cam2gripper_Inverse = " << endl << " " << R_Inverse << endl << endl;
+    cout << "R_cam2gripper_Inverse = " << endl << " " << R_cam2gripper_Inverse << endl << endl;
+    cout << " Rodrigues R_cam2gripper_Inverse = " << endl << " " << Rad2degV(Rodrigues_Horaud_Inverse) << endl << endl;
+    cout << "t_cam2gripper_HORAUD_Inverse = " << endl << " " << t_Inverse/1000 << endl << endl;
+    //std::vector<double> Cam2Gripper = {-0.00228131, 0.011324, -0.116136, 0.0246032, 0.035415, 2.3357};
+    //Pose_inv(Cam2Gripper);
 }
 
 void print(std::vector<double> const &input)
@@ -599,6 +851,16 @@ float deg2rad(float degree) {
     double pi = 3.14159;
     return(degree * (pi / 180));
 }
+
+Vec3f Rad2degV(Vec3f v)
+{
+    float x,y,z;
+    x=v[0];
+    y=v[1];
+    z=v[2];
+    return Vec3f(x, y, z);
+}
+
 
 // Checks if a matrix is a valid rotation matrix.
 bool isRotationMatrix(Mat &R)
@@ -650,4 +912,67 @@ Mat ReverseVector(Mat &v)
     RV.at<float>(0,2)=v.at<float>(0,0);
 
     return RV;
+}
+
+Mat TransposeVector(Vec3f &v)
+{
+
+    Mat RV = Mat_<float>(3, 1, CV_32F);
+
+    RV.at<float>(0,0)=v[0];
+    RV.at<float>(0,1)=v[1];
+    RV.at<float>(0,2)=v[2];
+
+    return RV;
+}
+
+Vec3f Poly_Scale(Vec3f theta_rv)
+{
+
+float rv_len = sqrt(pow(theta_rv[0], 2) + pow(theta_rv[1], 2) + pow(theta_rv[2], 2));
+float scale = 1 - 2 * CV_PI / rv_len;
+theta_rv = theta_rv * scale;
+
+return theta_rv;
+}
+
+std::vector<double> Pose_inv(std::vector<double> v)
+{
+    // Initialze
+    cv::Mat t_Inverse(3, 1, CV_64F), R_Inverse(3, 1, CV_64F), R_Inverse_result(3, 1, CV_64F);
+    cv::Mat Rodrigues_Inverse;
+    cv::Mat t = (cv::Mat_<double>(3, 1)<< v[0],v[1],v[2]);
+    cv::Mat R = (cv::Mat_<double>(3, 1)<< v[3],v[4],v[5]);
+
+    //std::cout <<std::endl << "R " << std::endl << R << std::endl;
+    //std::cout <<std::endl << "t " << std::endl << t << std::endl;
+
+    // from 3x1 rotvec to 3x3 rotm
+    cv::Rodrigues(R,Rodrigues_Inverse);
+
+    //std::cout <<std::endl << "Rodrigues_Inverse " << std::endl << Rodrigues_Inverse << std::endl;
+
+    // create inverse T
+    R_Inverse=Rodrigues_Inverse.t();// Inverse Rotation
+    t_Inverse= -R_Inverse * t; // Inverse translation
+
+    //std::cout <<std::endl << "R_inverse " << std::endl << R_Inverse << std::endl;
+    //std::cout <<std::endl << "t_Inverse " << std::endl << t_Inverse << std::endl;
+
+    // from 3x3 rotvec to 3x1 rotm
+    cv::Rodrigues(R_Inverse,R_Inverse_result);
+    //std::cout <<std::endl << "R_Inverse_result " << std::endl << R_Inverse_result << std::endl;
+
+    // cv::Mat --> std::vector
+    std::vector<double>t_inv(t_Inverse.begin<double>(), t_Inverse.end<double>());
+    std::vector<double>R_inv(R_Inverse_result.begin<double>(), R_Inverse_result.end<double>());
+
+//    print(t_inv);
+//    print(R_inv);
+
+    std::vector<double> pose(t_inv);
+        pose.insert(pose.end(), R_inv.begin(), R_inv.end());
+        print(pose);
+        std::cout << std::endl;
+    return pose;
 }

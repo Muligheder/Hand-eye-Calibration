@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_Plugin_t {
-    QByteArrayData data[52];
-    char stringdata0[677];
+    QByteArrayData data[68];
+    char stringdata0[888];
 };
 #define QT_MOC_LITERAL(idx, ofs, len) \
     Q_STATIC_BYTE_ARRAY_DATA_HEADER_INITIALIZER_WITH_OFFSET(len, \
@@ -69,21 +69,37 @@ QT_MOC_LITERAL(33, 428, 20), // "createPathRRTConnect"
 QT_MOC_LITERAL(34, 449, 34), // "std::vector<std::vector<doubl..."
 QT_MOC_LITERAL(35, 484, 12), // "Take_picture"
 QT_MOC_LITERAL(36, 497, 14), // "Analyze_images"
-QT_MOC_LITERAL(37, 512, 27), // "eulerAnglesToRotationMatrix"
-QT_MOC_LITERAL(38, 540, 7), // "cv::Mat"
-QT_MOC_LITERAL(39, 548, 10), // "cv::Vec3d&"
-QT_MOC_LITERAL(40, 559, 5), // "theta"
-QT_MOC_LITERAL(41, 565, 7), // "rad2deg"
-QT_MOC_LITERAL(42, 573, 6), // "radian"
-QT_MOC_LITERAL(43, 580, 7), // "deg2rad"
-QT_MOC_LITERAL(44, 588, 6), // "degree"
-QT_MOC_LITERAL(45, 595, 16), // "isRotationMatrix"
-QT_MOC_LITERAL(46, 612, 8), // "cv::Mat&"
-QT_MOC_LITERAL(47, 621, 1), // "R"
-QT_MOC_LITERAL(48, 623, 27), // "rotationMatrixToEulerAngles"
-QT_MOC_LITERAL(49, 651, 9), // "cv::Vec3d"
-QT_MOC_LITERAL(50, 661, 13), // "ReverseVector"
-QT_MOC_LITERAL(51, 675, 1) // "v"
+QT_MOC_LITERAL(37, 512, 3), // "PCL"
+QT_MOC_LITERAL(38, 516, 27), // "eulerAnglesToRotationMatrix"
+QT_MOC_LITERAL(39, 544, 7), // "cv::Mat"
+QT_MOC_LITERAL(40, 552, 10), // "cv::Vec3d&"
+QT_MOC_LITERAL(41, 563, 5), // "theta"
+QT_MOC_LITERAL(42, 569, 7), // "rad2deg"
+QT_MOC_LITERAL(43, 577, 6), // "radian"
+QT_MOC_LITERAL(44, 584, 7), // "deg2rad"
+QT_MOC_LITERAL(45, 592, 6), // "degree"
+QT_MOC_LITERAL(46, 599, 16), // "isRotationMatrix"
+QT_MOC_LITERAL(47, 616, 8), // "cv::Mat&"
+QT_MOC_LITERAL(48, 625, 1), // "R"
+QT_MOC_LITERAL(49, 627, 27), // "rotationMatrixToEulerAngles"
+QT_MOC_LITERAL(50, 655, 9), // "cv::Vec3d"
+QT_MOC_LITERAL(51, 665, 13), // "ReverseVector"
+QT_MOC_LITERAL(52, 679, 1), // "v"
+QT_MOC_LITERAL(53, 681, 8), // "Pose_inv"
+QT_MOC_LITERAL(54, 690, 13), // "import3DPoint"
+QT_MOC_LITERAL(55, 704, 20), // "std::vector<double>&"
+QT_MOC_LITERAL(56, 725, 5), // "point"
+QT_MOC_LITERAL(57, 731, 12), // "get_texcolor"
+QT_MOC_LITERAL(58, 744, 35), // "std::tuple<uint8_t,uint8_t,ui..."
+QT_MOC_LITERAL(59, 780, 16), // "rs2::video_frame"
+QT_MOC_LITERAL(60, 797, 7), // "texture"
+QT_MOC_LITERAL(61, 805, 23), // "rs2::texture_coordinate"
+QT_MOC_LITERAL(62, 829, 9), // "texcoords"
+QT_MOC_LITERAL(63, 839, 13), // "points_to_pcl"
+QT_MOC_LITERAL(64, 853, 9), // "ptr_cloud"
+QT_MOC_LITERAL(65, 863, 11), // "rs2::points"
+QT_MOC_LITERAL(66, 875, 6), // "points"
+QT_MOC_LITERAL(67, 882, 5) // "color"
 
     },
     "Plugin\0clickEvent\0\0stateChangedListener\0"
@@ -99,12 +115,18 @@ QT_MOC_LITERAL(51, 675, 1) // "v"
     "printDeviceNames\0rw::models::WorkCell\0"
     "workcell\0moveToJ\0createPathRRTConnect\0"
     "std::vector<std::vector<double> >&\0"
-    "Take_picture\0Analyze_images\0"
+    "Take_picture\0Analyze_images\0PCL\0"
     "eulerAnglesToRotationMatrix\0cv::Mat\0"
     "cv::Vec3d&\0theta\0rad2deg\0radian\0deg2rad\0"
     "degree\0isRotationMatrix\0cv::Mat&\0R\0"
     "rotationMatrixToEulerAngles\0cv::Vec3d\0"
-    "ReverseVector\0v"
+    "ReverseVector\0v\0Pose_inv\0import3DPoint\0"
+    "std::vector<double>&\0point\0get_texcolor\0"
+    "std::tuple<uint8_t,uint8_t,uint8_t>\0"
+    "rs2::video_frame\0texture\0"
+    "rs2::texture_coordinate\0texcoords\0"
+    "points_to_pcl\0ptr_cloud\0rs2::points\0"
+    "points\0color"
 };
 #undef QT_MOC_LITERAL
 
@@ -114,7 +136,7 @@ static const uint qt_meta_data_Plugin[] = {
        7,       // revision
        0,       // classname
        0,    0, // classinfo
-      32,   14, // methods
+      37,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
@@ -122,38 +144,43 @@ static const uint qt_meta_data_Plugin[] = {
        0,       // signalCount
 
  // slots: name, argc, parameters, tag, flags
-       1,    0,  174,    2, 0x08 /* Private */,
-       3,    1,  175,    2, 0x08 /* Private */,
-       6,    0,  178,    2, 0x08 /* Private */,
-       7,    0,  179,    2, 0x08 /* Private */,
-       8,    0,  180,    2, 0x08 /* Private */,
-       9,    0,  181,    2, 0x08 /* Private */,
-      10,    0,  182,    2, 0x08 /* Private */,
-      11,    0,  183,    2, 0x08 /* Private */,
-      12,    0,  184,    2, 0x08 /* Private */,
-      13,    0,  185,    2, 0x08 /* Private */,
-      14,    0,  186,    2, 0x08 /* Private */,
-      15,    0,  187,    2, 0x08 /* Private */,
-      16,    2,  188,    2, 0x08 /* Private */,
-      18,    0,  193,    2, 0x08 /* Private */,
-      19,    0,  194,    2, 0x08 /* Private */,
-      20,    0,  195,    2, 0x08 /* Private */,
-      21,    0,  196,    2, 0x08 /* Private */,
-      22,    2,  197,    2, 0x08 /* Private */,
-      23,    1,  202,    2, 0x08 /* Private */,
-      24,    4,  205,    2, 0x08 /* Private */,
-      25,    2,  214,    2, 0x08 /* Private */,
-      29,    1,  219,    2, 0x08 /* Private */,
-      32,    3,  222,    2, 0x08 /* Private */,
-      33,    8,  229,    2, 0x08 /* Private */,
-      35,    0,  246,    2, 0x08 /* Private */,
-      36,    0,  247,    2, 0x08 /* Private */,
-      37,    1,  248,    2, 0x08 /* Private */,
-      41,    1,  251,    2, 0x08 /* Private */,
-      43,    1,  254,    2, 0x08 /* Private */,
-      45,    1,  257,    2, 0x08 /* Private */,
-      48,    1,  260,    2, 0x08 /* Private */,
-      50,    1,  263,    2, 0x08 /* Private */,
+       1,    0,  199,    2, 0x08 /* Private */,
+       3,    1,  200,    2, 0x08 /* Private */,
+       6,    0,  203,    2, 0x08 /* Private */,
+       7,    0,  204,    2, 0x08 /* Private */,
+       8,    0,  205,    2, 0x08 /* Private */,
+       9,    0,  206,    2, 0x08 /* Private */,
+      10,    0,  207,    2, 0x08 /* Private */,
+      11,    0,  208,    2, 0x08 /* Private */,
+      12,    0,  209,    2, 0x08 /* Private */,
+      13,    0,  210,    2, 0x08 /* Private */,
+      14,    0,  211,    2, 0x08 /* Private */,
+      15,    0,  212,    2, 0x08 /* Private */,
+      16,    2,  213,    2, 0x08 /* Private */,
+      18,    0,  218,    2, 0x08 /* Private */,
+      19,    0,  219,    2, 0x08 /* Private */,
+      20,    0,  220,    2, 0x08 /* Private */,
+      21,    0,  221,    2, 0x08 /* Private */,
+      22,    2,  222,    2, 0x08 /* Private */,
+      23,    1,  227,    2, 0x08 /* Private */,
+      24,    4,  230,    2, 0x08 /* Private */,
+      25,    2,  239,    2, 0x08 /* Private */,
+      29,    1,  244,    2, 0x08 /* Private */,
+      32,    3,  247,    2, 0x08 /* Private */,
+      33,    8,  254,    2, 0x08 /* Private */,
+      35,    0,  271,    2, 0x08 /* Private */,
+      36,    0,  272,    2, 0x08 /* Private */,
+      37,    0,  273,    2, 0x08 /* Private */,
+      38,    1,  274,    2, 0x08 /* Private */,
+      42,    1,  277,    2, 0x08 /* Private */,
+      44,    1,  280,    2, 0x08 /* Private */,
+      46,    1,  283,    2, 0x08 /* Private */,
+      49,    1,  286,    2, 0x08 /* Private */,
+      51,    1,  289,    2, 0x08 /* Private */,
+      53,    1,  292,    2, 0x08 /* Private */,
+      54,    1,  295,    2, 0x08 /* Private */,
+      57,    2,  298,    2, 0x08 /* Private */,
+      63,    2,  303,    2, 0x08 /* Private */,
 
  // slots: parameters
     QMetaType::Void,
@@ -182,12 +209,17 @@ static const uint qt_meta_data_Plugin[] = {
     QMetaType::Void, 0x80000000 | 17, 0x80000000 | 17, QMetaType::Double, QMetaType::Double, QMetaType::Double, QMetaType::Double, 0x80000000 | 34, 0x80000000 | 4,    2,    2,    2,    2,    2,    2,    2,    2,
     QMetaType::Void,
     QMetaType::Void,
-    0x80000000 | 38, 0x80000000 | 39,   40,
-    QMetaType::Double, QMetaType::Double,   42,
-    QMetaType::Double, QMetaType::Double,   44,
-    QMetaType::Bool, 0x80000000 | 46,   47,
-    0x80000000 | 49, 0x80000000 | 46,   47,
-    0x80000000 | 38, 0x80000000 | 46,   51,
+    QMetaType::Void,
+    0x80000000 | 39, 0x80000000 | 40,   41,
+    QMetaType::Double, QMetaType::Double,   43,
+    QMetaType::Double, QMetaType::Double,   45,
+    QMetaType::Bool, 0x80000000 | 47,   48,
+    0x80000000 | 50, 0x80000000 | 47,   48,
+    0x80000000 | 39, 0x80000000 | 47,   52,
+    0x80000000 | 17, 0x80000000 | 17,   52,
+    QMetaType::Void, 0x80000000 | 55,   56,
+    0x80000000 | 58, 0x80000000 | 59, 0x80000000 | 61,   60,   62,
+    0x80000000 | 64, 0x80000000 | 65, 0x80000000 | 59,   66,   67,
 
        0        // eod
 };
@@ -227,18 +259,26 @@ void Plugin::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, void
         case 23: _t->createPathRRTConnect((*reinterpret_cast< std::vector<double>(*)>(_a[1])),(*reinterpret_cast< std::vector<double>(*)>(_a[2])),(*reinterpret_cast< double(*)>(_a[3])),(*reinterpret_cast< double(*)>(_a[4])),(*reinterpret_cast< double(*)>(_a[5])),(*reinterpret_cast< double(*)>(_a[6])),(*reinterpret_cast< std::vector<std::vector<double> >(*)>(_a[7])),(*reinterpret_cast< rw::kinematics::State(*)>(_a[8]))); break;
         case 24: _t->Take_picture(); break;
         case 25: _t->Analyze_images(); break;
-        case 26: { cv::Mat _r = _t->eulerAnglesToRotationMatrix((*reinterpret_cast< cv::Vec3d(*)>(_a[1])));
+        case 26: _t->PCL(); break;
+        case 27: { cv::Mat _r = _t->eulerAnglesToRotationMatrix((*reinterpret_cast< cv::Vec3d(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< cv::Mat*>(_a[0]) = std::move(_r); }  break;
-        case 27: { double _r = _t->rad2deg((*reinterpret_cast< double(*)>(_a[1])));
+        case 28: { double _r = _t->rad2deg((*reinterpret_cast< double(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< double*>(_a[0]) = std::move(_r); }  break;
-        case 28: { double _r = _t->deg2rad((*reinterpret_cast< double(*)>(_a[1])));
+        case 29: { double _r = _t->deg2rad((*reinterpret_cast< double(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< double*>(_a[0]) = std::move(_r); }  break;
-        case 29: { bool _r = _t->isRotationMatrix((*reinterpret_cast< cv::Mat(*)>(_a[1])));
+        case 30: { bool _r = _t->isRotationMatrix((*reinterpret_cast< cv::Mat(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< bool*>(_a[0]) = std::move(_r); }  break;
-        case 30: { cv::Vec3d _r = _t->rotationMatrixToEulerAngles((*reinterpret_cast< cv::Mat(*)>(_a[1])));
+        case 31: { cv::Vec3d _r = _t->rotationMatrixToEulerAngles((*reinterpret_cast< cv::Mat(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< cv::Vec3d*>(_a[0]) = std::move(_r); }  break;
-        case 31: { cv::Mat _r = _t->ReverseVector((*reinterpret_cast< cv::Mat(*)>(_a[1])));
+        case 32: { cv::Mat _r = _t->ReverseVector((*reinterpret_cast< cv::Mat(*)>(_a[1])));
             if (_a[0]) *reinterpret_cast< cv::Mat*>(_a[0]) = std::move(_r); }  break;
+        case 33: { std::vector<double> _r = _t->Pose_inv((*reinterpret_cast< std::vector<double>(*)>(_a[1])));
+            if (_a[0]) *reinterpret_cast< std::vector<double>*>(_a[0]) = std::move(_r); }  break;
+        case 34: _t->import3DPoint((*reinterpret_cast< std::vector<double>(*)>(_a[1]))); break;
+        case 35: { std::tuple<uint8_t,uint8_t,uint8_t> _r = _t->get_texcolor((*reinterpret_cast< rs2::video_frame(*)>(_a[1])),(*reinterpret_cast< rs2::texture_coordinate(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< std::tuple<uint8_t,uint8_t,uint8_t>*>(_a[0]) = std::move(_r); }  break;
+        case 36: { ptr_cloud _r = _t->points_to_pcl((*reinterpret_cast< const rs2::points(*)>(_a[1])),(*reinterpret_cast< const rs2::video_frame(*)>(_a[2])));
+            if (_a[0]) *reinterpret_cast< ptr_cloud*>(_a[0]) = std::move(_r); }  break;
         default: ;
         }
     }
@@ -271,13 +311,13 @@ int Plugin::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 32)
+        if (_id < 37)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 32;
+        _id -= 37;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 32)
+        if (_id < 37)
             *reinterpret_cast<int*>(_a[0]) = -1;
-        _id -= 32;
+        _id -= 37;
     }
     return _id;
 }

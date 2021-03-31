@@ -60,15 +60,15 @@ include CMakeFiles/RTDE.dir/flags.make
 CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.o: CMakeFiles/RTDE.dir/flags.make
 CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.o: ../src/ur_robot_rtde_test.cpp
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/anders/Master/Hand-eye-Calibration/Test_program/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Test_program/src/ur_robot_rtde_test.cpp
+	/usr/bin/g++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.o -c /home/anders/Master/Hand-eye-Calibration/Test_program/src/ur_robot_rtde_test.cpp
 
 CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.i: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Test_program/src/ur_robot_rtde_test.cpp > CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.i
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/anders/Master/Hand-eye-Calibration/Test_program/src/ur_robot_rtde_test.cpp > CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.i
 
 CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.s: cmake_force
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Test_program/src/ur_robot_rtde_test.cpp -o CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.s
+	/usr/bin/g++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/anders/Master/Hand-eye-Calibration/Test_program/src/ur_robot_rtde_test.cpp -o CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.s
 
 CMakeFiles/RTDE.dir/src/ur_robot_rtde_test.cpp.o.requires:
 

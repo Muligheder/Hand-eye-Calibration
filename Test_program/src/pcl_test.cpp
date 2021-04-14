@@ -157,7 +157,7 @@ int main(int argc, char * argv[]) try
     pcl::PassThrough<pcl::PointXYZRGB> pass;
     pass.setInputCloud (cloud);
     pass.setFilterFieldName ("z");
-    pass.setFilterLimits (0.0, 1.0);
+    pass.setFilterLimits (0.0, 0.7);
     //pass.setFilterLimitsNegative (true);
     pass.filter (*cloud_filtered);
 

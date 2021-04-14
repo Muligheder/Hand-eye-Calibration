@@ -9,7 +9,10 @@
 #include <cstdio>
 //#include "pch.h"
 
+#include <cmath>  // std::fabs
+#include <limits> // numeric_limits
 
+#include <visp3/vision/vpHandEyeCalibration.h>
 
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
@@ -31,7 +34,7 @@
 
 using namespace cv;
 using namespace std;
-
+#define DEBUG_LEVEL2 0
 Mat eulerAnglesToRotationMatrix(Vec3f &theta);
 Vec3f rotationMatrixToEulerAngles(Mat &R);
 float rad2deg(float radian);
@@ -40,8 +43,11 @@ Mat ReverseVector(Mat &v);
 void print(std::vector<double> const &input);
 Vec3f Rad2degV(Vec3f v);
 Vec3f Poly_Scale(Vec3f theta_rv);
-Mat TransposeVector(Vec3f &v);
+Mat TransposeVector(Vec3d &v);
 std::vector<double> Pose_inv(std::vector<double> v);
+void errorEstimate(const std::vector<Mat> &R_gripper2base, const std::vector<Mat> &t_gripper2base, const std::vector<Mat> &R_target2cam, const std::vector<Mat> &t_target2cam, const Mat &R_cam2gripper, const Mat &t_cam2gripper);
+int Mat2ViSP(const cv::Mat& mat_in, vpHomogeneousMatrix& visp_ou);
+void calibrationVerifrMo(const std::vector<vpHomogeneousMatrix> &cMo, const std::vector<vpHomogeneousMatrix> &rMe, const vpHomogeneousMatrix &eMc);
 int CHECKERBOARD[2]{8,5};
 
 int main()
@@ -122,16 +128,16 @@ int main()
     std::vector<cv::Mat> t_gripper2base;
     std::vector<cv::Mat> R_target2cam;
     std::vector<cv::Mat> t_target2cam;
-    cv::Mat R_cam2gripper_TSAI = (cv::Mat_<float>(3, 3));
-    cv::Mat R_cam2gripper_HORAUD = (cv::Mat_<float>(3, 3));
-    cv::Mat R_cam2gripper_PARK = (cv::Mat_<float>(3, 3));
-    cv::Mat R_cam2gripper_ANDREFF = (cv::Mat_<float>(3, 3));
-    cv::Mat R_cam2gripper_DAN = (cv::Mat_<float>(3, 3));
-    cv::Mat t_cam2gripper_TSAI = (cv::Mat_<float>(3, 1));
-    cv::Mat t_cam2gripper_HORAUD = (cv::Mat_<float>(3, 1));
-    cv::Mat t_cam2gripper_PARK = (cv::Mat_<float>(3, 1));
-    cv::Mat t_cam2gripper_ANDREFF = (cv::Mat_<float>(3, 1));
-    cv::Mat t_cam2gripper_DAN = (cv::Mat_<float>(3, 1));
+    cv::Mat R_cam2gripper_TSAI = (cv::Mat_<double>(3, 3));
+    cv::Mat R_cam2gripper_HORAUD = (cv::Mat_<double>(3, 3));
+    cv::Mat R_cam2gripper_PARK = (cv::Mat_<double>(3, 3));
+    cv::Mat R_cam2gripper_ANDREFF = (cv::Mat_<double>(3, 3));
+    cv::Mat R_cam2gripper_DAN = (cv::Mat_<double>(3, 3));
+    cv::Mat t_cam2gripper_TSAI = (cv::Mat_<double>(3, 1));
+    cv::Mat t_cam2gripper_HORAUD = (cv::Mat_<double>(3, 1));
+    cv::Mat t_cam2gripper_PARK = (cv::Mat_<double>(3, 1));
+    cv::Mat t_cam2gripper_ANDREFF = (cv::Mat_<double>(3, 1));
+    cv::Mat t_cam2gripper_DAN = (cv::Mat_<double>(3, 1));
 
     // Euler
 //    cv::Mat R_cam2gripper_Euler_TSAI = (cv::Mat_<float>(3, 3));
@@ -157,13 +163,13 @@ int main()
       // To calculate reprojection error
       std::vector<double> stdDeviationsIntrinsics,stdDeviationExtrinsics,perViewErrors;
       cv::Mat rvecs,tvecs;
-      float Cell_size = 28.6666666666;
+      float Cell_size = 0.0286666666666;
 
       for(int i{0}; i<CHECKERBOARD[1]; i++)
       {
         for(int j{0}; j<CHECKERBOARD[0]; j++)
           objp.push_back(cv::Point3f(float(j*Cell_size),float(i*Cell_size),0.f));
-        std::cout << objp << std::endl;
+        //std::cout << objp << std::endl;
 
       }
 
@@ -223,8 +229,8 @@ int main()
           cv::drawFrameAxes(frame,cameraMatrix,distortionCoefficients,rvec,tvec,length,thickness);
           cv::Mat R;
                      cv::Rodrigues(rvec, R); // R is 3x3
-                     std::cout <<std::endl << "Tvec " << std::endl << tvec/1000 << std::endl;
-                     std::cout <<std::endl << "Rvec " << std::endl << rvec*1 << std::endl;
+//                     std::cout <<std::endl << "Tvec " << std::endl << tvec/1000 << std::endl;
+//                     std::cout <<std::endl << "Rvec " << std::endl << rvec*1 << std::endl;
                      //R=R.t();// rotation of inverse
                      //tvec= -R * tvec; // translation of inverse
                      R_target2cam.push_back(R*1);
@@ -234,13 +240,13 @@ int main()
                      T(cv::Range(0, 3), cv::Range(0, 3)) = R*1; // copies R into T
                      T(cv::Range(0, 3), cv::Range(3, 4)) = tvec*1; // copies tvec into T
 
-                     std::cout << "T = " << std::endl << " " << T << std::endl << std::endl;
+//                     std::cout << "T = " << std::endl << " " << T << std::endl << std::endl;
 
 
         }
 
-        cv::imshow("Image",frame);
-        cv::waitKey(0);
+//        cv::imshow("Image",frame);
+//        cv::waitKey(0);
 
 
 
@@ -363,15 +369,15 @@ int main()
 
 
 // read data from file and seperate to vector of vector.
-           std::vector<std::vector<float>> v;
+           std::vector<std::vector<double>> v;
            std::ifstream in( "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/test.txt" );
            std::string record;
 
            while ( std::getline( in, record ) )
            {
                std::istringstream is( record );
-               std::vector<float> row( ( std::istream_iterator<float>( is ) ),
-                                        std::istream_iterator<float>() );
+               std::vector<double> row( ( std::istream_iterator<double>( is ) ),
+                                        std::istream_iterator<double>() );
                v.push_back( row );
            }
 //    // from VISP Libary
@@ -458,48 +464,49 @@ int main()
 //*************************************************************************************************
 
 // Rodriguez            rx      ry      rz
-    Vec3f theta_01{v[0][3],v[0][4],v[0][5]};
-    Vec3f theta_02{v[1][3],v[1][4],v[1][5]};
-    Vec3f theta_03{v[2][3],v[2][4],v[2][5]};
-    Vec3f theta_04{v[3][3],v[3][4],v[3][5]};
-    Vec3f theta_05{v[4][3],v[4][4],v[4][5]};
-    Vec3f theta_06{v[5][3],v[5][4],v[5][5]};
-    Vec3f theta_07{v[6][3],v[6][4],v[6][5]};
-    Vec3f theta_08{v[7][3],v[7][4],v[7][5]};
-    Vec3f theta_09{v[8][3],v[8][4],v[8][5]};
-    Vec3f theta_10{v[9][3],v[9][4],v[9][5]};
-    Vec3f theta_11{v[10][3],v[10][4],v[10][5]};
-    Vec3f theta_12{v[11][3],v[11][4],v[11][5]};
-    Vec3f theta_13{v[12][3],v[12][4],v[12][5]};
-    Vec3f theta_14{v[13][3],v[13][4],v[13][5]};
-    Vec3f theta_15{v[14][3],v[14][4],v[14][5]};
-    Vec3f theta_16{v[15][3],v[15][4],v[15][5]};
-    Vec3f theta_17{v[16][3],v[16][4],v[16][5]};
-    Vec3f theta_18{v[17][3],v[17][4],v[17][5]};
-    Vec3f theta_19{v[18][3],v[18][4],v[18][5]};
-    Vec3f theta_20{v[19][3],v[19][4],v[19][5]};
+    Vec3d theta_01{v[0][3],v[0][4],v[0][5]};
+    Vec3d theta_02{v[1][3],v[1][4],v[1][5]};
+    Vec3d theta_03{v[2][3],v[2][4],v[2][5]};
+    Vec3d theta_04{v[3][3],v[3][4],v[3][5]};
+    Vec3d theta_05{v[4][3],v[4][4],v[4][5]};
+    Vec3d theta_06{v[5][3],v[5][4],v[5][5]};
+    Vec3d theta_07{v[6][3],v[6][4],v[6][5]};
+    Vec3d theta_08{v[7][3],v[7][4],v[7][5]};
+    Vec3d theta_09{v[8][3],v[8][4],v[8][5]};
+    Vec3d theta_10{v[9][3],v[9][4],v[9][5]};
+    Vec3d theta_11{v[10][3],v[10][4],v[10][5]};
+    Vec3d theta_12{v[11][3],v[11][4],v[11][5]};
+    Vec3d theta_13{v[12][3],v[12][4],v[12][5]};
+    Vec3d theta_14{v[13][3],v[13][4],v[13][5]};
+    Vec3d theta_15{v[14][3],v[14][4],v[14][5]};
+    Vec3d theta_16{v[15][3],v[15][4],v[15][5]};
+    Vec3d theta_17{v[16][3],v[16][4],v[16][5]};
+    Vec3d theta_18{v[17][3],v[17][4],v[17][5]};
+    Vec3d theta_19{v[18][3],v[18][4],v[18][5]};
+    Vec3d theta_20{v[19][3],v[19][4],v[19][5]};
 
-    cout<< "Before scaling: " <<endl << endl;
-    cout<< "theta 1" <<endl << theta_01<< endl << endl;
-    cout<< "theta 2" <<endl << theta_02<< endl << endl;
-    cout<< "theta 3" <<endl << theta_03<< endl << endl;
-    cout<< "theta 4" <<endl << theta_04<< endl << endl;
-    cout<< "theta 5" <<endl << theta_05<< endl << endl;
-    cout<< "theta 6" <<endl << theta_06<< endl << endl;
-    cout<< "theta 7" <<endl << theta_07<< endl << endl;
-    cout<< "theta 8" <<endl << theta_08<< endl << endl;
-    cout<< "theta 9" <<endl << theta_09<< endl << endl;
-    cout<< "theta 10" <<endl << theta_10<< endl << endl;
-    cout<< "theta 11" <<endl << theta_11<< endl << endl;
-    cout<< "theta 12" <<endl << theta_12<< endl << endl;
-    cout<< "theta 13" <<endl << theta_13<< endl << endl;
-    cout<< "theta 14" <<endl << theta_14<< endl << endl;
-    cout<< "theta 15" <<endl << theta_15<< endl << endl;
-    cout<< "theta 16" <<endl << theta_16<< endl << endl;
-    cout<< "theta 17" <<endl << theta_17<< endl << endl;
-    cout<< "theta 18" <<endl << theta_18<< endl << endl;
-    cout<< "theta 19" <<endl << theta_19<< endl << endl;
-    cout<< "theta 20" <<endl << theta_20<< endl << endl;
+      // output before UR scaling
+//    cout<< "Before scaling: " <<endl << endl;
+//    cout<< "theta 1" <<endl << theta_01<< endl << endl;
+//    cout<< "theta 2" <<endl << theta_02<< endl << endl;
+//    cout<< "theta 3" <<endl << theta_03<< endl << endl;
+//    cout<< "theta 4" <<endl << theta_04<< endl << endl;
+//    cout<< "theta 5" <<endl << theta_05<< endl << endl;
+//    cout<< "theta 6" <<endl << theta_06<< endl << endl;
+//    cout<< "theta 7" <<endl << theta_07<< endl << endl;
+//    cout<< "theta 8" <<endl << theta_08<< endl << endl;
+//    cout<< "theta 9" <<endl << theta_09<< endl << endl;
+//    cout<< "theta 10" <<endl << theta_10<< endl << endl;
+//    cout<< "theta 11" <<endl << theta_11<< endl << endl;
+//    cout<< "theta 12" <<endl << theta_12<< endl << endl;
+//    cout<< "theta 13" <<endl << theta_13<< endl << endl;
+//    cout<< "theta 14" <<endl << theta_14<< endl << endl;
+//    cout<< "theta 15" <<endl << theta_15<< endl << endl;
+//    cout<< "theta 16" <<endl << theta_16<< endl << endl;
+//    cout<< "theta 17" <<endl << theta_17<< endl << endl;
+//    cout<< "theta 18" <<endl << theta_18<< endl << endl;
+//    cout<< "theta 19" <<endl << theta_19<< endl << endl;
+//    cout<< "theta 20" <<endl << theta_20<< endl << endl;
 
     theta_01=Poly_Scale(theta_01);
     theta_02=Poly_Scale(theta_02);
@@ -578,107 +585,92 @@ int main()
 //    cv::Rodrigues(theta_09,robot_rot_09);
 //    cv::Rodrigues(theta_10,robot_rot_10);
 
+//    // Output after scaling with ur robot
+//    cout<< "After scaling: " <<endl << endl;
+//    cout<< "theta 1" <<endl << theta_scaled_01<< endl << endl;
+//    cout<< "theta 2" <<endl << theta_scaled_02<< endl << endl;
+//    cout<< "theta 3" <<endl << theta_scaled_03<< endl << endl;
+//    cout<< "theta 4" <<endl << theta_scaled_04<< endl << endl;
+//    cout<< "theta 5" <<endl << theta_scaled_05<< endl << endl;
+//    cout<< "theta 6" <<endl << theta_scaled_06<< endl << endl;
+//    cout<< "theta 7" <<endl << theta_scaled_07<< endl << endl;
+//    cout<< "theta 8" <<endl << theta_scaled_08<< endl << endl;
+//    cout<< "theta 9" <<endl << theta_scaled_09<< endl << endl;
+//    cout<< "theta 10" <<endl << theta_scaled_10<< endl << endl;
+//    cout<< "theta 11" <<endl << theta_scaled_11<< endl << endl;
+//    cout<< "theta 12" <<endl << theta_scaled_12<< endl << endl;
+//    cout<< "theta 13" <<endl << theta_scaled_13<< endl << endl;
+//    cout<< "theta 14" <<endl << theta_scaled_14<< endl << endl;
+//    cout<< "theta 15" <<endl << theta_scaled_15<< endl << endl;
+//    cout<< "theta 16" <<endl << theta_scaled_16<< endl << endl;
+//    cout<< "theta 17" <<endl << theta_scaled_17<< endl << endl;
+//    cout<< "theta 18" <<endl << theta_scaled_18<< endl << endl;
+//    cout<< "theta 19" <<endl << theta_scaled_19<< endl << endl;
+//    cout<< "theta 20" <<endl << theta_scaled_20<< endl << endl;
 
-    cout<< "After scaling: " <<endl << endl;
-    cout<< "theta 1" <<endl << theta_scaled_01<< endl << endl;
-    cout<< "theta 2" <<endl << theta_scaled_02<< endl << endl;
-    cout<< "theta 3" <<endl << theta_scaled_03<< endl << endl;
-    cout<< "theta 4" <<endl << theta_scaled_04<< endl << endl;
-    cout<< "theta 5" <<endl << theta_scaled_05<< endl << endl;
-    cout<< "theta 6" <<endl << theta_scaled_06<< endl << endl;
-    cout<< "theta 7" <<endl << theta_scaled_07<< endl << endl;
-    cout<< "theta 8" <<endl << theta_scaled_08<< endl << endl;
-    cout<< "theta 9" <<endl << theta_scaled_09<< endl << endl;
-    cout<< "theta 10" <<endl << theta_scaled_10<< endl << endl;
-    cout<< "theta 11" <<endl << theta_scaled_11<< endl << endl;
-    cout<< "theta 12" <<endl << theta_scaled_12<< endl << endl;
-    cout<< "theta 13" <<endl << theta_scaled_13<< endl << endl;
-    cout<< "theta 14" <<endl << theta_scaled_14<< endl << endl;
-    cout<< "theta 15" <<endl << theta_scaled_15<< endl << endl;
-    cout<< "theta 16" <<endl << theta_scaled_16<< endl << endl;
-    cout<< "theta 17" <<endl << theta_scaled_17<< endl << endl;
-    cout<< "theta 18" <<endl << theta_scaled_18<< endl << endl;
-    cout<< "theta 19" <<endl << theta_scaled_19<< endl << endl;
-    cout<< "theta 20" <<endl << theta_scaled_20<< endl << endl;
+    const Mat robot_tr_01 = (Mat_<double>(3, 1) << v[0][0],v[0][1],v[0][2]);
+    const Mat robot_tr_02 = (Mat_<double>(3, 1) << v[1][0],v[1][1],v[1][2]);
+    const Mat robot_tr_03 = (Mat_<double>(3, 1) << v[2][0],v[2][1],v[2][2]);
+    const Mat robot_tr_04 = (Mat_<double>(3, 1) << v[3][0],v[3][1],v[3][2]);
+    const Mat robot_tr_05 = (Mat_<double>(3, 1) << v[4][0],v[4][1],v[4][2]);
+    const Mat robot_tr_06 = (Mat_<double>(3, 1) << v[5][0],v[5][1],v[5][2]);
+    const Mat robot_tr_07 = (Mat_<double>(3, 1) << v[6][0],v[6][1],v[6][2]);
+    const Mat robot_tr_08 = (Mat_<double>(3, 1) << v[7][0],v[7][1],v[7][2]);
+    const Mat robot_tr_09 = (Mat_<double>(3, 1) << v[8][0],v[8][1],v[8][2]);
+    const Mat robot_tr_10 = (Mat_<double>(3, 1) << v[9][0],v[9][1],v[9][2]);
+    const Mat robot_tr_11 = (Mat_<double>(3, 1) << v[10][0],v[10][1],v[10][2]);
+    const Mat robot_tr_12 = (Mat_<double>(3, 1) << v[11][0],v[11][1],v[11][2]);
+    const Mat robot_tr_13 = (Mat_<double>(3, 1) << v[12][0],v[12][1],v[12][2]);
+    const Mat robot_tr_14 = (Mat_<double>(3, 1) << v[13][0],v[13][1],v[13][2]);
+    const Mat robot_tr_15 = (Mat_<double>(3, 1) << v[14][0],v[14][1],v[14][2]);
+    const Mat robot_tr_16 = (Mat_<double>(3, 1) << v[15][0],v[15][1],v[15][2]);
+    const Mat robot_tr_17 = (Mat_<double>(3, 1) << v[16][0],v[16][1],v[16][2]);
+    const Mat robot_tr_18 = (Mat_<double>(3, 1) << v[17][0],v[17][1],v[17][2]);
+    const Mat robot_tr_19 = (Mat_<double>(3, 1) << v[18][0],v[18][1],v[18][2]);
+    const Mat robot_tr_20 = (Mat_<double>(3, 1) << v[19][0],v[19][1],v[19][2]);
 
-    const Mat robot_tr_01 = (Mat_<float>(3, 1) << v[0][0]*1000,v[0][1]*1000,v[0][2]*1000);
-    const Mat robot_tr_02 = (Mat_<float>(3, 1) << v[1][0]*1000,v[1][1]*1000,v[1][2]*1000);
-    const Mat robot_tr_03 = (Mat_<float>(3, 1) << v[2][0]*1000,v[2][1]*1000,v[2][2]*1000);
-    const Mat robot_tr_04 = (Mat_<float>(3, 1) << v[3][0]*1000,v[3][1]*1000,v[3][2]*1000);
-    const Mat robot_tr_05 = (Mat_<float>(3, 1) << v[4][0]*1000,v[4][1]*1000,v[4][2]*1000);
-    const Mat robot_tr_06 = (Mat_<float>(3, 1) << v[5][0]*1000,v[5][1]*1000,v[5][2]*1000);
-    const Mat robot_tr_07 = (Mat_<float>(3, 1) << v[6][0]*1000,v[6][1]*1000,v[6][2]*1000);
-    const Mat robot_tr_08 = (Mat_<float>(3, 1) << v[7][0]*1000,v[7][1]*1000,v[7][2]*1000);
-    const Mat robot_tr_09 = (Mat_<float>(3, 1) << v[8][0]*1000,v[8][1]*1000,v[8][2]*1000);
-    const Mat robot_tr_10 = (Mat_<float>(3, 1) << v[9][0]*1000,v[9][1]*1000,v[9][2]*1000);
-    const Mat robot_tr_11 = (Mat_<float>(3, 1) << v[10][0]*1000,v[10][1]*1000,v[10][2]*1000);
-    const Mat robot_tr_12 = (Mat_<float>(3, 1) << v[11][0]*1000,v[11][1]*1000,v[11][2]*1000);
-    const Mat robot_tr_13 = (Mat_<float>(3, 1) << v[12][0]*1000,v[12][1]*1000,v[12][2]*1000);
-    const Mat robot_tr_14 = (Mat_<float>(3, 1) << v[13][0]*1000,v[13][1]*1000,v[13][2]*1000);
-    const Mat robot_tr_15 = (Mat_<float>(3, 1) << v[14][0]*1000,v[14][1]*1000,v[14][2]*1000);
-    const Mat robot_tr_16 = (Mat_<float>(3, 1) << v[15][0]*1000,v[15][1]*1000,v[15][2]*1000);
-    const Mat robot_tr_17 = (Mat_<float>(3, 1) << v[16][0]*1000,v[16][1]*1000,v[16][2]*1000);
-    const Mat robot_tr_18 = (Mat_<float>(3, 1) << v[17][0]*1000,v[17][1]*1000,v[17][2]*1000);
-    const Mat robot_tr_19 = (Mat_<float>(3, 1) << v[18][0]*1000,v[18][1]*1000,v[18][2]*1000);
-    const Mat robot_tr_20 = (Mat_<float>(3, 1) << v[19][0]*1000,v[19][1]*1000,v[19][2]*1000);
+//    // Output of Robot rotation and translation
+//    cout<< "robot_rot_01" <<endl << robot_rot_01<< endl << endl;
+//    cout<< "robot_rot_02" <<endl << robot_rot_02<< endl << endl;
+//    cout<< "robot_rot_03" <<endl << robot_rot_03<< endl << endl;
+//    cout<< "robot_rot_04" <<endl << robot_rot_04<< endl << endl;
+//    cout<< "robot_rot_05" <<endl << robot_rot_05<< endl << endl;
+//    cout<< "robot_rot_06" <<endl << robot_rot_06<< endl << endl;
+//    cout<< "robot_rot_07" <<endl << robot_rot_07<< endl << endl;
+//    cout<< "robot_rot_08" <<endl << robot_rot_08<< endl << endl;
+//    cout<< "robot_rot_09" <<endl << robot_rot_09<< endl << endl;
+//    cout<< "robot_rot_10" <<endl << robot_rot_10<< endl << endl;
+//    cout<< "robot_rot_11" <<endl << robot_rot_11<< endl << endl;
+//    cout<< "robot_rot_12" <<endl << robot_rot_12<< endl << endl;
+//    cout<< "robot_rot_13" <<endl << robot_rot_13<< endl << endl;
+//    cout<< "robot_rot_14" <<endl << robot_rot_14<< endl << endl;
+//    cout<< "robot_rot_15" <<endl << robot_rot_15<< endl << endl;
+//    cout<< "robot_rot_16" <<endl << robot_rot_16<< endl << endl;
+//    cout<< "robot_rot_17" <<endl << robot_rot_17<< endl << endl;
+//    cout<< "robot_rot_18" <<endl << robot_rot_18<< endl << endl;
+//    cout<< "robot_rot_19" <<endl << robot_rot_19<< endl << endl;
+//    cout<< "robot_rot_20" <<endl << robot_rot_20<< endl << endl;
 
-
-    const Mat a = (Mat_<float>(3, 1) << 500.09,-69.63,483.34);
-    const Mat b = (Mat_<float>(3, 1) << 540.86,-156.31,240.81);
-    double dist_man= cv::norm(a,b,cv::NORM_L2);
-
-    const Mat c = (Mat_<float>(3, 1) << -55.883121,88.315697,380.29547);
-    const Mat d = (Mat_<float>(3, 1) << 0,0,0);
-
-    double dist_pnp= cv::norm(c,d,cv::NORM_L2);
-
-    std::cout << "Manually Distance between first position and origin" << std::endl << std::endl;
-    std::cout << dist_man << std::endl << std::endl;
-
-    std::cout << "Solve_pnp Distance between first position and origin" << std::endl << std::endl;
-    std::cout << dist_pnp << std::endl << std::endl;
-
-    cout<< "robot_rot_01" <<endl << robot_rot_01<< endl << endl;
-    cout<< "robot_rot_02" <<endl << robot_rot_02<< endl << endl;
-    cout<< "robot_rot_03" <<endl << robot_rot_03<< endl << endl;
-    cout<< "robot_rot_04" <<endl << robot_rot_04<< endl << endl;
-    cout<< "robot_rot_05" <<endl << robot_rot_05<< endl << endl;
-    cout<< "robot_rot_06" <<endl << robot_rot_06<< endl << endl;
-    cout<< "robot_rot_07" <<endl << robot_rot_07<< endl << endl;
-    cout<< "robot_rot_08" <<endl << robot_rot_08<< endl << endl;
-    cout<< "robot_rot_09" <<endl << robot_rot_09<< endl << endl;
-    cout<< "robot_rot_10" <<endl << robot_rot_10<< endl << endl;
-    cout<< "robot_rot_11" <<endl << robot_rot_11<< endl << endl;
-    cout<< "robot_rot_12" <<endl << robot_rot_12<< endl << endl;
-    cout<< "robot_rot_13" <<endl << robot_rot_13<< endl << endl;
-    cout<< "robot_rot_14" <<endl << robot_rot_14<< endl << endl;
-    cout<< "robot_rot_15" <<endl << robot_rot_15<< endl << endl;
-    cout<< "robot_rot_16" <<endl << robot_rot_16<< endl << endl;
-    cout<< "robot_rot_17" <<endl << robot_rot_17<< endl << endl;
-    cout<< "robot_rot_18" <<endl << robot_rot_18<< endl << endl;
-    cout<< "robot_rot_19" <<endl << robot_rot_19<< endl << endl;
-    cout<< "robot_rot_20" <<endl << robot_rot_20<< endl << endl;
-
-    cout<< "Translation 1" <<endl << robot_tr_01<< endl << endl;
-    cout<< "Translation 2" <<endl << robot_tr_02<< endl << endl;
-    cout<< "Translation 3" <<endl << robot_tr_03<< endl << endl;
-    cout<< "Translation 4" <<endl << robot_tr_04<< endl << endl;
-    cout<< "Translation 5" <<endl << robot_tr_05<< endl << endl;
-    cout<< "Translation 6" <<endl << robot_tr_06<< endl << endl;
-    cout<< "Translation 7" <<endl << robot_tr_07<< endl << endl;
-    cout<< "Translation 8" <<endl << robot_tr_08<< endl << endl;
-    cout<< "Translation 9" <<endl << robot_tr_09<< endl << endl;
-    cout<< "Translation 10" <<endl << robot_tr_10<< endl << endl;
-    cout<< "Translation 11" <<endl << robot_tr_11<< endl << endl;
-    cout<< "Translation 12" <<endl << robot_tr_12<< endl << endl;
-    cout<< "Translation 13" <<endl << robot_tr_13<< endl << endl;
-    cout<< "Translation 14" <<endl << robot_tr_14<< endl << endl;
-    cout<< "Translation 15" <<endl << robot_tr_15<< endl << endl;
-    cout<< "Translation 16" <<endl << robot_tr_16<< endl << endl;
-    cout<< "Translation 17" <<endl << robot_tr_17<< endl << endl;
-    cout<< "Translation 18" <<endl << robot_tr_18<< endl << endl;
-    cout<< "Translation 19" <<endl << robot_tr_19<< endl << endl;
-    cout<< "Translation 20" <<endl << robot_tr_20<< endl << endl;
+//    cout<< "Translation 1" <<endl << robot_tr_01<< endl << endl;
+//    cout<< "Translation 2" <<endl << robot_tr_02<< endl << endl;
+//    cout<< "Translation 3" <<endl << robot_tr_03<< endl << endl;
+//    cout<< "Translation 4" <<endl << robot_tr_04<< endl << endl;
+//    cout<< "Translation 5" <<endl << robot_tr_05<< endl << endl;
+//    cout<< "Translation 6" <<endl << robot_tr_06<< endl << endl;
+//    cout<< "Translation 7" <<endl << robot_tr_07<< endl << endl;
+//    cout<< "Translation 8" <<endl << robot_tr_08<< endl << endl;
+//    cout<< "Translation 9" <<endl << robot_tr_09<< endl << endl;
+//    cout<< "Translation 10" <<endl << robot_tr_10<< endl << endl;
+//    cout<< "Translation 11" <<endl << robot_tr_11<< endl << endl;
+//    cout<< "Translation 12" <<endl << robot_tr_12<< endl << endl;
+//    cout<< "Translation 13" <<endl << robot_tr_13<< endl << endl;
+//    cout<< "Translation 14" <<endl << robot_tr_14<< endl << endl;
+//    cout<< "Translation 15" <<endl << robot_tr_15<< endl << endl;
+//    cout<< "Translation 16" <<endl << robot_tr_16<< endl << endl;
+//    cout<< "Translation 17" <<endl << robot_tr_17<< endl << endl;
+//    cout<< "Translation 18" <<endl << robot_tr_18<< endl << endl;
+//    cout<< "Translation 19" <<endl << robot_tr_19<< endl << endl;
+//    cout<< "Translation 20" <<endl << robot_tr_20<< endl << endl;
 
     R_gripper2base.push_back(robot_rot_01);
     R_gripper2base.push_back(robot_rot_02);
@@ -781,29 +773,40 @@ int main()
     cout << " Rodrigues R_cam2gripper_rD = " << endl << " " << Rad2degV(Rodrigues_Dan) << endl << endl;
 
     // Translation
-    cout << "t_cam2gripper_TSAI = " << endl << " " << t_cam2gripper_TSAI/1000 << endl << endl;
-    cout << "t_cam2gripper_HORAUD = " << endl << " " << t_cam2gripper_HORAUD/1000 << endl << endl;
-    cout << "t_cam2gripper_PARK = " << endl << " " << t_cam2gripper_PARK/1000 << endl << endl;
-    cout << "t_cam2gripper_ANDREFF = " << endl << " " << t_cam2gripper_ANDREFF/1000 << endl << endl;
-    cout << "t_cam2gripper_DAN = " << endl << " " << t_cam2gripper_DAN/1000 << endl << endl;
+    cout << "t_cam2gripper_TSAI = " << endl << " " << t_cam2gripper_TSAI << endl << endl;
+    cout << "t_cam2gripper_HORAUD = " << endl << " " << t_cam2gripper_HORAUD << endl << endl;
+    cout << "t_cam2gripper_PARK = " << endl << " " << t_cam2gripper_PARK << endl << endl;
+    cout << "t_cam2gripper_ANDREFF = " << endl << " " << t_cam2gripper_ANDREFF << endl << endl;
+    cout << "t_cam2gripper_DAN = " << endl << " " << t_cam2gripper_DAN << endl << endl;
 
     // Inverse transformation
-    cv::Mat t_Inverse(3, 1, CV_64F);
-    cv::Mat R_Inverse, Rodrigues_Horaud_Inverse;
+//    cv::Mat t_Inverse(3, 1, CV_64F);
+//    cv::Mat R_Inverse, Rodrigues_Horaud_Inverse;
 
-    R_Inverse=R_cam2gripper_HORAUD.t();// rotation of inverse
-    t_Inverse= -R_Inverse * t_cam2gripper_HORAUD; // translation of inverse
+//    R_Inverse=R_cam2gripper_HORAUD.t();// rotation of inverse
+//    t_Inverse= -R_Inverse * t_cam2gripper_HORAUD; // translation of inverse
 
-    Vec3f R_cam2gripper_Inverse = rotationMatrixToEulerAngles(R_Inverse);
+//    Vec3f R_cam2gripper_Inverse = rotationMatrixToEulerAngles(R_Inverse);
 
-    cv::Rodrigues(R_Inverse,Rodrigues_Horaud_Inverse);
+//    cv::Rodrigues(R_Inverse,Rodrigues_Horaud_Inverse);
 
-    cout << "R_cam2gripper_Inverse = " << endl << " " << R_Inverse << endl << endl;
-    cout << "R_cam2gripper_Inverse = " << endl << " " << R_cam2gripper_Inverse << endl << endl;
-    cout << " Rodrigues R_cam2gripper_Inverse = " << endl << " " << Rad2degV(Rodrigues_Horaud_Inverse) << endl << endl;
-    cout << "t_cam2gripper_HORAUD_Inverse = " << endl << " " << t_Inverse/1000 << endl << endl;
+//    cout << "R_cam2gripper_Inverse = " << endl << " " << R_Inverse << endl << endl;
+//    cout << "R_cam2gripper_Inverse = " << endl << " " << R_cam2gripper_Inverse << endl << endl;
+//    cout << " Rodrigues R_cam2gripper_Inverse = " << endl << " " << Rad2degV(Rodrigues_Horaud_Inverse) << endl << endl;
+//    cout << "t_cam2gripper_HORAUD_Inverse = " << endl << " " << t_Inverse << endl << endl;
     //std::vector<double> Cam2Gripper = {-0.00228131, 0.011324, -0.116136, 0.0246032, 0.035415, 2.3357};
     //Pose_inv(Cam2Gripper);
+    cout << endl << endl << "Error_TSAI: " << endl;
+    errorEstimate(R_gripper2base,t_gripper2base,R_target2cam,t_target2cam,R_cam2gripper_TSAI,t_cam2gripper_TSAI);
+    cout << endl << endl << "Error_HORAUD: " << endl;
+    errorEstimate(R_gripper2base,t_gripper2base,R_target2cam,t_target2cam,R_cam2gripper_HORAUD,t_cam2gripper_HORAUD);
+    cout << endl << endl << "Error_PARK: " << endl;
+    errorEstimate(R_gripper2base,t_gripper2base,R_target2cam,t_target2cam,R_cam2gripper_PARK,t_cam2gripper_PARK);
+    cout << endl << endl << "Error_ANDREFF: " << endl;
+    errorEstimate(R_gripper2base,t_gripper2base,R_target2cam,t_target2cam,R_cam2gripper_ANDREFF,t_cam2gripper_ANDREFF);
+    cout << endl << endl << "Error_DAN: " << endl;
+    errorEstimate(R_gripper2base,t_gripper2base,R_target2cam,t_target2cam,R_cam2gripper_DAN,t_cam2gripper_DAN);
+
 }
 
 void print(std::vector<double> const &input)
@@ -914,14 +917,14 @@ Mat ReverseVector(Mat &v)
     return RV;
 }
 
-Mat TransposeVector(Vec3f &v)
+Mat TransposeVector(Vec3d &v)
 {
 
-    Mat RV = Mat_<float>(3, 1, CV_32F);
+    Mat RV = Mat_<double>(3, 1, CV_64FC1);
 
-    RV.at<float>(0,0)=v[0];
-    RV.at<float>(0,1)=v[1];
-    RV.at<float>(0,2)=v[2];
+    RV.at<double>(0,0)=v[0];
+    RV.at<double>(0,1)=v[1];
+    RV.at<double>(0,2)=v[2];
 
     return RV;
 }
@@ -975,4 +978,137 @@ std::vector<double> Pose_inv(std::vector<double> v)
         print(pose);
         std::cout << std::endl;
     return pose;
+}
+
+void errorEstimate(const std::vector<cv::Mat> &R_gripper2base, const std::vector<cv::Mat> &t_gripper2base, const std::vector<cv::Mat> &R_target2cam, const std::vector<cv::Mat> &t_target2cam, const cv::Mat &R_cam2gripper, const cv::Mat &t_cam2gripper)
+{
+    unsigned int nbPose = (unsigned int) R_target2cam.size();
+
+
+    std::vector<cv::Mat> rMe(nbPose),cMo(nbPose);
+
+    std::vector<vpHomogeneousMatrix> CmO(nbPose), RmE(nbPose);
+    vpHomogeneousMatrix EmC;
+
+    for (unsigned int i = 0; i < nbPose; i++) {
+
+        // output the information of the matrices
+        //      cout << "R_gripper2base = " << endl << " "  << R_gripper2base1[i] << endl << endl;
+        //      cout << "R_target2cam = " << endl << " "  << R_target2cam1[i] << endl << endl;
+        //      cout << "t_gripper2base = " << endl << " "  << t_gripper2base[i] << endl << endl;
+        //      cout << "t_target2cam = " << endl << " "  << t_target2cam[i] << endl << endl;
+
+        // concatenate the matrices
+        cv::hconcat(R_gripper2base[i],t_gripper2base[i],rMe[i]);
+        cv::hconcat(R_target2cam[i],t_target2cam[i],cMo[i]);
+        //    cout << "rMe = " << endl << " "  << rMe[i] << endl << endl;
+        //    cout << "cMo = " << endl << " "  << cMo[i] << endl << endl;
+
+        // OpenCV conversion to VISP
+        Mat2ViSP(cMo[i],CmO[i]);
+        Mat2ViSP(rMe[i],RmE[i]);
+//        cout << "RmE = " << endl << i << ": "   << RmE[i] << endl << endl;
+//        cout << "CmO = " << endl << i << ": "   << CmO[i] << endl << endl;
+
+
+    }
+
+
+    cv::Mat eMc;
+    cv::hconcat(R_cam2gripper,t_cam2gripper,eMc);
+    //    cout << "eMc = " << endl << " "  << eMc << endl << endl;
+    Mat2ViSP(eMc,EmC);
+    //cout << "EmC = " << endl << " "  << EmC << endl << endl;
+
+    // using the VISP libary on gathered data with OpenCV
+    calibrationVerifrMo(CmO,RmE,EmC);
+    vpHomogeneousMatrix E;
+    vpHandEyeCalibration::calibrate(CmO,RmE,E);
+    std::cout << std::endl << "** Hand-eye calibration succeed" << std::endl;
+    std::cout << std::endl << "** Hand-eye (eMc) transformation estimated:" << std::endl;
+    std::cout << E << std::endl;
+    std::cout << "** Corresponding pose vector: " << vpPoseVector(E).t() << std::endl;
+
+    vpThetaUVector erc(E.getRotationMatrix());
+    std::cout << std::endl << "** Translation [m]: " << E[0][3] << " " << E[1][3] << " " << E[2][3] << std::endl;
+    std::cout << "** Rotation (theta-u representation) [rad]: " << erc.t() << std::endl;
+    std::cout << "** Rotation (theta-u representation) [deg]: " << vpMath::deg(erc[0]) << " " << vpMath::deg(erc[1]) << " " << vpMath::deg(erc[2]) << std::endl;
+
+}
+
+int Mat2ViSP(const cv::Mat& mat_in, vpHomogeneousMatrix& visp_ou)
+{
+  int ret = 0;
+
+  //if (mat_in.type() != CV_32FC1 || mat_in.type() != CV_64FC1)
+  if (mat_in.type() != CV_64FC1)
+  {
+    //std::cout << "[HandEyeCalib] Mat input is not floating-point number!" << std::endl;
+    std::cout << "[HandEyeCalib] Mat input is not double floating-point number!" << std::endl;
+    ret = 1;
+    return ret;
+  }
+
+  for (int i=0; i<mat_in.rows; i++)
+  {
+    for (int j=0; j<mat_in.cols; j++)
+    {
+      visp_ou[i][j] = mat_in.ptr<double>(i)[j];  // new memory is created and data is copied in this line
+//      cout << visp_ou[i][j] << endl;
+    }
+  }
+
+  return ret;
+}
+
+void calibrationVerifrMo(const std::vector<vpHomogeneousMatrix> &cMo, const std::vector<vpHomogeneousMatrix> &rMe, const vpHomogeneousMatrix &eMc)
+{
+  unsigned int nbPose = (unsigned int) cMo.size();
+  std::vector<vpTranslationVector> rTo(nbPose);
+  std::vector<vpRotationMatrix> rRo(nbPose);
+
+  for (unsigned int i = 0; i < nbPose; i++) {
+    vpHomogeneousMatrix rMo = rMe[i] * eMc * cMo[i];
+    rRo[i] = rMo.getRotationMatrix();
+    rTo[i] = rMo.getTranslationVector();
+  }
+  vpRotationMatrix meanRot = vpRotationMatrix::mean(rRo);
+  vpTranslationVector meanTrans = vpTranslationVector::mean(rTo);
+
+#if DEBUG_LEVEL2
+  {
+    std::cout << "Mean  " << std::endl;
+    std::cout << "Translation: " << meanTrans.t() << std::endl;
+    vpThetaUVector P(meanRot);
+    std::cout << "Rotation : theta (deg) = " << vpMath::deg(sqrt(P.sumSquare())) << " Matrice : " << std::endl << meanRot  << std::endl;
+    std::cout << "theta U (deg): " << vpMath::deg(P[0]) << " " << vpMath::deg(P[1]) << " " << vpMath::deg(P[2]) << std::endl;
+  }
+#endif
+
+  // standard deviation, rotational part
+  double resRot = 0.0;
+  for (unsigned int i = 0; i < nbPose; i++) {
+    vpRotationMatrix R = meanRot.t() * rRo[i]; // Rm^T  Ri
+    vpThetaUVector P(R);
+    // theta = Riemannian distance d(Rm,Ri)
+    double theta = sqrt(P.sumSquare());
+    std::cout << "Distance theta between rMo(" << i << ") and mean (deg) = " << vpMath::deg(theta) << std::endl;
+    // Euclidean distance d(Rm,Ri) not used
+    // theta = 2.0*sqrt(2.0)*sin(theta/2.0);
+    resRot += theta*theta;
+  }
+  resRot = sqrt(resRot/nbPose);
+  std::cout << "Mean residual rMo(" << nbPose << ") - rotation (deg) = " << vpMath::deg(resRot) << std::endl;
+  // standard deviation, translational part
+  double resTrans = 0.0;
+  for (unsigned int i = 0; i < nbPose; i++) {
+    vpColVector errTrans = ((vpColVector) rTo[i]) - meanTrans;
+    resTrans += errTrans.sumSquare();
+    std::cout << "Distance d between rMo(" << i << ") and mean (m) = " << sqrt(errTrans.sumSquare()) << std::endl;
+  }
+  resTrans = sqrt(resTrans/nbPose);
+  std::cout << "Mean residual rMo(" << nbPose << ") - translation (m) = " << resTrans << std::endl;
+  double resPos = (resRot*resRot + resTrans*resTrans)*nbPose;
+  resPos = sqrt(resPos/(2*nbPose));
+  std::cout << "Mean residual rMo(" << nbPose << ") - global = " << resPos << std::endl;
 }

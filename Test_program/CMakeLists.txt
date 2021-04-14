@@ -27,6 +27,9 @@ add_definitions(${PCL_DEFINITIONS})
 
 find_package(ur_rtde REQUIRED)
 
+find_package(VISP REQUIRED)
+include_directories(${VISP_INCLUDE_DIRS})
+
 add_executable(${PROJECT_NAME} src/main.cpp )
 target_link_libraries(${PROJECT_NAME} PRIVATE realsense2::realsense2 ${OpenCV_LIBS} ${PCL_LIBRARIES} ${GLFW_LIBRARIES} PRIVATE ur_rtde::rtde -lpthread -lm)
 
@@ -34,7 +37,7 @@ add_executable(Camera_calibration src/camera_calibration.cpp )
 target_link_libraries(Camera_calibration PRIVATE realsense2::realsense2 ${OpenCV_LIBS} ${PCL_LIBRARIES} ${GLFW_LIBRARIES} PRIVATE ur_rtde::rtde -lpthread -lm)
 
 add_executable(Hand_eye src/hand_eye_calibration.cpp )
-target_link_libraries(Hand_eye PRIVATE realsense2::realsense2 ${OpenCV_LIBS} ${PCL_LIBRARIES} ${GLFW_LIBRARIES} PRIVATE ur_rtde::rtde -lpthread -lm)
+target_link_libraries(Hand_eye PRIVATE realsense2::realsense2 ${OpenCV_LIBS} ${PCL_LIBRARIES} ${GLFW_LIBRARIES} ${VISP_LIBRARIES} PRIVATE ur_rtde::rtde -lpthread -lm)
 
 add_executable(Parsing src/parsing_tcp_data.cpp )
 target_link_libraries(Parsing PRIVATE realsense2::realsense2 ${OpenCV_LIBS} ${PCL_LIBRARIES} ${GLFW_LIBRARIES} PRIVATE ur_rtde::rtde -lpthread -lm)

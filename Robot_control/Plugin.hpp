@@ -54,13 +54,30 @@
 // PCL
 #undef foreach
 #include <pcl/point_types.h>
+#include <pcl/point_cloud.h>
 #include <pcl/filters/passthrough.h>
+#include <pcl/filters/crop_box.h>
+#include <pcl/filters/voxel_grid.h>
 #include <pcl/io/pcd_io.h>
-#include <pcl/point_types.h>
 #include <pcl/visualization/cloud_viewer.h>
+#include <pcl/visualization/pcl_visualizer.h>
 #include <pcl/kdtree/kdtree_flann.h>
 #include "pcl/common/eigen.h"
 #include "pcl/common/transforms.h"
+#include <pcl/common/random.h>
+#include <pcl/common/time.h>
+#include <pcl/features/normal_3d.h>
+#include <pcl/features/spin_image.h>
+#include <pcl/registration/correspondence_rejection_sample_consensus.h>
+#include <pcl/registration/transformation_estimation_svd.h>
+
+
+
+
+
+
+
+
 
 // Real sense
 #include <librealsense2/rs.hpp>
@@ -139,6 +156,20 @@ private slots:
     void Analyze_images();
     void PCL();
 
+    void globalAlignment();
+    void localAlignment();
+    // Assitive functions
+    void cropScene(pcl::PCLPointCloud2::Ptr inputpcl, pcl::PCLPointCloud2::Ptr & outputpcl, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint);
+    void voxelGrid(pcl::PCLPointCloud2::Ptr inputpcl, pcl::PointCloud<pcl::PointNormal>::Ptr & outputpcl, float leafSize=0.005);
+    void computeSurfaceNormals(pcl::PointCloud<pcl::PointNormal>::Ptr & cloud, int K=10);
+    void computeShapeFeatures(pcl::PointCloud<pcl::PointNormal>::Ptr & cloud, pcl::PointCloud<pcl::Histogram<153>>::Ptr features, float radius=0.05);
+    std::tuple<Eigen::Matrix4f, pcl::PointCloud<pcl::PointNormal>::Ptr, size_t, float> RANSAC(pcl::PointCloud<pcl::PointNormal>::Ptr & object, pcl::Correspondences corr, const size_t iter, const float threshsq);
+    std::tuple<Eigen::Matrix4f, pcl::PointCloud<pcl::PointNormal>::Ptr, size_t, float> ICP(pcl::PointCloud<pcl::PointNormal>::Ptr & object, const size_t iter, const float threshsq);
+    void nearest_feature(const pcl::Histogram<153>& query, const pcl::PointCloud<pcl::Histogram<153>>& target, int &idx, float &distsq);
+    float dist_sq(const pcl::Histogram<153>& query, const pcl::Histogram<153>& target);
+    void visualizePointClouds(pcl::PointCloud<pcl::PointNormal>::Ptr scene, pcl::PointCloud<pcl::PointNormal>::Ptr object, std::string title);
+
+
     // Utility functions
     cv::Mat eulerAnglesToRotationMatrix(cv::Vec3d &theta);
     double rad2deg(double radian);
@@ -155,7 +186,7 @@ private slots:
 
 private:
     // Qt buttons
-    QPushButton *_btn0,*_btn1,*_btn2,*_btn3,*_btn4, *_btn5, *_btn6, *_btn7, *_btn8, *_btn9, *_btn10, *_btn11, *_btn_stop_sync;
+    QPushButton *_btn0,*_btn1,*_btn2,*_btn3,*_btn4, *_btn5, *_btn6, *_btn7, *_btn8, *_btn9, *_btn10, *_btn11, *_btn_stop_sync, *_btn_glob_align, *_btn_local_align, *_btn_global_test;
     //Base Shift
     double theta = 22.5 * (M_PI / 180);
 
@@ -199,6 +230,14 @@ private:
     std::thread control_thread;
     std::thread update_thread;
     std::thread home_thread;
+
+    // Vision
+    std::string camera_name = "Scanner25D";
+    pcl::PointCloud<pcl::PointNormal>::Ptr scene_filtered = pcl::PointCloud<pcl::PointNormal>::Ptr(new pcl::PointCloud<pcl::PointNormal>);
+    pcl::PointCloud<pcl::PointNormal>::Ptr glob_object_align;
+    pcl::PointCloud<pcl::PointNormal>::Ptr local_object_align;
+    Eigen::Matrix4f glob_pose;
+    Eigen::Matrix4f local_pose;
 };
 
 void pp_callback(const pcl::visualization::PointPickingEvent& event, void* viewer_void);

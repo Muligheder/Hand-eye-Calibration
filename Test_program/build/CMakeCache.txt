@@ -539,6 +539,12 @@ Test_program_BINARY_DIR:STATIC=/home/anders/Master/Hand-eye-Calibration/Test_pro
 //Value Computed by CMake
 Test_program_SOURCE_DIR:STATIC=/home/anders/Master/Hand-eye-Calibration/Test_program
 
+//ViSPConfig.cmake path location
+VISP_CONFIG_PATH:PATH=/home/anders/visp-ws/visp-build
+
+//The directory containing a CMake configuration file for VISP.
+VISP_DIR:PATH=/home/anders/visp-ws/visp-build
+
 //The directory containing VTKConfig.cmake
 VTK_DIR:PATH=/usr/lib/cmake/vtk-6.3
 
@@ -1072,6 +1078,8 @@ PKG_CONFIG_EXECUTABLE-ADVANCED:INTERNAL=1
 RSSDK_LIBRARY-ADVANCED:INTERNAL=1
 //ADVANCED property for variable: RSSDK_LIBRARY_DEBUG
 RSSDK_LIBRARY_DEBUG-ADVANCED:INTERNAL=1
+//ADVANCED property for variable: VISP_CONFIG_PATH
+VISP_CONFIG_PATH-ADVANCED:INTERNAL=1
 //Last used BOOST_INCLUDEDIR value.
 _BOOST_INCLUDEDIR_LAST:INTERNAL=/usr/include
 //Last used Boost_ADDITIONAL_VERSIONS value.

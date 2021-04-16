@@ -55,30 +55,30 @@ int main()
 //****************************************************** CAMERA SETUP ************************************************************************************'//
 
      //Camera calibration information from API 1920x1080
-    std::vector<double> distortionCoefficients(5);  // camera distortion
-    distortionCoefficients[0] = 1.83375015854836e-01;
-    distortionCoefficients[1] = -5.65327823162079e-01;
-    distortionCoefficients[2] = -1.45305093610659e-04;
-    distortionCoefficients[3] = 5.0213176291436e-04;
-    distortionCoefficients[4] = 5.08288383483887e-01;
+//    std::vector<double> distortionCoefficients(5);  // camera distortion
+//    distortionCoefficients[0] = 1.83375015854836e-01;
+//    distortionCoefficients[1] = -5.65327823162079e-01;
+//    distortionCoefficients[2] = -1.45305093610659e-04;
+//    distortionCoefficients[3] = 5.0213176291436e-04;
+//    distortionCoefficients[4] = 5.08288383483887e-01;
 
-    float f_x = 1364.6708984375; // Focal length in x axis
-    float f_y = 1364.94384765625; // Focal length in y axis
-    float c_x = 967.542907714844; // Camera primary point x
-    float c_y = 540.435607910156; // Camera primary point y
+//    float f_x = 1364.6708984375; // Focal length in x axis
+//    float f_y = 1364.94384765625; // Focal length in y axis
+//    float c_x = 967.542907714844; // Camera primary point x
+//    float c_y = 540.435607910156; // Camera primary point y
 
 ////    // Camera calibration information from calibration 1920x1080
-//    std::vector<double> distortionCoefficients(5);  // camera distortion
-//    distortionCoefficients[0] = 0.152762;
-//    distortionCoefficients[1] = -0.408405;
-//    distortionCoefficients[2] = 0.00366511;
-//    distortionCoefficients[3] = 0.000347318;
-//    distortionCoefficients[4] = 0.25188;
+    std::vector<double> distortionCoefficients(5);  // camera distortion
+    distortionCoefficients[0] = 0.152762;
+    distortionCoefficients[1] = -0.408405;
+    distortionCoefficients[2] = 0.00366511;
+    distortionCoefficients[3] = 0.000347318;
+    distortionCoefficients[4] = 0.25188;
 
-//    float f_x = 1373.745226037709; // Focal length in x axis
-//    float f_y = 1372.453906056477; // Focal length in y axis
-//    float c_x = 966.2194707820457; // Camera primary point x
-//    float c_y = 553.6856848982575; // Camera primary point y
+    float f_x = 1373.745226037709; // Focal length in x axis
+    float f_y = 1372.453906056477; // Focal length in y axis
+    float c_x = 966.2194707820457; // Camera primary point x
+    float c_y = 553.6856848982575; // Camera primary point y
 
 
 //    // Camera calibration information from API   960x540
@@ -251,9 +251,10 @@ int main()
 
 
       }
-      float Avg_RMS;
+      // camera calibration which leads to reprojection error
+
       cv::calibrateCamera(objpoints, imgpoints, cv::Size(gray.rows,gray.cols), cameraMatrix, distortionCoefficients, rvecs, tvecs, stdDeviationsIntrinsics, stdDeviationExtrinsics, perViewErrors,0);
-      //float Avg_RMS = std::accumulate(perViewErrors.begin(), perViewErrors.end(), 0);
+      float Avg_RMS = std::accumulate(perViewErrors.begin(), perViewErrors.end(), 0);
       for (auto& n : perViewErrors)
           Avg_RMS += n;
 
@@ -277,99 +278,11 @@ int main()
       std::cout << std::endl << "Size = "<< perViewErrors.size() << std::endl << "RMS re-projection error estimated for each pattern view = " << std::endl;
       print(perViewErrors);
       std::cout<< std::endl << std::endl << "Avg_RMS = " << Avg_RMS/perViewErrors.size() << std::endl << std::endl;
-//*************************** OLD APPROACH *****************************//
-
-//    cv::Mat rvec(3, 1, CV_32F), tvec(3, 1, CV_32F);
-
-//    std::vector<cv::Mat> R_gripper2base;
-//    std::vector<cv::Mat> t_gripper2base;
-//    std::vector<cv::Mat> R_target2cam;
-//    std::vector<cv::Mat> t_target2cam;
-//    cv::Mat R_cam2gripper_TSAI = (cv::Mat_<float>(3, 3));
-//    cv::Mat R_cam2gripper_HORAUD = (cv::Mat_<float>(3, 3));
-//    cv::Mat R_cam2gripper_PARK = (cv::Mat_<float>(3, 3));
-//    cv::Mat R_cam2gripper_ANDREFF = (cv::Mat_<float>(3, 3));
-//    cv::Mat R_cam2gripper_DAN = (cv::Mat_<float>(3, 3));
-//    cv::Mat t_cam2gripper_TSAI = (cv::Mat_<float>(3, 1));
-//    cv::Mat t_cam2gripper_HORAUD = (cv::Mat_<float>(3, 1));
-//    cv::Mat t_cam2gripper_PARK = (cv::Mat_<float>(3, 1));
-//    cv::Mat t_cam2gripper_ANDREFF = (cv::Mat_<float>(3, 1));
-//    cv::Mat t_cam2gripper_DAN = (cv::Mat_<float>(3, 1));
-
-
-//    std::vector<std::string> fn;
-//    cv::glob("/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/*.bmp", fn, false);
-
-//    std::vector<cv::Mat> images;
-//    size_t num_images = fn.size(); //number of bmp files in images folder
-//    std::cout << "number of images "<< num_images<<std::endl;
-//    cv::Size patternsize(5, 8); //number of centers
-//    std::vector<cv::Point2f> centers; //this will be filled by the detected centers
-//    double cell_size = 30;
-//    std::vector<cv::Point3f> obj_points;
-
-//    R_gripper2base.reserve(num_images);
-//    t_gripper2base.reserve(num_images);
-//    R_target2cam.reserve(num_images);
-//    t_target2cam.reserve(num_images);
-
-//    for (int i = 0; i < patternsize.height; ++i)
-//        for (int j = 0; j < patternsize.width; ++j)
-//            obj_points.push_back(cv::Point3f(float(j*cell_size),
-//                                         float(i*cell_size), 0.f));
-
-//cout <<"Objectpoints: " <<endl<<obj_points<<endl;
-//cout <<"Objectpoints: " <<endl<<obj_points.size()<<endl;
-
-//    for (size_t i = 0; i < num_images; i++)
-//        images.push_back(cv::imread(fn[i]));
-
-
-//    cv::Mat frame;
-
-//    for (size_t i = 0; i < num_images; i++)
-//    {
-//        frame = cv::imread(fn[i]); //source image
-//        cv::Mat gray;
-//        cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
-
-////          cv::imshow("window",gray);
-////         cv::waitKey(0);
-
-//        bool patternfound = cv::findChessboardCorners(frame, patternsize, centers);
-//        if (patternfound)
-//        {
-//            cornerSubPix(gray, centers, Size(1, 1), Size(-1, -1),
-//                              TermCriteria(CV_TERMCRIT_EPS + CV_TERMCRIT_ITER, 30, 0.001));
-
-//            cv::drawChessboardCorners(frame, patternsize, cv::Mat(centers), patternfound);
-//            // cv::imshow("window", frame);
-//          // int key = cv::waitKey(0) & 0xff;
-//            cv::solvePnP(cv::Mat(obj_points), cv::Mat(centers), cameraMatrix, distortionCoefficients, rvec, tvec,false,cv::SOLVEPNP_ITERATIVE);
-//          //  cout <<"Rotation vetor = "<<endl<<" " << rvec<<endl<<endl;
-//           // cout <<"Tranlation vetor = "<<endl<<" " << tvec<<endl<<endl;
-//           // cout <<"Centers = "<<endl<<" " << centers<<endl<<endl;
-
-//            cv::Mat R;
-//            cv::Rodrigues(rvec, R); // R is 3x3
-//            R_target2cam.push_back(R*1);
-//            t_target2cam.push_back(tvec*1);
-//            cv::Mat T = cv::Mat::eye(4, 4, R.type()); // T is 4x4
-//            T(cv::Range(0, 3), cv::Range(0, 3)) = R * 1; // copies R into T
-//            T(cv::Range(0, 3), cv::Range(3, 4)) = tvec *1; // copies tvec into T
-
-//            std::cout << "T = " << std::endl << " " << T << std::endl << std::endl;
-
-//        }
-//        std::cout << patternfound << std::endl;
-//    }
-
-
-//****************************************************** CAMERA DONE ************************************************************************************//
 
 
 // read data from file and seperate to vector of vector.
            std::vector<std::vector<double>> v;
+
            std::ifstream in( "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/test.txt" );
            std::string record;
 
@@ -379,355 +292,29 @@ int main()
                std::vector<double> row( ( std::istream_iterator<double>( is ) ),
                                         std::istream_iterator<double>() );
                v.push_back( row );
+
            }
-//    // from VISP Libary
-//   const Mat cam_tr_01 = (Mat_<float>(3, 1) << 0.315381*1000, -0.021125*1000, 0.722898*1000);
-//   const Mat cam_tr_02 = (Mat_<float>(3, 1) << -0.078425*1000, -0.133783*1000, 0.534473*1000);
-//   const Mat cam_tr_03 = (Mat_<float>(3, 1) << 0.0788305*1000, 0.0721394*1000, 0.535168*1000);
-//   const Mat cam_tr_04 = (Mat_<float>(3, 1) << 0.012403*1000, 0.0111715*1000, 0.417285*1000);
-//   const Mat cam_tr_05 = (Mat_<float>(3, 1) << 0.0876483*1000, 0.0417796*1000, 0.409529*1000);
-//   const Mat cam_tr_06 = (Mat_<float>(3, 1) << 0.114375*1000, 0.103106*1000 , 0.604487*1000);
-//   const Mat cam_tr_07 = (Mat_<float>(3, 1) << 0.236032*1000, 0.0513511*1000, 0.695683*1000);
-//   const Mat cam_tr_08 = (Mat_<float>(3, 1) << 0.0107176*1000, 0.0366413*1000, 0.699486*1000);
-//   const Mat cam_tr_09 = (Mat_<float>(3, 1) << 0.00146471*1000, -0.037318*1000, 0.635741*1000);
-//   const Mat cam_tr_10 = (Mat_<float>(3, 1) << -0.0844981*1000, -0.0571934*1000, 0.376917*1000);
+           for(int i = 0; i < v.size(); i++)
+           {
+                cv::Mat theta_scaled, robot_rot, robot_tr;
 
-//   const Mat cam_vec_01 = (Mat_<float>(3, 1) << -0.535678, -0.230308, 2.54516);
-//   const Mat cam_vec_02 = (Mat_<float>(3, 1) << -0.0996332, 0.52286, 0.859977);
-//   const Mat cam_vec_03 = (Mat_<float>(3, 1) << -0.999344, 0.424924, -2.4614);
-//   const Mat cam_vec_04 = (Mat_<float>(3, 1) << 0.612053, -0.0443759, 2.53025);
-//   const Mat cam_vec_05 = (Mat_<float>(3, 1) << 0.0162682, -0.414474, -3.11301);
-//   const Mat cam_vec_06 = (Mat_<float>(3, 1) << -0.136851, -0.644572, 3.06214);
-//   const Mat cam_vec_07 = (Mat_<float>(3, 1) << -0.214164, -0.180724, 3.12673);
-//   const Mat cam_vec_08 = (Mat_<float>(3, 1) << 0.307674, -0.2211, 3.03606);
-//   const Mat cam_vec_09 = (Mat_<float>(3, 1) << -0.255442, 1.34404, -2.77981);
-//   const Mat cam_vec_10 = (Mat_<float>(3, 1) << -0.252077, 0.0466144, -0.0542956);
+                    // parsing roational data from robot //
+                   Vec3d theta{ v[i][3], v[i][4], v[i][5]};
+                   // scale vector to match ur interface
+                   theta=Poly_Scale(theta);
+                   // transpose vector
+                   theta_scaled = TransposeVector(theta);
+                   // from rotvector to rot matrix
+                   cv::Rodrigues(theta_scaled,robot_rot);
+                   // push back elements to vector of vectors I.e matrix
+                   R_gripper2base.push_back(robot_rot);
+                   //cout<< "Robot_rot: " << i << endl << R_gripper2base[i]<< endl << endl;
 
-//   cv::Mat cam_rot_01,cam_rot_02,cam_rot_03,cam_rot_04,cam_rot_05,cam_rot_06,cam_rot_07,cam_rot_08,cam_rot_09,cam_rot_10;
-//   cv::Rodrigues(cam_vec_01,cam_rot_01);
-//   cv::Rodrigues(cam_vec_02,cam_rot_02);
-//   cv::Rodrigues(cam_vec_03,cam_rot_03);
-//   cv::Rodrigues(cam_vec_04,cam_rot_04);
-//   cv::Rodrigues(cam_vec_05,cam_rot_05);
-//   cv::Rodrigues(cam_vec_06,cam_rot_06);
-//   cv::Rodrigues(cam_vec_07,cam_rot_07);
-//   cv::Rodrigues(cam_vec_08,cam_rot_08);
-//   cv::Rodrigues(cam_vec_09,cam_rot_09);
-//   cv::Rodrigues(cam_vec_10,cam_rot_10);
-
-//   cout<< "cam_rot_01" <<endl << cam_rot_01<< endl << endl;
-//   cout<< "cam_rot_02" <<endl << cam_rot_02<< endl << endl;
-//   cout<< "cam_rot_03" <<endl << cam_rot_03<< endl << endl;
-//   cout<< "cam_rot_04" <<endl << cam_rot_04<< endl << endl;
-//   cout<< "cam_rot_05" <<endl << cam_rot_05<< endl << endl;
-//   cout<< "cam_rot_06" <<endl << cam_rot_06<< endl << endl;
-//   cout<< "cam_rot_07" <<endl << cam_rot_07<< endl << endl;
-//   cout<< "cam_rot_08" <<endl << cam_rot_08<< endl << endl;
-//   cout<< "cam_rot_09" <<endl << cam_rot_09<< endl << endl;
-//   cout<< "cam_rot_10" <<endl << cam_rot_10<< endl << endl;
-
-//   cout<< "cam_tr_01" <<endl << cam_tr_01<< endl << endl;
-//   cout<< "cam_tr_02" <<endl << cam_tr_02<< endl << endl;
-//   cout<< "cam_tr_03" <<endl << cam_tr_03<< endl << endl;
-//   cout<< "cam_tr_04" <<endl << cam_tr_04<< endl << endl;
-//   cout<< "cam_tr_05" <<endl << cam_tr_05<< endl << endl;
-//   cout<< "cam_tr_06" <<endl << cam_tr_06<< endl << endl;
-//   cout<< "cam_tr_07" <<endl << cam_tr_07<< endl << endl;
-//   cout<< "cam_tr_08" <<endl << cam_tr_08<< endl << endl;
-//   cout<< "cam_tr_09" <<endl << cam_tr_09<< endl << endl;
-//   cout<< "cam_tr_10" <<endl << cam_tr_10<< endl << endl;
-
-
-
-
-//   R_target2cam.push_back(cam_rot_01);
-//   R_target2cam.push_back(cam_rot_02);
-//   R_target2cam.push_back(cam_rot_03);
-//   R_target2cam.push_back(cam_rot_04);
-//   R_target2cam.push_back(cam_rot_05);
-//   R_target2cam.push_back(cam_rot_06);
-//   R_target2cam.push_back(cam_rot_07);
-//   R_target2cam.push_back(cam_rot_08);
-//   R_target2cam.push_back(cam_rot_09);
-//   R_target2cam.push_back(cam_rot_10);
-
-//   t_target2cam.push_back(cam_tr_01);
-//   t_target2cam.push_back(cam_tr_02);
-//   t_target2cam.push_back(cam_tr_03);
-//   t_target2cam.push_back(cam_tr_04);
-//   t_target2cam.push_back(cam_tr_05);
-//   t_target2cam.push_back(cam_tr_06);
-//   t_target2cam.push_back(cam_tr_07);
-//   t_target2cam.push_back(cam_tr_08);
-//   t_target2cam.push_back(cam_tr_09);
-//   t_target2cam.push_back(cam_tr_10);
-//*************************************************************************************************
-
-// Rodriguez            rx      ry      rz
-    Vec3d theta_01{v[0][3],v[0][4],v[0][5]};
-    Vec3d theta_02{v[1][3],v[1][4],v[1][5]};
-    Vec3d theta_03{v[2][3],v[2][4],v[2][5]};
-    Vec3d theta_04{v[3][3],v[3][4],v[3][5]};
-    Vec3d theta_05{v[4][3],v[4][4],v[4][5]};
-    Vec3d theta_06{v[5][3],v[5][4],v[5][5]};
-    Vec3d theta_07{v[6][3],v[6][4],v[6][5]};
-    Vec3d theta_08{v[7][3],v[7][4],v[7][5]};
-    Vec3d theta_09{v[8][3],v[8][4],v[8][5]};
-    Vec3d theta_10{v[9][3],v[9][4],v[9][5]};
-    Vec3d theta_11{v[10][3],v[10][4],v[10][5]};
-    Vec3d theta_12{v[11][3],v[11][4],v[11][5]};
-    Vec3d theta_13{v[12][3],v[12][4],v[12][5]};
-    Vec3d theta_14{v[13][3],v[13][4],v[13][5]};
-    Vec3d theta_15{v[14][3],v[14][4],v[14][5]};
-    Vec3d theta_16{v[15][3],v[15][4],v[15][5]};
-    Vec3d theta_17{v[16][3],v[16][4],v[16][5]};
-    Vec3d theta_18{v[17][3],v[17][4],v[17][5]};
-    Vec3d theta_19{v[18][3],v[18][4],v[18][5]};
-    Vec3d theta_20{v[19][3],v[19][4],v[19][5]};
-
-      // output before UR scaling
-//    cout<< "Before scaling: " <<endl << endl;
-//    cout<< "theta 1" <<endl << theta_01<< endl << endl;
-//    cout<< "theta 2" <<endl << theta_02<< endl << endl;
-//    cout<< "theta 3" <<endl << theta_03<< endl << endl;
-//    cout<< "theta 4" <<endl << theta_04<< endl << endl;
-//    cout<< "theta 5" <<endl << theta_05<< endl << endl;
-//    cout<< "theta 6" <<endl << theta_06<< endl << endl;
-//    cout<< "theta 7" <<endl << theta_07<< endl << endl;
-//    cout<< "theta 8" <<endl << theta_08<< endl << endl;
-//    cout<< "theta 9" <<endl << theta_09<< endl << endl;
-//    cout<< "theta 10" <<endl << theta_10<< endl << endl;
-//    cout<< "theta 11" <<endl << theta_11<< endl << endl;
-//    cout<< "theta 12" <<endl << theta_12<< endl << endl;
-//    cout<< "theta 13" <<endl << theta_13<< endl << endl;
-//    cout<< "theta 14" <<endl << theta_14<< endl << endl;
-//    cout<< "theta 15" <<endl << theta_15<< endl << endl;
-//    cout<< "theta 16" <<endl << theta_16<< endl << endl;
-//    cout<< "theta 17" <<endl << theta_17<< endl << endl;
-//    cout<< "theta 18" <<endl << theta_18<< endl << endl;
-//    cout<< "theta 19" <<endl << theta_19<< endl << endl;
-//    cout<< "theta 20" <<endl << theta_20<< endl << endl;
-
-    theta_01=Poly_Scale(theta_01);
-    theta_02=Poly_Scale(theta_02);
-    theta_03=Poly_Scale(theta_03);
-    theta_04=Poly_Scale(theta_04);
-    theta_05=Poly_Scale(theta_05);
-    theta_06=Poly_Scale(theta_06);
-    theta_07=Poly_Scale(theta_07);
-    theta_08=Poly_Scale(theta_08);
-    theta_09=Poly_Scale(theta_09);
-    theta_10=Poly_Scale(theta_10);
-    theta_11=Poly_Scale(theta_11);
-    theta_12=Poly_Scale(theta_12);
-    theta_13=Poly_Scale(theta_13);
-    theta_14=Poly_Scale(theta_14);
-    theta_15=Poly_Scale(theta_15);
-    theta_16=Poly_Scale(theta_16);
-    theta_17=Poly_Scale(theta_17);
-    theta_18=Poly_Scale(theta_18);
-    theta_19=Poly_Scale(theta_19);
-    theta_20=Poly_Scale(theta_20);
-
-    const cv::Mat theta_scaled_01 = TransposeVector(theta_01);
-    const cv::Mat theta_scaled_02 = TransposeVector(theta_02);
-    const cv::Mat theta_scaled_03 = TransposeVector(theta_03);
-    const cv::Mat theta_scaled_04 = TransposeVector(theta_04);
-    const cv::Mat theta_scaled_05 = TransposeVector(theta_05);
-    const cv::Mat theta_scaled_06 = TransposeVector(theta_06);
-    const cv::Mat theta_scaled_07 = TransposeVector(theta_07);
-    const cv::Mat theta_scaled_08 = TransposeVector(theta_08);
-    const cv::Mat theta_scaled_09 = TransposeVector(theta_09);
-    const cv::Mat theta_scaled_10 = TransposeVector(theta_10);
-    const cv::Mat theta_scaled_11 = TransposeVector(theta_11);
-    const cv::Mat theta_scaled_12 = TransposeVector(theta_12);
-    const cv::Mat theta_scaled_13 = TransposeVector(theta_13);
-    const cv::Mat theta_scaled_14 = TransposeVector(theta_14);
-    const cv::Mat theta_scaled_15 = TransposeVector(theta_15);
-    const cv::Mat theta_scaled_16 = TransposeVector(theta_16);
-    const cv::Mat theta_scaled_17 = TransposeVector(theta_17);
-    const cv::Mat theta_scaled_18 = TransposeVector(theta_18);
-    const cv::Mat theta_scaled_19 = TransposeVector(theta_19);
-    const cv::Mat theta_scaled_20 = TransposeVector(theta_20);
-
-
-    cv::Mat robot_rot_01,robot_rot_02,robot_rot_03,robot_rot_04,robot_rot_05,robot_rot_06,robot_rot_07,robot_rot_08,robot_rot_09,robot_rot_10,robot_rot_11,robot_rot_12,robot_rot_13,robot_rot_14,robot_rot_15,robot_rot_16,robot_rot_17,robot_rot_18,robot_rot_19,robot_rot_20,robot_rot_21,robot_rot_22,robot_rot_23 ;
-    // with scaling
-    cv::Rodrigues(theta_scaled_01,robot_rot_01);
-    cv::Rodrigues(theta_scaled_02,robot_rot_02);
-    cv::Rodrigues(theta_scaled_03,robot_rot_03);
-    cv::Rodrigues(theta_scaled_04,robot_rot_04);
-    cv::Rodrigues(theta_scaled_05,robot_rot_05);
-    cv::Rodrigues(theta_scaled_06,robot_rot_06);
-    cv::Rodrigues(theta_scaled_07,robot_rot_07);
-    cv::Rodrigues(theta_scaled_08,robot_rot_08);
-    cv::Rodrigues(theta_scaled_09,robot_rot_09);
-    cv::Rodrigues(theta_scaled_10,robot_rot_10);
-    cv::Rodrigues(theta_scaled_11,robot_rot_11);
-    cv::Rodrigues(theta_scaled_12,robot_rot_12);
-    cv::Rodrigues(theta_scaled_13,robot_rot_13);
-    cv::Rodrigues(theta_scaled_14,robot_rot_14);
-    cv::Rodrigues(theta_scaled_15,robot_rot_15);
-    cv::Rodrigues(theta_scaled_16,robot_rot_16);
-    cv::Rodrigues(theta_scaled_17,robot_rot_17);
-    cv::Rodrigues(theta_scaled_18,robot_rot_18);
-    cv::Rodrigues(theta_scaled_19,robot_rot_19);
-    cv::Rodrigues(theta_scaled_20,robot_rot_20);
-    // without scaling
-//    cv::Rodrigues(theta_01,robot_rot_01);
-//    cv::Rodrigues(theta_02,robot_rot_02);
-//    cv::Rodrigues(theta_03,robot_rot_03);
-//    cv::Rodrigues(theta_04,robot_rot_04);
-//    cv::Rodrigues(theta_05,robot_rot_05);
-//    cv::Rodrigues(theta_06,robot_rot_06);
-//    cv::Rodrigues(theta_07,robot_rot_07);
-//    cv::Rodrigues(theta_08,robot_rot_08);
-//    cv::Rodrigues(theta_09,robot_rot_09);
-//    cv::Rodrigues(theta_10,robot_rot_10);
-
-//    // Output after scaling with ur robot
-//    cout<< "After scaling: " <<endl << endl;
-//    cout<< "theta 1" <<endl << theta_scaled_01<< endl << endl;
-//    cout<< "theta 2" <<endl << theta_scaled_02<< endl << endl;
-//    cout<< "theta 3" <<endl << theta_scaled_03<< endl << endl;
-//    cout<< "theta 4" <<endl << theta_scaled_04<< endl << endl;
-//    cout<< "theta 5" <<endl << theta_scaled_05<< endl << endl;
-//    cout<< "theta 6" <<endl << theta_scaled_06<< endl << endl;
-//    cout<< "theta 7" <<endl << theta_scaled_07<< endl << endl;
-//    cout<< "theta 8" <<endl << theta_scaled_08<< endl << endl;
-//    cout<< "theta 9" <<endl << theta_scaled_09<< endl << endl;
-//    cout<< "theta 10" <<endl << theta_scaled_10<< endl << endl;
-//    cout<< "theta 11" <<endl << theta_scaled_11<< endl << endl;
-//    cout<< "theta 12" <<endl << theta_scaled_12<< endl << endl;
-//    cout<< "theta 13" <<endl << theta_scaled_13<< endl << endl;
-//    cout<< "theta 14" <<endl << theta_scaled_14<< endl << endl;
-//    cout<< "theta 15" <<endl << theta_scaled_15<< endl << endl;
-//    cout<< "theta 16" <<endl << theta_scaled_16<< endl << endl;
-//    cout<< "theta 17" <<endl << theta_scaled_17<< endl << endl;
-//    cout<< "theta 18" <<endl << theta_scaled_18<< endl << endl;
-//    cout<< "theta 19" <<endl << theta_scaled_19<< endl << endl;
-//    cout<< "theta 20" <<endl << theta_scaled_20<< endl << endl;
-
-    const Mat robot_tr_01 = (Mat_<double>(3, 1) << v[0][0],v[0][1],v[0][2]);
-    const Mat robot_tr_02 = (Mat_<double>(3, 1) << v[1][0],v[1][1],v[1][2]);
-    const Mat robot_tr_03 = (Mat_<double>(3, 1) << v[2][0],v[2][1],v[2][2]);
-    const Mat robot_tr_04 = (Mat_<double>(3, 1) << v[3][0],v[3][1],v[3][2]);
-    const Mat robot_tr_05 = (Mat_<double>(3, 1) << v[4][0],v[4][1],v[4][2]);
-    const Mat robot_tr_06 = (Mat_<double>(3, 1) << v[5][0],v[5][1],v[5][2]);
-    const Mat robot_tr_07 = (Mat_<double>(3, 1) << v[6][0],v[6][1],v[6][2]);
-    const Mat robot_tr_08 = (Mat_<double>(3, 1) << v[7][0],v[7][1],v[7][2]);
-    const Mat robot_tr_09 = (Mat_<double>(3, 1) << v[8][0],v[8][1],v[8][2]);
-    const Mat robot_tr_10 = (Mat_<double>(3, 1) << v[9][0],v[9][1],v[9][2]);
-    const Mat robot_tr_11 = (Mat_<double>(3, 1) << v[10][0],v[10][1],v[10][2]);
-    const Mat robot_tr_12 = (Mat_<double>(3, 1) << v[11][0],v[11][1],v[11][2]);
-    const Mat robot_tr_13 = (Mat_<double>(3, 1) << v[12][0],v[12][1],v[12][2]);
-    const Mat robot_tr_14 = (Mat_<double>(3, 1) << v[13][0],v[13][1],v[13][2]);
-    const Mat robot_tr_15 = (Mat_<double>(3, 1) << v[14][0],v[14][1],v[14][2]);
-    const Mat robot_tr_16 = (Mat_<double>(3, 1) << v[15][0],v[15][1],v[15][2]);
-    const Mat robot_tr_17 = (Mat_<double>(3, 1) << v[16][0],v[16][1],v[16][2]);
-    const Mat robot_tr_18 = (Mat_<double>(3, 1) << v[17][0],v[17][1],v[17][2]);
-    const Mat robot_tr_19 = (Mat_<double>(3, 1) << v[18][0],v[18][1],v[18][2]);
-    const Mat robot_tr_20 = (Mat_<double>(3, 1) << v[19][0],v[19][1],v[19][2]);
-
-//    // Output of Robot rotation and translation
-//    cout<< "robot_rot_01" <<endl << robot_rot_01<< endl << endl;
-//    cout<< "robot_rot_02" <<endl << robot_rot_02<< endl << endl;
-//    cout<< "robot_rot_03" <<endl << robot_rot_03<< endl << endl;
-//    cout<< "robot_rot_04" <<endl << robot_rot_04<< endl << endl;
-//    cout<< "robot_rot_05" <<endl << robot_rot_05<< endl << endl;
-//    cout<< "robot_rot_06" <<endl << robot_rot_06<< endl << endl;
-//    cout<< "robot_rot_07" <<endl << robot_rot_07<< endl << endl;
-//    cout<< "robot_rot_08" <<endl << robot_rot_08<< endl << endl;
-//    cout<< "robot_rot_09" <<endl << robot_rot_09<< endl << endl;
-//    cout<< "robot_rot_10" <<endl << robot_rot_10<< endl << endl;
-//    cout<< "robot_rot_11" <<endl << robot_rot_11<< endl << endl;
-//    cout<< "robot_rot_12" <<endl << robot_rot_12<< endl << endl;
-//    cout<< "robot_rot_13" <<endl << robot_rot_13<< endl << endl;
-//    cout<< "robot_rot_14" <<endl << robot_rot_14<< endl << endl;
-//    cout<< "robot_rot_15" <<endl << robot_rot_15<< endl << endl;
-//    cout<< "robot_rot_16" <<endl << robot_rot_16<< endl << endl;
-//    cout<< "robot_rot_17" <<endl << robot_rot_17<< endl << endl;
-//    cout<< "robot_rot_18" <<endl << robot_rot_18<< endl << endl;
-//    cout<< "robot_rot_19" <<endl << robot_rot_19<< endl << endl;
-//    cout<< "robot_rot_20" <<endl << robot_rot_20<< endl << endl;
-
-//    cout<< "Translation 1" <<endl << robot_tr_01<< endl << endl;
-//    cout<< "Translation 2" <<endl << robot_tr_02<< endl << endl;
-//    cout<< "Translation 3" <<endl << robot_tr_03<< endl << endl;
-//    cout<< "Translation 4" <<endl << robot_tr_04<< endl << endl;
-//    cout<< "Translation 5" <<endl << robot_tr_05<< endl << endl;
-//    cout<< "Translation 6" <<endl << robot_tr_06<< endl << endl;
-//    cout<< "Translation 7" <<endl << robot_tr_07<< endl << endl;
-//    cout<< "Translation 8" <<endl << robot_tr_08<< endl << endl;
-//    cout<< "Translation 9" <<endl << robot_tr_09<< endl << endl;
-//    cout<< "Translation 10" <<endl << robot_tr_10<< endl << endl;
-//    cout<< "Translation 11" <<endl << robot_tr_11<< endl << endl;
-//    cout<< "Translation 12" <<endl << robot_tr_12<< endl << endl;
-//    cout<< "Translation 13" <<endl << robot_tr_13<< endl << endl;
-//    cout<< "Translation 14" <<endl << robot_tr_14<< endl << endl;
-//    cout<< "Translation 15" <<endl << robot_tr_15<< endl << endl;
-//    cout<< "Translation 16" <<endl << robot_tr_16<< endl << endl;
-//    cout<< "Translation 17" <<endl << robot_tr_17<< endl << endl;
-//    cout<< "Translation 18" <<endl << robot_tr_18<< endl << endl;
-//    cout<< "Translation 19" <<endl << robot_tr_19<< endl << endl;
-//    cout<< "Translation 20" <<endl << robot_tr_20<< endl << endl;
-
-    R_gripper2base.push_back(robot_rot_01);
-    R_gripper2base.push_back(robot_rot_02);
-    R_gripper2base.push_back(robot_rot_03);
-    R_gripper2base.push_back(robot_rot_04);
-    R_gripper2base.push_back(robot_rot_05);
-    R_gripper2base.push_back(robot_rot_06);
-    R_gripper2base.push_back(robot_rot_07);
-    R_gripper2base.push_back(robot_rot_08);
-    R_gripper2base.push_back(robot_rot_09);
-    R_gripper2base.push_back(robot_rot_10);
-    R_gripper2base.push_back(robot_rot_11);
-    R_gripper2base.push_back(robot_rot_12);
-    R_gripper2base.push_back(robot_rot_13);
-    R_gripper2base.push_back(robot_rot_14);
-    R_gripper2base.push_back(robot_rot_15);
-    R_gripper2base.push_back(robot_rot_16);
-    R_gripper2base.push_back(robot_rot_17);
-    R_gripper2base.push_back(robot_rot_18);
-    R_gripper2base.push_back(robot_rot_19);
-    R_gripper2base.push_back(robot_rot_20);
-
-    t_gripper2base.push_back(robot_tr_01);
-    t_gripper2base.push_back(robot_tr_02);
-    t_gripper2base.push_back(robot_tr_03);
-    t_gripper2base.push_back(robot_tr_04);
-    t_gripper2base.push_back(robot_tr_05);
-    t_gripper2base.push_back(robot_tr_06);
-    t_gripper2base.push_back(robot_tr_07);
-    t_gripper2base.push_back(robot_tr_08);
-    t_gripper2base.push_back(robot_tr_09);
-    t_gripper2base.push_back(robot_tr_10);
-    t_gripper2base.push_back(robot_tr_11);
-    t_gripper2base.push_back(robot_tr_12);
-    t_gripper2base.push_back(robot_tr_13);
-    t_gripper2base.push_back(robot_tr_14);
-    t_gripper2base.push_back(robot_tr_15);
-    t_gripper2base.push_back(robot_tr_16);
-    t_gripper2base.push_back(robot_tr_17);
-    t_gripper2base.push_back(robot_tr_18);
-    t_gripper2base.push_back(robot_tr_19);
-    t_gripper2base.push_back(robot_tr_20);
-
-//    cout << R_gripper2base.size() << " R_gripper2base"<<endl;
-//    cout << t_gripper2base.size() << " t_gripper2base"<<endl;
-//    cout << R_target2cam.size() << " R_target2cam"<<endl;
-//    cout << R_target2cam.size() << " t_target2cam"<<endl;
-//    cout << t_target2cam[0] << endl << endl;
-//    cout << t_target2cam[1] << endl << endl;
-//    cout << t_target2cam[2] << endl << endl;
-//    cout << t_target2cam[3] << endl << endl;
-//    cout << t_target2cam[4] << endl << endl;
-//    cout << t_target2cam[5] << endl << endl;
-//    cout << t_target2cam[6] << endl << endl;
-//    cout << t_target2cam[7] << endl << endl;
-//    cout << t_target2cam[8] << endl << endl;
-//    cout << t_target2cam[9] << endl << endl;
+                   // Parsing translational data from robot //
+                   robot_tr = (Mat_<double>(3, 1) << v[i][0],v[i][1],v[i][2]);
+                   t_gripper2base.push_back(robot_tr);
+                   //cout<< "Robot_tr: " << i << endl << t_gripper2base[i]<< endl << endl;
+           }
 
     //**************************** RODRIGUES **************************************************
     calibrateHandEye(R_gripper2base, t_gripper2base, R_target2cam, t_target2cam, R_cam2gripper_TSAI, t_cam2gripper_TSAI, CALIB_HAND_EYE_TSAI);
@@ -779,23 +366,8 @@ int main()
     cout << "t_cam2gripper_ANDREFF = " << endl << " " << t_cam2gripper_ANDREFF << endl << endl;
     cout << "t_cam2gripper_DAN = " << endl << " " << t_cam2gripper_DAN << endl << endl;
 
-    // Inverse transformation
-//    cv::Mat t_Inverse(3, 1, CV_64F);
-//    cv::Mat R_Inverse, Rodrigues_Horaud_Inverse;
 
-//    R_Inverse=R_cam2gripper_HORAUD.t();// rotation of inverse
-//    t_Inverse= -R_Inverse * t_cam2gripper_HORAUD; // translation of inverse
-
-//    Vec3f R_cam2gripper_Inverse = rotationMatrixToEulerAngles(R_Inverse);
-
-//    cv::Rodrigues(R_Inverse,Rodrigues_Horaud_Inverse);
-
-//    cout << "R_cam2gripper_Inverse = " << endl << " " << R_Inverse << endl << endl;
-//    cout << "R_cam2gripper_Inverse = " << endl << " " << R_cam2gripper_Inverse << endl << endl;
-//    cout << " Rodrigues R_cam2gripper_Inverse = " << endl << " " << Rad2degV(Rodrigues_Horaud_Inverse) << endl << endl;
-//    cout << "t_cam2gripper_HORAUD_Inverse = " << endl << " " << t_Inverse << endl << endl;
-    //std::vector<double> Cam2Gripper = {-0.00228131, 0.011324, -0.116136, 0.0246032, 0.035415, 2.3357};
-    //Pose_inv(Cam2Gripper);
+        // error estimation
     cout << endl << endl << "Error_TSAI: " << endl;
     errorEstimate(R_gripper2base,t_gripper2base,R_target2cam,t_target2cam,R_cam2gripper_TSAI,t_cam2gripper_TSAI);
     cout << endl << endl << "Error_HORAUD: " << endl;
@@ -1022,17 +594,17 @@ void errorEstimate(const std::vector<cv::Mat> &R_gripper2base, const std::vector
 
     // using the VISP libary on gathered data with OpenCV
     calibrationVerifrMo(CmO,RmE,EmC);
-    vpHomogeneousMatrix E;
-    vpHandEyeCalibration::calibrate(CmO,RmE,E);
-    std::cout << std::endl << "** Hand-eye calibration succeed" << std::endl;
-    std::cout << std::endl << "** Hand-eye (eMc) transformation estimated:" << std::endl;
-    std::cout << E << std::endl;
-    std::cout << "** Corresponding pose vector: " << vpPoseVector(E).t() << std::endl;
+//    vpHomogeneousMatrix E;
+//    vpHandEyeCalibration::calibrate(CmO,RmE,E);
+//    std::cout << std::endl << "** Hand-eye calibration succeed" << std::endl;
+//    std::cout << std::endl << "** Hand-eye (eMc) transformation estimated:" << std::endl;
+//    std::cout << E << std::endl;
+//    std::cout << "** Corresponding pose vector: " << vpPoseVector(E).t() << std::endl;
 
-    vpThetaUVector erc(E.getRotationMatrix());
-    std::cout << std::endl << "** Translation [m]: " << E[0][3] << " " << E[1][3] << " " << E[2][3] << std::endl;
-    std::cout << "** Rotation (theta-u representation) [rad]: " << erc.t() << std::endl;
-    std::cout << "** Rotation (theta-u representation) [deg]: " << vpMath::deg(erc[0]) << " " << vpMath::deg(erc[1]) << " " << vpMath::deg(erc[2]) << std::endl;
+//    vpThetaUVector erc(E.getRotationMatrix());
+//    std::cout << std::endl << "** Translation [m]: " << E[0][3] << " " << E[1][3] << " " << E[2][3] << std::endl;
+//    std::cout << "** Rotation (theta-u representation) [rad]: " << erc.t() << std::endl;
+//    std::cout << "** Rotation (theta-u representation) [deg]: " << vpMath::deg(erc[0]) << " " << vpMath::deg(erc[1]) << " " << vpMath::deg(erc[2]) << std::endl;
 
 }
 

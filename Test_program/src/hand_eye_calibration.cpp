@@ -48,37 +48,49 @@ std::vector<double> Pose_inv(std::vector<double> v);
 void errorEstimate(const std::vector<Mat> &R_gripper2base, const std::vector<Mat> &t_gripper2base, const std::vector<Mat> &R_target2cam, const std::vector<Mat> &t_target2cam, const Mat &R_cam2gripper, const Mat &t_cam2gripper);
 int Mat2ViSP(const cv::Mat& mat_in, vpHomogeneousMatrix& visp_ou);
 void calibrationVerifrMo(const std::vector<vpHomogeneousMatrix> &cMo, const std::vector<vpHomogeneousMatrix> &rMe, const vpHomogeneousMatrix &eMc);
-int CHECKERBOARD[2]{8,5};
+int CHECKERBOARD[2]{5,8};
 
 int main()
 {
 //****************************************************** CAMERA SETUP ************************************************************************************'//
 
      //Camera calibration information from API 1920x1080
-//    std::vector<double> distortionCoefficients(5);  // camera distortion
-//    distortionCoefficients[0] = 1.83375015854836e-01;
-//    distortionCoefficients[1] = -5.65327823162079e-01;
-//    distortionCoefficients[2] = -1.45305093610659e-04;
-//    distortionCoefficients[3] = 5.0213176291436e-04;
-//    distortionCoefficients[4] = 5.08288383483887e-01;
+    std::vector<double> distortionCoefficients(5);  // camera distortion
+    distortionCoefficients[0] = 1.83375015854836e-01;
+    distortionCoefficients[1] = -5.65327823162079e-01;
+    distortionCoefficients[2] = -1.45305093610659e-04;
+    distortionCoefficients[3] = 5.0213176291436e-04;
+    distortionCoefficients[4] = 5.08288383483887e-01;
 
-//    float f_x = 1364.6708984375; // Focal length in x axis
-//    float f_y = 1364.94384765625; // Focal length in y axis
-//    float c_x = 967.542907714844; // Camera primary point x
-//    float c_y = 540.435607910156; // Camera primary point y
+    float f_x = 1364.6708984375; // Focal length in x axis
+    float f_y = 1364.94384765625; // Focal length in y axis
+    float c_x = 967.542907714844; // Camera primary point x
+    float c_y = 540.435607910156; // Camera primary point y
 
 ////    // Camera calibration information from calibration 1920x1080
-    std::vector<double> distortionCoefficients(5);  // camera distortion
-    distortionCoefficients[0] = 0.152762;
-    distortionCoefficients[1] = -0.408405;
-    distortionCoefficients[2] = 0.00366511;
-    distortionCoefficients[3] = 0.000347318;
-    distortionCoefficients[4] = 0.25188;
+//    std::vector<double> distortionCoefficients(5);  // camera distortion
+//    distortionCoefficients[0] = 0.152762;
+//    distortionCoefficients[1] = -0.408405;
+//    distortionCoefficients[2] = 0.00366511;
+//    distortionCoefficients[3] = 0.000347318;
+//    distortionCoefficients[4] = 0.25188;
 
-    float f_x = 1373.745226037709; // Focal length in x axis
-    float f_y = 1372.453906056477; // Focal length in y axis
-    float c_x = 966.2194707820457; // Camera primary point x
-    float c_y = 553.6856848982575; // Camera primary point y
+//    float f_x = 1373.745226037709; // Focal length in x axis
+//    float f_y = 1372.453906056477; // Focal length in y axis
+//    float c_x = 966.2194707820457; // Camera primary point x
+//    float c_y = 553.6856848982575; // Camera primary point y
+
+//    std::vector<double> distortionCoefficients(5);  // camera distortion
+//    distortionCoefficients[0] = 0.0941717;
+//    distortionCoefficients[1] = 0.0214873;
+//    distortionCoefficients[2] = 0.00493083;
+//    distortionCoefficients[3] = 0.000244589;
+//    distortionCoefficients[4] = -0.746346;
+
+//    float f_x = 1365.567566059209; // Focal length in x axis
+//    float f_y = 1364.670083928078; // Focal length in y axis
+//    float c_x = 964.7070499563438; // Camera primary point x
+//    float c_y = 559.3336078254289; // Camera primary point y
 
 
 //    // Camera calibration information from API   960x540
@@ -183,7 +195,6 @@ int main()
       cv::Mat frame, gray;
       // std::sort(images);
 
-
       R_gripper2base.reserve(num_images);
       t_gripper2base.reserve(num_images);
       R_target2cam.reserve(num_images);
@@ -192,9 +203,9 @@ int main()
       // vector to store the pixel coordinates of detected checker board corners
       std::vector<cv::Point2f> corner_pts;
       bool success;
-
+        int cool = 20;
       // Looping over all the images in the directory
-      for(int i{0}; i<images.size(); i++)
+      for(int i{0}; i<cool/*images.size()*/; i++)
       {
         frame = cv::imread(images[i]);
         cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
@@ -221,7 +232,7 @@ int main()
           objpoints.push_back(objp);
           imgpoints.push_back(corner_pts);
 
-          float length = 50.0;
+          float length = 0.05;
           int thickness = 3;
 
           // Finding transformation matrix
@@ -246,6 +257,7 @@ int main()
         }
 
 //        cv::imshow("Image",frame);
+//        cv::imwrite("Axis.bmp",frame);
 //        cv::waitKey(0);
 
 
@@ -254,9 +266,42 @@ int main()
       // camera calibration which leads to reprojection error
 
       cv::calibrateCamera(objpoints, imgpoints, cv::Size(gray.rows,gray.cols), cameraMatrix, distortionCoefficients, rvecs, tvecs, stdDeviationsIntrinsics, stdDeviationExtrinsics, perViewErrors,0);
+      std::ofstream myfile;
+            myfile.open ("example.csv");
+            for (int i = 0; i<perViewErrors.size(); i++)
+            {
+            myfile << perViewErrors[i];
+            myfile << "\n";
+            }
+            myfile.close();
+
       float Avg_RMS = std::accumulate(perViewErrors.begin(), perViewErrors.end(), 0);
       for (auto& n : perViewErrors)
           Avg_RMS += n;
+
+      /*
+      tot_error=0
+      total_points=0
+      for i in xrange(len(obj_points)):
+          reprojected_points, _ = cv2.projectPoints(obj_points[i], rvecs[i], tvecs[i], camera_matrix, dist_coeffs)
+          reprojected_points=reprojected_points.reshape(-1,2)
+          tot_error+=np.sum(np.abs(img_points[i]-reprojected_points)**2)
+          total_points+=len(obj_points[i])
+
+      mean_error=np.sqrt(tot_error/total_points)
+      print "Mean reprojection error: ", mean_error*/
+
+//      double error=0;
+//      double tot_error=0;
+//      double total_point=0;
+//      std::vector<cv::Point2f> projected_pts;
+//      for(int i=0; i<images.size(); i++)
+//      {
+//          cv::projectPoints(cv::Mat(objpoints[i]),rvecs[i],tvecs[i],cameraMatrix,distortionCoefficients,projected_pts);
+//          error=cv::norm(cv::Mat(imgpoints[i]),cv::Mat(projected_pts),NORM_L2)/projected_pts.size();
+//          tot_error+=error;
+//      }
+//      std::cout << "Reproejction error : " << std::endl <<" "<< tot_error/objpoints.size() << std::endl << std::endl;
 
       std::cout << "cameraMatrix : " << std::endl <<" "<< cameraMatrix << std::endl << std::endl;
 
@@ -294,7 +339,7 @@ int main()
                v.push_back( row );
 
            }
-           for(int i = 0; i < v.size(); i++)
+           for(int i = 0; i < cool/*v.size()*/; i++)
            {
                 cv::Mat theta_scaled, robot_rot, robot_tr;
 
@@ -366,6 +411,57 @@ int main()
     cout << "t_cam2gripper_ANDREFF = " << endl << " " << t_cam2gripper_ANDREFF << endl << endl;
     cout << "t_cam2gripper_DAN = " << endl << " " << t_cam2gripper_DAN << endl << endl;
 
+//    std::ofstream myfile_tsai;
+//    myfile_tsai.open ("translation_Tsai.csv",std::ios::app);
+//    // for (int i = 0; i<perViewErrors.size(); i++)
+//    //{
+//    myfile_tsai << t_cam2gripper_TSAI.t();
+//    myfile_tsai << Rad2degV(Rodrigues_Tsai).t();
+//    myfile_tsai << "\n";
+//    //}
+//    myfile_tsai.close();
+
+//    std::ofstream myfile_Horaud;
+//    myfile_Horaud.open ("translation_Horaud.csv",std::ios::app);
+//    // for (int i = 0; i<perViewErrors.size(); i++)
+//    //{
+//    myfile_Horaud << t_cam2gripper_HORAUD.t();
+//    myfile_Horaud << Rad2degV(Rodrigues_Horaud).t();
+//    myfile_Horaud << "\n";
+//    //}
+//    myfile_Horaud.close();
+
+//    std::ofstream myfile_park;
+//    myfile_park.open ("translation_Park.csv",std::ios::app);
+//    // for (int i = 0; i<perViewErrors.size(); i++)
+//    //{
+//    myfile_park << t_cam2gripper_PARK.t();
+//    myfile_park << Rad2degV(Rodrigues_Park).t();
+//    myfile_park << "\n";
+//    //}
+//    myfile_park.close();
+
+//    std::ofstream myfile_Andreff;
+//    myfile_Andreff.open ("translation_Andreff.csv",std::ios::app);
+//    // for (int i = 0; i<perViewErrors.size(); i++)
+//    //{
+//    myfile_Andreff << t_cam2gripper_ANDREFF.t();
+//    myfile_Andreff << Rad2degV(Rodrigues_Andreff).t();
+//    myfile_Andreff << "\n";
+//    //}
+//    myfile_Andreff.close();
+
+//    std::ofstream myfile_Dan;
+//    myfile_Dan.open ("translation_Dan.csv",std::ios::app);
+//    // for (int i = 0; i<perViewErrors.size(); i++)
+//    //{
+//    myfile_Dan << t_cam2gripper_DAN.t();
+//    myfile_Dan << Rad2degV(Rodrigues_Dan).t();
+//    myfile_Dan << "\n";
+//    //}
+//    myfile_Dan.close();
+
+
 
         // error estimation
     cout << endl << endl << "Error_TSAI: " << endl;
@@ -433,7 +529,7 @@ Vec3f Rad2degV(Vec3f v)
     x=v[0];
     y=v[1];
     z=v[2];
-    return Vec3f(x, y, z);
+    return Vec3f(rad2deg(x), rad2deg(y), rad2deg(z));
 }
 
 

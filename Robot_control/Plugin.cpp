@@ -180,6 +180,7 @@ void Plugin::clickEvent()
     else if(obj == _btn_global_test)
         for(int i = 0; i< 25; i++)
         {
+        PCL();
         globalAlignment();
         localAlignment();
         }
@@ -239,7 +240,7 @@ void Plugin::import3DPoint(std::vector<double> &point)
 {
 
         std::vector<std::vector<double>> v;
-        std::ifstream in( "test1.txt" );
+        std::ifstream in( "/home/anders/Master/Hand-eye-Calibration/Test_program/build/Camera_points.txt" );
         std::string record;
 
         while ( std::getline( in, record ) )
@@ -250,6 +251,7 @@ void Plugin::import3DPoint(std::vector<double> &point)
             v.push_back( row );
         }
         for(auto && p : v){
+            //std::cout << "hey error here" << std::endl;
           point.insert(point.end(), p.begin(), p.end());
         }
 }
@@ -275,16 +277,22 @@ void Plugin::RunRobotControl()
     import3DPoint(point);
     printArray(point);
 
-    // Camera to target
-    std::vector<double> cTt = point;
+    // { 0.62584, -0.0954425, 0.143734, -2.84471, -1.23559, -0.088553 } first position
+    // { 0.392544, -0.0894295, 0.137264, -2.84178, -1.23825, -0.0893458 } secound position
 
+
+
+    // Camera to target
+    std::vector<double> cTt = {point[0], point[1], point[2], 0, 0, 0};
+
+    //std::vector<double> cTt = {-0.0854658, 0.0158527, 0.50825, 0, 0, 0};
     // target to camera
     std::vector<double> tTc  = Pose_inv(cTt);
 
     // Camera to Gripper from visp
-    std::vector<double> gTc = {-0.008496624885,  0.01004966999,  0.1188209676,  -0.026702465,  -0.03330274707,  -2.335288144};
+    //std::vector<double> gTc = {-0.008496624885,  0.01004966999,  0.1188209676,  -0.026702465,  -0.03330274707,  -2.335288144};
     // Camera to Gripper from openCV
-    //std::vector<double> gTc = {-0.007333253944998697,  0.00941774561076744,  0.1150842076108506,  -0.0114279, -0.0131705, -2.33678};
+    std::vector<double> gTc = {-0.007333253944998697,  0.00941774561076744,  0.1150842076108506,  -0.0114279, -0.0131705, -2.33678};
 
     // Gripper to Camera
     std::vector<double> cTg = Pose_inv(gTc);
@@ -306,7 +314,9 @@ void Plugin::RunRobotControl()
     std::vector<double> bTt_offset = ur_robot->poseTrans(bTt,cTg);
 
     // RRT Between points
+
     std::vector<std::vector<double>> path;
+
     std::vector<double> fromQ = ur_robot_receive->getActualQ();
     std::vector<double> toQ = invKin(fromQ,bTt_offset);
     rw::kinematics::State tmp_state = rws_state.clone();
@@ -319,6 +329,9 @@ void Plugin::RunRobotControl()
     ur_robot->moveJ(path);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
+
+     std::vector<double> PrintTCP=ur_robot_receive->getActualTCPPose();
+    write_vector_to_file(PrintTCP,"Robot_poses.txt");
 
 //    QMatrix4x4 tranform;
 //    transform.translate();
@@ -489,7 +502,7 @@ void Plugin::MoveInToolSpace()
         return;
     }
 
-    std::vector<double> bTg = {0.50643, -0.136141, 0.643752, -2.84425, -1.22914, -0.0897504};
+    std::vector<double> bTg = {0.567417, -0.114328, 0.715459, -2.76394, 1.31289, 0.0947902};
     std::cout << "Moving to location" << std::endl;
     ur_robot->moveJ_IK(bTg);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
@@ -498,12 +511,15 @@ void Plugin::MoveInToolSpace()
 
 void Plugin::write_vector_to_file(const std::vector<double>& myVector, std::string filename)
 {
-    std::ofstream ofs(filename, std::ios::app | std::ofstream::binary);
+    std::ofstream ofs;
+    ofs.open(filename, std::ios::app | std::ofstream::binary);
     for(size_t i = 0; i < myVector.size()-1; i++)
 
         ofs << myVector[i] << " ";
 
     ofs << myVector[myVector.size()-1]<< std::endl;
+
+    ofs.close();
 }
 
 void Plugin::printQ()
@@ -568,9 +584,6 @@ void Plugin::createPathRRTConnect(std::vector<double> from, std::vector<double> 
 
 std::vector<double> Plugin::invKin(std::vector<double> startQ, std::vector<double> goalL)
 {
-    //double theta = 22.5 * (M_PI / 180);
-
-
     // Duplicate state
     rw::kinematics::State tmp_state = rws_state.clone();
 
@@ -1105,7 +1118,7 @@ void pp_callback(const pcl::visualization::PointPickingEvent& event, void *viewe
 
 void Plugin::PCL()
 {
-    char key;
+
 //    // Create a simple OpenGL window for rendering:
 //    window app(1280, 720, "RealSense Pointcloud Example");
 //    // Construct an object to manage view state
@@ -1124,34 +1137,34 @@ void Plugin::PCL()
     // Start streaming with default recommended configuration
     pipe.start();
 
-    pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
+//    pcl::visualization::PCLVisualizer viewer("Simple Cloud Viewer");
 
-    while (!viewer.wasStopped()) // Application still alive?
-    {
+//    while (!viewer.wasStopped()) // Application still alive?
+//    {
 
-        // Wait for the next set of frames from the camera
-        auto frames = pipe.wait_for_frames();
+//        // Wait for the next set of frames from the camera
+//        auto frames = pipe.wait_for_frames();
 
-        auto color = frames.get_color_frame();
+//        auto color = frames.get_color_frame();
 
-        // For cameras that don't have RGB sensor, we'll map the pointcloud to infrared instead of color
-        if (!color)
-            color = frames.get_infrared_frame();
+//        // For cameras that don't have RGB sensor, we'll map the pointcloud to infrared instead of color
+//        if (!color)
+//            color = frames.get_infrared_frame();
 
-        // Tell pointcloud object to map to this color frame
-        pc.map_to(color);
+//        // Tell pointcloud object to map to this color frame
+//        pc.map_to(color);
 
-        auto depth = frames.get_depth_frame();
+//        auto depth = frames.get_depth_frame();
 
-        // Generate the pointcloud and texture mappings
-        points = pc.calculate(depth);
+//        // Generate the pointcloud and texture mappings
+//        points = pc.calculate(depth);
 
-        ptr_cloud cloud = points_to_pcl(points, color);
-        viewer.removeAllPointClouds();
-        viewer.addPointCloud<pcl::PointXYZRGB> (cloud, "Sample cloud",0);
-        viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "Sample cloud");
-        viewer.initCameraParameters();
-        viewer.spinOnce(100);
+//        ptr_cloud cloud = points_to_pcl(points, color);
+//        viewer.removeAllPointClouds();
+//        viewer.addPointCloud<pcl::PointXYZRGB> (cloud, "Sample cloud",0);
+//        viewer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "Sample cloud");
+//        viewer.initCameraParameters();
+//        viewer.spinOnce(100);
 
 
         // Upload the color frame to OpenGL
@@ -1161,8 +1174,8 @@ void Plugin::PCL()
        // draw_pointcloud(app.width(), app.height(), app_state, points);
 
 
-}
-    viewer.close();
+//}
+    //viewer.close();
 
     for (int i = 0; i < 30; i++) {
         auto frames = pipe.wait_for_frames(); //Drop several frames for auto-exposure
@@ -1175,6 +1188,11 @@ void Plugin::PCL()
     {
         color1 = frames.get_infrared_frame();
     }
+    //pc.map_to(color1);
+
+    auto depth = frames.get_depth_frame();
+
+    points = pc.calculate(depth);
 
     // Save current point cloud
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
@@ -1193,14 +1211,14 @@ void Plugin::PCL()
     pcl::io::savePCDFileASCII("cloud_test.pcd", *cloud_filtered);
 
     // Vizualize point cloud and generate point clicking event
-    pcl::visualization::PCLVisualizer visualizer("PCL visualizer");
-    visualizer.setBackgroundColor (0.251, 0.251, 0.251);// Floral white 1, 0.98, 0.94 | Misty Rose 1, 0.912, 0.9 |
-    visualizer.addCoordinateSystem (1.0);
-    visualizer.registerPointPickingCallback(pp_callback, (void*) &visualizer);
-    visualizer.addPointCloud<pcl::PointXYZRGB> (cloud_filtered, "sample cloud",0);
-    visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "sample cloud");
-    visualizer.initCameraParameters();
-    visualizer.spin();
+//    pcl::visualization::PCLVisualizer visualizer("PCL visualizer");
+//    visualizer.setBackgroundColor (0.251, 0.251, 0.251);// Floral white 1, 0.98, 0.94 | Misty Rose 1, 0.912, 0.9 |
+//    visualizer.addCoordinateSystem (1.0);
+//    visualizer.registerPointPickingCallback(pp_callback, (void*) &visualizer);
+//    visualizer.addPointCloud<pcl::PointXYZRGB> (cloud_filtered, "sample cloud",0);
+//    visualizer.setPointCloudRenderingProperties(pcl::visualization::PCL_VISUALIZER_POINT_SIZE, 2, "sample cloud");
+//    visualizer.initCameraParameters();
+//    visualizer.spin();
 }
 
 void Plugin::globalAlignment()
@@ -1210,7 +1228,7 @@ void Plugin::globalAlignment()
     pcl::PCLPointCloud2::Ptr scene_in (new pcl::PCLPointCloud2 ());
     pcl::PCLPointCloud2::Ptr scene_cropped (new pcl::PCLPointCloud2 ());
 
-    //Load pcl file created with get25DImage()
+    //Load pcl file created with PCL()
     if (pcl::io::loadPCDFile("m1.pcd", *object_in) == -1)
     {
       PCL_ERROR ("Couldn't read object pointcloud \n");
@@ -1221,12 +1239,25 @@ void Plugin::globalAlignment()
       PCL_ERROR ("Couldn't read scene pointcloud \n");
       return;
     }
-    Eigen::Vector4f minPoint = Eigen::Vector4f(-2, -2, -1, 1.0);
-    Eigen::Vector4f maxPoint = Eigen::Vector4f(2, 2, 1, 1.0);
+
+    pcl::PointCloud<pcl::PointNormal>::Ptr scene_in_vis(new pcl::PointCloud<pcl::PointNormal>);
+    pcl::PointCloud<pcl::PointNormal>::Ptr scene_cropped_vis(new pcl::PointCloud<pcl::PointNormal>);
+    pcl::fromPCLPointCloud2( *scene_in, *scene_in_vis);
+
+    // good crops
+//    Eigen::Vector4f minPoint = Eigen::Vector4f(-0.2, -0.2, -1.0, 1.0);
+//    Eigen::Vector4f maxPoint = Eigen::Vector4f(0.2, 0.2, 1.0, 1.0);
+      // the whole scene
+    Eigen::Vector4f minPoint = Eigen::Vector4f(-1.0, -1.0, -1.0, 1.0);
+    Eigen::Vector4f maxPoint = Eigen::Vector4f(1.0, 1.0, 1.0, 1.0);
+
 
     cropScene(scene_in, scene_cropped, minPoint, maxPoint);
+    pcl::fromPCLPointCloud2( *scene_cropped, *scene_cropped_vis);
 
     pcl::PointCloud<pcl::PointNormal>::Ptr object_filtered(new pcl::PointCloud<pcl::PointNormal>);
+    pcl::PointCloud<pcl::PointNormal>::Ptr object_SOR(new pcl::PointCloud<pcl::PointNormal>);
+    pcl::PointCloud<pcl::PointNormal>::Ptr scene_SOR(new pcl::PointCloud<pcl::PointNormal>);
 
     // Downsample using a VoxelGrid filter
     std::cout << "Downsampling pointclouds" << std::endl;
@@ -1239,23 +1270,31 @@ void Plugin::globalAlignment()
           object_filtered->points[i].y *= 0.1;
           object_filtered->points[i].z *= 0.1;
     }
+    visualizePointClouds(scene_in_vis, object_filtered, "Before pre-processing");
+    visualizePointClouds(scene_cropped_vis, object_filtered, "After Cropping");
+    visualizePointClouds(scene_filtered, object_filtered, "After downsampling");
+    // Outlier Removal
+    outlierRemoval(scene_filtered, scene_SOR );
+    //outlierRemoval(object_filtered, object_SOR );
+
+
 
     std::cout << "Object size " << object_filtered->points.size()<< std::endl;
     std::cout << "Scene size " << scene_filtered->points.size()<< std::endl;
-    //visualizePointClouds(scene_filtered, object_filtered, "Before global alignment");
+    visualizePointClouds(scene_SOR, object_filtered, "After Outlier Removal");
 
 
     // Compute surface normals
     std::cout << "Computing surface normals" << std::endl;
     computeSurfaceNormals(object_filtered);
-    computeSurfaceNormals(scene_filtered);
+    computeSurfaceNormals(scene_SOR);
 
     // Compute shape features
     std::cout << "Computing shape features" << std::endl;
     pcl::PointCloud<pcl::Histogram<153>>::Ptr object_features(new pcl::PointCloud<pcl::Histogram<153>>);
     pcl::PointCloud<pcl::Histogram<153>>::Ptr scene_features(new pcl::PointCloud<pcl::Histogram<153>>);
     computeShapeFeatures(object_filtered, object_features);
-    computeShapeFeatures(scene_filtered, scene_features);
+    computeShapeFeatures(scene_SOR, scene_features);
 
     // Find feature matches
     std::cout << "Finding feature matches" << std::endl;
@@ -1277,18 +1316,25 @@ void Plugin::globalAlignment()
     glob_object_align = object_aligned;
 
     // Set to true to display pointclouds
-    bool visualize = false;
+    bool visualize = true;
 
     if (visualize) {
-        visualizePointClouds(scene_filtered, object_aligned, "After global alignment");
+        visualizePointClouds(scene_SOR, object_aligned, "After global alignment");
     }
 
     std::cout << "Finished global alignment!" << std::endl;
     std::cout << "Global transform is:\n" << glob_pose << std::endl;
     std::cout << "Rmse GLOBAL " << glob_rmse << std::endl;
+
     std::string filename = "Global_RMSE.txt";
     std::ofstream ofs(filename, std::ios::app | std::ofstream::binary);
-    ofs << glob_rmse;
+    ofs << glob_rmse << std::endl ;
+
+    std::ofstream file("Global_poses.txt", std::ios::app | std::ofstream::binary);
+      if (file.is_open())
+      {
+        file << "Here is the matrix Global_pose:\n" << glob_pose << '\n';
+      }
 }
 
 std::tuple<Eigen::Matrix4f, pcl::PointCloud<pcl::PointNormal>::Ptr, size_t, float> Plugin::RANSAC(pcl::PointCloud<pcl::PointNormal>::Ptr & object, pcl::Correspondences corr, const size_t iter, const float threshsq)
@@ -1339,11 +1385,13 @@ std::tuple<Eigen::Matrix4f, pcl::PointCloud<pcl::PointNormal>::Ptr, size_t, floa
 
         // Evaluate a penalty function
         const float outlier_rate = 1.0f - float(inliers) / object->size();
-        //const float penaltyi = rmse;
-        const float penaltyi = outlier_rate;
 
-        // Update result
-        if(penaltyi < penalty) {
+        const float penaltyi = rmse;
+        //const float penaltyi = outlier_rate;
+
+
+        // Update result 50% outlier rate
+        if(penaltyi < penalty && outlier_rate <0.40f) {
             std::cout << "Got a new model with " << inliers << " inliers after " << i << " iterations!\n" << std::endl;
             penalty = penaltyi;
             pose = T;
@@ -1382,17 +1430,25 @@ void Plugin::localAlignment()
     local_object_align = object_aligned;
 
     //Set visualize to true to display pointclouds
-    bool visualize = false;
+    bool visualize = true;
 
     if (visualize) {
         visualizePointClouds(scene_filtered, object_aligned, "After local alignment");
     }
     std::cout << "Finished local alignment!" << std::endl;
     std::cout << "Local transform is:\n" << local_pose << std::endl;
+    std::cout << "Local Inliers" << local_inliers << std::endl;
     std::cout << "Rmse Local " << local_rmse << std::endl;
     std::string filename = "Local_RMSE.txt";
+
+    // write data to files
     std::ofstream ofs(filename, std::ios::app | std::ofstream::binary);
-    ofs << local_rmse;
+    ofs << local_rmse << std::endl;
+    std::ofstream file("Local_poses.txt", std::ios::app | std::ofstream::binary);
+      if (file.is_open())
+      {
+        file << "Here is the matrix Local Pose:\n" << local_pose << '\n';
+      }
 }
 
 std::tuple<Eigen::Matrix4f, pcl::PointCloud<pcl::PointNormal>::Ptr, size_t, float> Plugin::ICP(pcl::PointCloud<pcl::PointNormal>::Ptr & object, const size_t iter, const float threshsq)
@@ -1460,6 +1516,15 @@ void Plugin::cropScene(pcl::PCLPointCloud2::Ptr inputpcl, pcl::PCLPointCloud2::P
     cropFilter.filter(*outputpcl);
 }
 
+void Plugin::outlierRemoval(pcl::PointCloud<pcl::PointNormal>::Ptr inputpcl, pcl::PointCloud<pcl::PointNormal>::Ptr & outputpcl)
+{
+    pcl::StatisticalOutlierRemoval<pcl::PointNormal> sor;
+    sor.setInputCloud (inputpcl);
+    sor.setMeanK (50);
+    sor.setStddevMulThresh (1.0f);
+    sor.filter (*outputpcl);
+}
+
 void Plugin::voxelGrid(pcl::PCLPointCloud2::Ptr inputpcl, pcl::PointCloud<pcl::PointNormal>::Ptr & outputpcl, float leafSize){
     pcl::PCLPointCloud2::Ptr temp (new pcl::PCLPointCloud2 ());
 
@@ -1476,8 +1541,23 @@ void Plugin::computeSurfaceNormals(pcl::PointCloud<pcl::PointNormal>::Ptr & clou
     pcl::NormalEstimation<pcl::PointNormal,pcl::PointNormal> ne;
     ne.setKSearch(K);
     ne.setInputCloud(cloud);
-    ne.compute(*cloud);
+    ne.compute(*cloud);  
 }
+
+//void Plugin::Smoothing(pcl::PointCloud<pcl::PointNormal>::Ptr inputpcl, pcl::PointCloud<pcl::PointNormal>::Ptr & outputpcl)
+//{
+//    pcl::search::KdTree<pcl::PointXYZ>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZ>);
+
+
+//    pcl::MovingLeastSquares<pcl::PointXYZ,pcl::PointCloud<pcl::PointNormal>::Ptr> mls;
+//    mls.setInputCloud (*inputpcl);
+//    mls.setPolynomialOrder (2);
+//    mls.setSearchMethod (tree);
+//    mls.setSearchRadius (0.03);
+//    mls.process (*outputpcl);
+
+//}
+
 
 void Plugin::computeShapeFeatures(pcl::PointCloud<pcl::PointNormal>::Ptr & cloud, pcl::PointCloud<pcl::Histogram<153>>::Ptr features, float radius)
 {

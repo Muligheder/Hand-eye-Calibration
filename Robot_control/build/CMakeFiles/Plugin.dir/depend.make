@@ -324,6 +324,7 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/common/common.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/common/concatenate.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/common/copy_point.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/common/eigen.h
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/common/geometry.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/accumulators.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/centroid.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/common.hpp
@@ -358,8 +359,10 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/crop_b
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/filter.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/filter_indices.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/passthrough.hpp
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/statistical_outlier_removal.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/voxel_grid.hpp
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/filters/passthrough.h
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/filters/statistical_outlier_removal.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/filters/voxel_grid.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/for_each_type.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/geometry/planar_polygon.h
@@ -424,6 +427,12 @@ CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/search/octree.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/search/organized.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/search/pcl_search.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/search/search.h
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/surface/boost.h
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/surface/eigen.h
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/surface/impl/mls.hpp
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/surface/impl/processing.hpp
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/surface/mls.h
+CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/surface/processing.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/visualization/area_picking_event.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/visualization/boost.h
 CMakeFiles/Plugin.dir/Plugin.cpp.o: /usr/include/pcl-1.8/pcl/visualization/cloud_viewer.h
@@ -1584,6 +1593,7 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/common/concatenate.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/common/copy_point.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/common/eigen.h
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/common/geometry.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/accumulators.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/centroid.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/common/impl/common.hpp
@@ -1618,8 +1628,10 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/filter.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/filter_indices.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/passthrough.hpp
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/statistical_outlier_removal.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/filters/impl/voxel_grid.hpp
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/filters/passthrough.h
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/filters/statistical_outlier_removal.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/filters/voxel_grid.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/for_each_type.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/geometry/planar_polygon.h
@@ -1684,6 +1696,12 @@ CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/search/organized.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/search/pcl_search.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/search/search.h
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/surface/boost.h
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/surface/eigen.h
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/surface/impl/mls.hpp
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/surface/impl/processing.hpp
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/surface/mls.h
+CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/surface/processing.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/visualization/area_picking_event.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/visualization/boost.h
 CMakeFiles/Plugin.dir/Plugin_autogen/mocs_compilation.cpp.o: /usr/include/pcl-1.8/pcl/visualization/cloud_viewer.h

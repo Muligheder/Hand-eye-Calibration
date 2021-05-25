@@ -29,6 +29,8 @@ pcl/common/eigen.h
 /home/anders/Master/Hand-eye-Calibration/Test_program/src/pcl/common/eigen.h
 pcl/common/transforms.h
 /home/anders/Master/Hand-eye-Calibration/Test_program/src/pcl/common/transforms.h
+pcl/common/distances.h
+/home/anders/Master/Hand-eye-Calibration/Test_program/src/pcl/common/distances.h
 boost/date_time/posix_time/posix_time.hpp
 -
 boost/thread/thread.hpp
@@ -1262,12 +1264,24 @@ pcl/common/impl/centroid.hpp
 pcl/pcl_macros.h
 -
 
+/usr/include/pcl-1.8/pcl/common/common.h
+pcl/pcl_base.h
+-
+cfloat
+-
+pcl/common/impl/common.hpp
+-
+
 /usr/include/pcl-1.8/pcl/common/concatenate.h
 pcl/conversions.h
 -
 
 /usr/include/pcl-1.8/pcl/common/copy_point.h
 pcl/common/impl/copy_point.hpp
+-
+
+/usr/include/pcl-1.8/pcl/common/distances.h
+pcl/common/common.h
 -
 
 /usr/include/pcl-1.8/pcl/common/eigen.h
@@ -1314,6 +1328,12 @@ pcl/common/centroid.h
 pcl/conversions.h
 -
 boost/mpl/size.hpp
+-
+
+/usr/include/pcl-1.8/pcl/common/impl/common.hpp
+pcl/point_types.h
+-
+pcl/common/common.h
 -
 
 /usr/include/pcl-1.8/pcl/common/impl/copy_point.hpp

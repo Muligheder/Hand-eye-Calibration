@@ -55,29 +55,31 @@
 #undef foreach
 #include <pcl/point_types.h>
 #include <pcl/point_cloud.h>
+
 #include <pcl/filters/passthrough.h>
 #include <pcl/filters/crop_box.h>
 #include <pcl/filters/voxel_grid.h>
+#include <pcl/filters/statistical_outlier_removal.h>
+
 #include <pcl/io/pcd_io.h>
+
 #include <pcl/visualization/cloud_viewer.h>
 #include <pcl/visualization/pcl_visualizer.h>
+
 #include <pcl/kdtree/kdtree_flann.h>
+
 #include "pcl/common/eigen.h"
 #include "pcl/common/transforms.h"
 #include <pcl/common/random.h>
 #include <pcl/common/time.h>
+
 #include <pcl/features/normal_3d.h>
 #include <pcl/features/spin_image.h>
+
 #include <pcl/registration/correspondence_rejection_sample_consensus.h>
 #include <pcl/registration/transformation_estimation_svd.h>
 
-
-
-
-
-
-
-
+#include <pcl/surface/mls.h>
 
 // Real sense
 #include <librealsense2/rs.hpp>
@@ -161,7 +163,9 @@ private slots:
     // Assitive functions
     void cropScene(pcl::PCLPointCloud2::Ptr inputpcl, pcl::PCLPointCloud2::Ptr & outputpcl, Eigen::Vector4f minPoint, Eigen::Vector4f maxPoint);
     void voxelGrid(pcl::PCLPointCloud2::Ptr inputpcl, pcl::PointCloud<pcl::PointNormal>::Ptr & outputpcl, float leafSize=0.005);
-    void computeSurfaceNormals(pcl::PointCloud<pcl::PointNormal>::Ptr & cloud, int K=10);
+    void outlierRemoval(pcl::PointCloud<pcl::PointNormal>::Ptr inputpcl, pcl::PointCloud<pcl::PointNormal>::Ptr & outputpcl);
+    //void Smoothing(pcl::PointCloud<pcl::PointNormal>::Ptr inputpcl, pcl::PointCloud<pcl::PointNormal>::Ptr & outputpcl);
+    void computeSurfaceNormals(pcl::PointCloud<pcl::PointNormal>::Ptr & cloud, int K=15);
     void computeShapeFeatures(pcl::PointCloud<pcl::PointNormal>::Ptr & cloud, pcl::PointCloud<pcl::Histogram<153>>::Ptr features, float radius=0.05);
     std::tuple<Eigen::Matrix4f, pcl::PointCloud<pcl::PointNormal>::Ptr, size_t, float> RANSAC(pcl::PointCloud<pcl::PointNormal>::Ptr & object, pcl::Correspondences corr, const size_t iter, const float threshsq);
     std::tuple<Eigen::Matrix4f, pcl::PointCloud<pcl::PointNormal>::Ptr, size_t, float> ICP(pcl::PointCloud<pcl::PointNormal>::Ptr & object, const size_t iter, const float threshsq);
@@ -199,7 +203,7 @@ private:
     rw::kinematics::Frame::Ptr rws_table;
 
     // UR interface
-    std::string ur_robot_ip = "192.168.1.210";
+    std::string ur_robot_ip = "192.168.0.101";
     ur_rtde::RTDEControlInterface   *ur_robot;
     ur_rtde::RTDEIOInterface        *ur_robot_io;
     ur_rtde::RTDEReceiveInterface   *ur_robot_receive;

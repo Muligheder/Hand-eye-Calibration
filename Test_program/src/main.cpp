@@ -55,8 +55,19 @@
 #include "opencv2/highgui.hpp"
 #include <opencv2/aruco/charuco.hpp>
 #include <opencv2/highgui.hpp>
+
+
 #include <iostream>
+#include <sstream>
 #include <string>
+#include <algorithm>
+#include <iterator>
+#include <vector>
+#include <fstream>
+#include <ctime>
+#include <cstdio>
+
+
 namespace {
 const char* about = "A tutorial code on charuco board creation and detection of charuco board with and without camera caliberation";
 const char* keys = "{c        |       | Put value of c=1 to create charuco board;\nc=2 to detect charuco board without camera calibration;\nc=3 to detect charuco board with camera calibration and Pose Estimation}";
@@ -204,28 +215,69 @@ void detectCharucoBoardWithoutCalibration()
 }}
 int main(int argc, char* argv[])
 {
-    cv::CommandLineParser parser(argc, argv, keys);
-    parser.about(about);
-    if (argc < 2) {
-        parser.printMessage();
-        return 0;
+//    cv::CommandLineParser parser(argc, argv, keys);
+//    parser.about(about);
+//    if (argc < 2) {
+//        parser.printMessage();
+//        return 0;
+//    }
+//    int choose = parser.get<int>("c");
+//    switch (choose) {
+//    case 1:
+//        createBoard();
+//        std::cout << "An image named BoardImg.jpg is generated in folder containing this file" << std::endl;
+//        break;
+//    case 2:
+//        detectCharucoBoardWithoutCalibration();
+//        break;
+//    case 3:
+//        detectCharucoBoardWithCalibrationPose();
+//        break;
+//    default:
+//        break;
+//    }
+//    return 0;
+
+    // { 0.617054, -0.0902524, 0.142154, -2.84451, -1.23569, -0.0885921 } first position
+    // { 0.383671, -0.0848814, 0.139784, -2.84177, -1.23832, -0.0894176 } secound position
+    std::ofstream myfile("error_test_robot.txt", std::ios::app | std::ofstream::binary);
+
+    std::vector<std::vector<double>> v;
+
+    std::ifstream in( "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Robot_poses.txt" );
+    std::string record;
+
+    while ( std::getline( in, record ) )
+    {
+        std::istringstream is( record );
+        std::vector<double> row( ( std::istream_iterator<double>( is ) ),
+                                 std::istream_iterator<double>() );
+        v.push_back( row );
+
     }
-    int choose = parser.get<int>("c");
-    switch (choose) {
-    case 1:
-        createBoard();
-        std::cout << "An image named BoardImg.jpg is generated in folder containing this file" << std::endl;
-        break;
-    case 2:
-        detectCharucoBoardWithoutCalibration();
-        break;
-    case 3:
-        detectCharucoBoardWithCalibrationPose();
-        break;
-    default:
-        break;
-    }
-    return 0;
+
+
+         double paper_size = 0.23;
+        cv::Vec3d a{v[0][0], v[0][1], v[0][2]};
+        cv::Vec3d b{v[1][0], v[1][1], v[1][2]};
+
+        std::cout << "The distance between point a and b: " << cv::norm(a,b,cv::NORM_L2) << std::endl;
+
+        double c=abs(/*paper_size-*/cv::norm(a,b,cv::NORM_L2));
+        std::cout << "The error is: " << c << std::endl;
+
+        myfile << c << std::endl;
+    std::ofstream myfile1;
+    myfile1.open("/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Robot_poses.txt", std::ofstream::out | std::ofstream::trunc);
+
+
+
+
+
+
+
+
+
 }
 
 /*

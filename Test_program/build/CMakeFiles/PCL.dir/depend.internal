@@ -232,11 +232,14 @@ CMakeFiles/PCL.dir/src/pcl_test.cpp.o
  /usr/include/pcl-1.8/pcl/cloud_iterator.h
  /usr/include/pcl-1.8/pcl/common/centroid.h
  /usr/include/pcl-1.8/pcl/common/colors.h
+ /usr/include/pcl-1.8/pcl/common/common.h
  /usr/include/pcl-1.8/pcl/common/concatenate.h
  /usr/include/pcl-1.8/pcl/common/copy_point.h
+ /usr/include/pcl-1.8/pcl/common/distances.h
  /usr/include/pcl-1.8/pcl/common/eigen.h
  /usr/include/pcl-1.8/pcl/common/impl/accumulators.hpp
  /usr/include/pcl-1.8/pcl/common/impl/centroid.hpp
+ /usr/include/pcl-1.8/pcl/common/impl/common.hpp
  /usr/include/pcl-1.8/pcl/common/impl/copy_point.hpp
  /usr/include/pcl-1.8/pcl/common/impl/eigen.hpp
  /usr/include/pcl-1.8/pcl/common/impl/io.hpp

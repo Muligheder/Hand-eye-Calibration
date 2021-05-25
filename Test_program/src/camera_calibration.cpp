@@ -7,7 +7,7 @@
 #include <string>
 
 // Defining the dimensions of checkerboard
-int CHECKERBOARD[2]{6,9};
+int CHECKERBOARD[2]{8,5};
 
 int main()
 {
@@ -31,7 +31,7 @@ int main()
   // Extracting path of individual image stored in a given directory
   std::vector<cv::String> images;
   // Path of the folder containing checkerboard images
-  std::string path = "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/*.jpg";
+  std::string path = "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images/*.bmp";
 
   cv::glob(path, images);
 
@@ -56,6 +56,7 @@ int main()
      * them on the images of checker board
     */
     std::cout << "Calibrating..." << std::endl;
+
     if(success)
     {
       cv::TermCriteria criteria(cv::TermCriteria::EPS | cv::TermCriteria::COUNT, 30, 0.001);
@@ -71,6 +72,7 @@ int main()
     }
 
     cv::imshow("Image",frame);
+    cv::imwrite("Corner.bmp",frame);
     cv::waitKey(0);
   }
 

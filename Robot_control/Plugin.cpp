@@ -64,6 +64,10 @@ Plugin::Plugin():
     pLayout->addWidget(_btn9, row++, 0);
     connect(_btn9, SIGNAL(clicked()), this, SLOT(clickEvent()));
 
+    _btnAuto = new QPushButton("Auto Collect");
+    pLayout->addWidget(_btnAuto, row++, 0);
+    connect(_btnAuto, SIGNAL(clicked()), this, SLOT(clickEvent()));
+
     _btn10 = new QPushButton("Extrating Camera T-Matrix");
     pLayout->addWidget(_btn10, row++, 0);
     connect(_btn10, SIGNAL(clicked()), this, SLOT(clickEvent()));
@@ -167,6 +171,8 @@ void Plugin::clickEvent()
         MoveInToolSpace();
     else if(obj == _btn9)
         Take_picture();
+    else if(obj == _btnAuto)
+        Auto_data_collector();
     else if(obj == _btn10)
         Analyze_images();
     else if(obj == _btn11)
@@ -272,6 +278,7 @@ void Plugin::RunRobotControl()
         return;
     }
 
+    // import 3D point, can be scaled to contain more points
 
     std::vector<double> point;
     import3DPoint(point);
@@ -280,37 +287,37 @@ void Plugin::RunRobotControl()
     // { 0.62584, -0.0954425, 0.143734, -2.84471, -1.23559, -0.088553 } first position
     // { 0.392544, -0.0894295, 0.137264, -2.84178, -1.23825, -0.0893458 } secound position
 
+    // beaware of the notation, here it is reversed to follow the notation of the figure in openCV
 
-
-    // Camera to target
-    std::vector<double> cTt = {point[0], point[1], point[2], 0, 0, 0};
-
-    //std::vector<double> cTt = {-0.0854658, 0.0158527, 0.50825, 0, 0, 0};
     // target to camera
+    //std::vector<double> cTt = {point[0], point[1], point[2], 0, 0, 0};
+
+    std::vector<double> cTt = {0.0560,   -0.0511,    0.5950,   -0.1217,    0.5569,   -1.9377};
+    // camera to target
     std::vector<double> tTc  = Pose_inv(cTt);
 
     // Camera to Gripper from visp
     //std::vector<double> gTc = {-0.008496624885,  0.01004966999,  0.1188209676,  -0.026702465,  -0.03330274707,  -2.335288144};
-    // Camera to Gripper from openCV
+    // Camera to Gripper from openCV //
     std::vector<double> gTc = {-0.007333253944998697,  0.00941774561076744,  0.1150842076108506,  -0.0114279, -0.0131705, -2.33678};
 
     // Gripper to Camera
     std::vector<double> cTg = Pose_inv(gTc);
 
-    // base to gripper getActualTCPPose()
+    // gripper to base getActualTCPPose()
     //std::vector<double> bTg = {0.50643, -0.136141, 0.643752, -2.84425, -1.22914, -0.0897504};
     std::vector<double> bTg = ur_robot_receive->getActualTCPPose();
 
-    // gripper to base
+    // base to gripper
     std::vector<double> gTb = Pose_inv(bTg);
 
-    // base to camera bTt=bTg*cTg⁻1*cTt
+    // camera to base bTt=bTg*cTg⁻1*cTt
     std::vector<double> bTc = ur_robot->poseTrans(bTg,gTc);
 
-    // base to target
+    // target to base
     std::vector<double> bTt = ur_robot->poseTrans(bTc,cTt);
 
-    // Offset
+    // Offset of end effector
     std::vector<double> bTt_offset = ur_robot->poseTrans(bTt,cTg);
 
     // RRT Between points
@@ -329,7 +336,7 @@ void Plugin::RunRobotControl()
     ur_robot->moveJ(path);
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
-
+        
      std::vector<double> PrintTCP=ur_robot_receive->getActualTCPPose();
     write_vector_to_file(PrintTCP,"Robot_poses.txt");
 
@@ -644,6 +651,8 @@ double Plugin::getConfDistance(std::vector<double> a, std::vector<double> b)
     return sum;
 }
 
+// capture an image, if the chessboard pattern is seen by the camera
+// this function stores the image and the pose vector of the robot.
 void Plugin::Take_picture()
 {
 
@@ -675,7 +684,7 @@ void Plugin::Take_picture()
 
     cv::Size patternsize(5, 8); //number of centers
     std::vector<cv::Point2f> centers; //this will be filled by the detected centers
-    double cell_size = 28.6666666666;
+    double cell_size = 28.6666666666; // size of each square
     std::vector<cv::Point3f> obj_points;
     for (int i = 0; i < patternsize.height; ++i)
         for (int j = 0; j < patternsize.width; ++j)
@@ -752,6 +761,147 @@ void Plugin::Take_picture()
 
 
 }
+
+
+void Plugin::Auto_data_collector()
+{
+    if(!ur_robot_exists)
+    {
+        std::cout << "Robot not connected..." << std::endl;
+        return;
+    }
+
+    if(ur_robot_teach_mode)
+    {
+        std::cout << "Teach mode enabled..." << std::endl;
+        return;
+
+    }
+
+
+    char key;
+    char filename[100]; // For filename
+    int  c = 1; // For filename
+    //rs2_pose pose;
+    std::cout << "starting pipe.." << std::endl;
+    // Declare RealSense pipeline, encapsulating the actual device and sensors
+    rs2::pipeline pipe;
+    // Create a configuration for configuring the pipeline with a non default profile
+    rs2::config cfg;
+    // Add pose stream
+    cfg.enable_stream(RS2_STREAM_COLOR, 1920, 1080, RS2_FORMAT_BGR8, 30);
+
+    // Start pipeline with chosen configuration
+    pipe.start(cfg);
+    std::cout << "capture frame..." << std::endl;
+
+    rs2::frameset frames;
+    //    for(int i = 0; i < 30; i++)
+    //    {
+    //        //Wait for all configured streams to produce a frame
+    //        frames = pipe.wait_for_frames();
+    //    }
+
+
+    cv::Size patternsize(5, 8); //number of centers
+    std::vector<cv::Point2f> centers; //this will be filled by the detected centers
+    double cell_size = 28.6666666666; // size of each square
+    std::vector<cv::Point3f> obj_points;
+    for (int i = 0; i < patternsize.height; ++i)
+        for (int j = 0; j < patternsize.width; ++j)
+            obj_points.push_back(cv::Point3f(double(j*cell_size),
+                                             double(i*cell_size), 0.f));
+
+    std::vector<std::vector<double>> v;
+
+    std::ifstream in( "test.txt" );
+    std::string record;
+
+    while ( std::getline( in, record ) )
+    {
+        std::istringstream is( record );
+        std::vector<double> row( ( std::istream_iterator<double>( is ) ),
+                                 std::istream_iterator<double>() );
+        v.push_back( row );
+
+    }
+    for(int i = 0; i < v.size(); i++)
+    {
+        std::cout << "Moving to location" << std::endl;
+        ur_robot->moveJ_IK(v[i]);
+        std::this_thread::sleep_for(std::chrono::milliseconds(200)); // 0.2 secounds
+
+        //usleep(5000); 5 secounds
+
+        frames = pipe.wait_for_frames();
+
+        rs2::frame color_frame = frames.get_color_frame();
+
+        // Creating OpenCV Matrix from a color image
+        cv::Mat color(cv::Size(1920, 1080), CV_8UC3, (void*)color_frame.get_data(), cv::Mat::AUTO_STEP);
+
+        // save Image
+        if(color.empty())
+        {
+            std::cerr << "Something is wrong with the camera, could not get frame." << std::endl;
+            break;
+        }
+        usleep(5);
+        cv::namedWindow("L515", cv::WINDOW_NORMAL);
+        cv::resizeWindow("L515", cv::Size(960,540));
+        cv::imshow("L515", color);
+
+        key =  cvWaitKey(25);
+
+              //CAPTURING IMAGE FROM CAM
+        //            rs2::frameset frames;
+//                for(int i = 0; i < 30; i++)
+//                {
+//                    //Wait for all configured streams to produce a frame
+//                    frames = pipe.wait_for_frames();
+//                }
+
+            bool patternfound = cv::findChessboardCorners(color, patternsize, centers);
+            if (patternfound)
+            {
+                sprintf(filename, "/home/anders/Master/Hand-eye-Calibration/Robot_control/workcell/Images_test/%02d.bmp", c);
+                cv::imwrite(filename, color);
+                cv::drawChessboardCorners(color, patternsize, cv::Mat(centers), patternfound);
+
+                cv::namedWindow("CAMERA 1", cv::WINDOW_NORMAL);
+                cv::resizeWindow("CAMERA 1", cv::Size(960, 540));
+                cv::imshow("CAMERA 1", color);
+                std::cout << "Cam 1 image captured   = " << c << std::endl;
+                std::vector<double> fromQ = ur_robot_receive->getActualTCPPose();
+                printArray(fromQ);
+
+                write_vector_to_file(fromQ,"test_new.txt");
+
+
+                c++;
+            }
+            std::cout << patternfound << std::endl;
+
+            if(key == 27)
+            {
+                std::cout << "Escape Pressed\n";
+                std::cerr << "destroy windows and ends video stream..." << std::endl;
+                cv::destroyAllWindows();
+                break;
+
+
+        }
+
+
+
+
+
+
+
+    }
+}
+
+// Outputs the transformation of the current robot pose.
 void Plugin::TransformationRobot()
 {
     std::vector<cv::Mat> R_gripper2base;
@@ -792,7 +942,7 @@ void Plugin::TransformationRobot()
 }
 
 
-
+// This function anlyse all the images taken by the camera, and extract their individual poses i.e (cTt)
 void Plugin::Analyze_images()
 {
     // Camera calibration information
@@ -1093,6 +1243,8 @@ ptr_cloud Plugin::points_to_pcl(const rs2::points& points, const rs2::video_fram
    return cloud;
 }
 
+// this function makes it possible to extract information of a particular point in the viewer
+// It stores the point in a file, which is used later
 void pp_callback(const pcl::visualization::PointPickingEvent& event, void *viewer_void)
 {
    std::ofstream myfile;
@@ -1116,6 +1268,7 @@ void pp_callback(const pcl::visualization::PointPickingEvent& event, void *viewe
    }
 }
 
+// A function to see the current point cloud, when closed, captures the current cloud as input to pose estimation.
 void Plugin::PCL()
 {
 
@@ -1220,7 +1373,7 @@ void Plugin::PCL()
 //    visualizer.initCameraParameters();
 //    visualizer.spin();
 }
-
+// performs global alignmemt
 void Plugin::globalAlignment()
 {
     std::cout << "Doing global alignment" << std::endl;
@@ -1383,14 +1536,14 @@ std::tuple<Eigen::Matrix4f, pcl::PointCloud<pcl::PointNormal>::Ptr, size_t, floa
             }
         rmse = sqrtf(rmse / inliers);
 
-        // Evaluate a penalty function
+        // Evaluate a penalty function either based on RMSE or outlier rate
         const float outlier_rate = 1.0f - float(inliers) / object->size();
 
         const float penaltyi = rmse;
         //const float penaltyi = outlier_rate;
 
 
-        // Update result 50% outlier rate
+        // Update result 60% outlier rate
         if(penaltyi < penalty && outlier_rate <0.40f) {
             std::cout << "Got a new model with " << inliers << " inliers after " << i << " iterations!\n" << std::endl;
             penalty = penaltyi;
@@ -1417,7 +1570,7 @@ std::tuple<Eigen::Matrix4f, pcl::PointCloud<pcl::PointNormal>::Ptr, size_t, floa
     std::cout << "Rmse RANSAC " << rmse << std::endl;
     return {pose, object_aligned, inliers, rmse};
 }
-
+// performan local alignment
 void Plugin::localAlignment()
 {
     // ICP (Iterative Closest Point) parameters

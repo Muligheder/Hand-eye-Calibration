@@ -157,6 +157,7 @@ private slots:
     void Take_picture();
     void Analyze_images();
     void PCL();
+    void Auto_data_collector();
 
     void globalAlignment();
     void localAlignment();
@@ -190,7 +191,7 @@ private slots:
 
 private:
     // Qt buttons
-    QPushButton *_btn0,*_btn1,*_btn2,*_btn3,*_btn4, *_btn5, *_btn6, *_btn7, *_btn8, *_btn9, *_btn10, *_btn11, *_btn_stop_sync, *_btn_glob_align, *_btn_local_align, *_btn_global_test;
+    QPushButton *_btn0,*_btn1,*_btn2,*_btn3,*_btn4, *_btn5, *_btn6, *_btn7, *_btn8, *_btn9, *_btn10, *_btn11, *_btnAuto, *_btn_stop_sync, *_btn_glob_align, *_btn_local_align, *_btn_global_test;
     //Base Shift
     double theta = 22.5 * (M_PI / 180);
 
@@ -203,7 +204,7 @@ private:
     rw::kinematics::Frame::Ptr rws_table;
 
     // UR interface
-    std::string ur_robot_ip = "192.168.0.101";
+    std::string ur_robot_ip = "192.168.0.120";
     ur_rtde::RTDEControlInterface   *ur_robot;
     ur_rtde::RTDEIOInterface        *ur_robot_io;
     ur_rtde::RTDEReceiveInterface   *ur_robot_receive;

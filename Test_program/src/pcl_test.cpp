@@ -404,9 +404,9 @@ catch (const std::exception & e)
 //  align.setTargetFeatures (scene_features);
 //  align.setMaximumIterations (50000); // Number of RANSAC iterations
 //  align.setNumberOfSamples (3); // Number of points to sample for generating/prerejecting a pose
-//  align.setCorrespondenceRandomness (5); // Number of nearest features to use
-//  align.setSimilarityThreshold (0.5f); // Polygonal edge length similarity threshold
-//  align.setMaxCorrespondenceDistance (2.5f * leaf); // Inlier threshold
+//  align.setCorrespondenceRandomness (2); // Number of nearest features to use
+//  align.setSimilarityThreshold (0.6f); // Polygonal edge length similarity threshold
+//  align.setMaxCorrespondenceDistance (0.01f * leaf); // Inlier threshold
 //  align.setInlierFraction (0.25f); // Required inlier fraction for accepting a pose hypothesis
 //  {
 //    pcl::ScopeTime t("Alignment");

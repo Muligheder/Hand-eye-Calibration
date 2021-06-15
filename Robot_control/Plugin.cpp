@@ -242,6 +242,7 @@ std::vector<double> Plugin::addMove(std::vector<double> position, double acceler
     return position_and_move;
 }
 
+// Import the 3D point from user-defined inupt
 void Plugin::import3DPoint(std::vector<double> &point)
 {
 
@@ -290,15 +291,15 @@ void Plugin::RunRobotControl()
     // beaware of the notation, here it is reversed to follow the notation of the figure in openCV
 
     // target to camera
-    //std::vector<double> cTt = {point[0], point[1], point[2], 0, 0, 0};
+    std::vector<double> cTt = {point[0], point[1], point[2], 0, 0, 0};
 
-    std::vector<double> cTt = {0.0560,   -0.0511,    0.5950,   -0.1217,    0.5569,   -1.9377};
+    //std::vector<double> cTt = {0.0560,   -0.0511,    0.5950,   -0.1217,    0.5569,   -1.9377};
     // camera to target
     std::vector<double> tTc  = Pose_inv(cTt);
 
     // Camera to Gripper from visp
     //std::vector<double> gTc = {-0.008496624885,  0.01004966999,  0.1188209676,  -0.026702465,  -0.03330274707,  -2.335288144};
-    // Camera to Gripper from openCV //
+    // Camera to Gripper from openCV // The function is from "hand_eye_calibration.cpp"
     std::vector<double> gTc = {-0.007333253944998697,  0.00941774561076744,  0.1150842076108506,  -0.0114279, -0.0131705, -2.33678};
 
     // Gripper to Camera
@@ -317,7 +318,7 @@ void Plugin::RunRobotControl()
     // target to base
     std::vector<double> bTt = ur_robot->poseTrans(bTc,cTt);
 
-    // Offset of end effector
+    // Offset of end effector (should be the TCP of the welding tool)
     std::vector<double> bTt_offset = ur_robot->poseTrans(bTt,cTg);
 
     // RRT Between points
@@ -354,6 +355,7 @@ void Plugin::RunRobotControl()
 //    std::cout << "Location reached.." << std::endl;
 }
 
+// toggles teach mode
 void Plugin::teachModeToggle()
 {
     if(ur_robot_exists)
@@ -378,6 +380,7 @@ void Plugin::teachModeToggle()
         std::cout << "Robot not connected..." << std::endl;
 }
 
+// Mimics the behaviour of the robot in the workcell
 void Plugin::RunRobotMimic()
 {
     if(!ur_robot_exists)
@@ -432,6 +435,7 @@ void Plugin::stopSync()
     rws_robot_synced = false;
 }
 
+//Currently not used
 void Plugin::RunHomeRobot()
 {
     std::vector<std::vector<double>> route;
@@ -494,6 +498,7 @@ void Plugin::moveToJ(std::vector<double> goal, double acceleration, double veloc
     ur_robot->moveJ(goal, acceleration, velocity);
 }
 
+// Moves robot to a chosen initialitation position
 void Plugin::MoveInToolSpace()
 {
 
@@ -511,7 +516,7 @@ void Plugin::MoveInToolSpace()
 
     std::vector<double> bTg = {0.567417, -0.114328, 0.715459, -2.76394, 1.31289, 0.0947902};
     std::cout << "Moving to location" << std::endl;
-    ur_robot->moveJ_IK(bTg);
+    ur_robot->moveJ_IK(bTg); // this could also have been used instead of RRT
     std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
 }
@@ -651,8 +656,9 @@ double Plugin::getConfDistance(std::vector<double> a, std::vector<double> b)
     return sum;
 }
 
-// capture an image, if the chessboard pattern is seen by the camera
-// this function stores the image and the pose vector of the robot.
+// capture an image, if the chessboard pattern is seen by the camera.
+// This function stores the image and the pose vector of the robot.
+// This is done before the calibration procedures.
 void Plugin::Take_picture()
 {
 
@@ -762,7 +768,7 @@ void Plugin::Take_picture()
 
 }
 
-
+// Moves robot to all collected positions.
 void Plugin::Auto_data_collector()
 {
     if(!ur_robot_exists)
@@ -888,15 +894,7 @@ void Plugin::Auto_data_collector()
                 std::cerr << "destroy windows and ends video stream..." << std::endl;
                 cv::destroyAllWindows();
                 break;
-
-
         }
-
-
-
-
-
-
 
     }
 }
@@ -941,7 +939,7 @@ void Plugin::TransformationRobot()
     std::cout << "t_gripper2base = " << std::endl << " " << t_gripper2base[0] << std::endl << std::endl;
 }
 
-
+// NOT USED //
 // This function anlyse all the images taken by the camera, and extract their individual poses i.e (cTt)
 void Plugin::Analyze_images()
 {
@@ -1244,7 +1242,7 @@ ptr_cloud Plugin::points_to_pcl(const rs2::points& points, const rs2::video_fram
 }
 
 // this function makes it possible to extract information of a particular point in the viewer
-// It stores the point in a file, which is used later
+// It stores the point in a file, which is used later as cTt
 void pp_callback(const pcl::visualization::PointPickingEvent& event, void *viewer_void)
 {
    std::ofstream myfile;
@@ -1269,6 +1267,8 @@ void pp_callback(const pcl::visualization::PointPickingEvent& event, void *viewe
 }
 
 // A function to see the current point cloud, when closed, captures the current cloud as input to pose estimation.
+// Currently only working as input to pose estimation, out comment the last part, and the point clicking event can
+// be initialised.
 void Plugin::PCL()
 {
 
@@ -1349,7 +1349,7 @@ void Plugin::PCL()
 
     // Save current point cloud
     pcl::PointCloud<pcl::PointXYZRGB>::Ptr cloud_filtered (new pcl::PointCloud<pcl::PointXYZRGB>);
-    //std::cout <<"I did it" <<std::endl;
+
     ptr_cloud cloud = points_to_pcl(points, color1);
 
     // filter everthing out with a distance further than 1m.
